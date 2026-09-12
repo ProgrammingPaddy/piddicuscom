@@ -1,0 +1,118 @@
+/* ==========================================================================
+   Animations: keyframes, scroll reveal, ambient motion, reduced motion
+   ========================================================================== */
+
+@keyframes fade-up {
+    from {
+        opacity: 0;
+        transform: translateY(18px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes drift {
+    0%,
+    100% {
+        transform: translate(0, 0) scale(1);
+    }
+
+    50% {
+        transform: translate(4vw, -3vh) scale(1.08);
+    }
+}
+
+@keyframes drift-reverse {
+    0%,
+    100% {
+        transform: translate(0, 0) scale(1);
+    }
+
+    50% {
+        transform: translate(-3vw, 4vh) scale(1.05);
+    }
+}
+
+/* Scroll reveal ---------------------------------------------------------- */
+
+.reveal {
+    opacity: 0;
+    transform: translateY(18px);
+    transition:
+        opacity var(--duration-slow) var(--ease-out),
+        transform var(--duration-slow) var(--ease-out);
+    transition-delay: var(--reveal-delay, 0ms);
+}
+
+.reveal.is-visible {
+    opacity: 1;
+    transform: none;
+}
+
+/* Hero entrance, staggered by document order ----------------------------- */
+
+.hero .reveal:nth-child(1) {
+    --reveal-delay: 0ms;
+}
+
+.hero .reveal:nth-child(2) {
+    --reveal-delay: 90ms;
+}
+
+.hero .reveal:nth-child(3) {
+    --reveal-delay: 180ms;
+}
+
+.hero .reveal:nth-child(4) {
+    --reveal-delay: 270ms;
+}
+
+/* Card entrance, staggered by index set in JS ---------------------------- */
+
+.card {
+    opacity: 0;
+    animation: fade-up var(--duration-slow) var(--ease-out) forwards;
+    animation-delay: calc(var(--card-index, 0) * 60ms);
+}
+
+/* Ambient backdrop ------------------------------------------------------- */
+
+.backdrop__orb--one {
+    animation: drift 22s var(--ease-in-out) infinite;
+}
+
+.backdrop__orb--two {
+    animation: drift-reverse 28s var(--ease-in-out) infinite;
+}
+
+/* Reduced motion --------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    .reveal {
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
+
+    .card {
+        opacity: 1;
+        animation: none;
+    }
+
+    .backdrop__orb--one,
+    .backdrop__orb--two {
+        animation: none;
+    }
+
+    .button:hover,
+    .card__link:hover {
+        transform: none;
+    }
+}

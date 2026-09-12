@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Piddicus — a home for small web projects and experiments.">
+    <title>Piddicus</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/animations.css">
+</head>
+<body>
+    <div class="backdrop" aria-hidden="true">
+        <div class="backdrop__orb backdrop__orb--one"></div>
+        <div class="backdrop__orb backdrop__orb--two"></div>
+        <div class="backdrop__grid"></div>
+    </div>
+
+    <header class="site-header">
+        <a class="site-header__brand" href="./">
+            <span class="site-header__mark" aria-hidden="true">P</span>
+            <span class="site-header__name">Piddicus</span>
+        </a>
+        <nav class="site-header__nav" aria-label="Primary">
+            <a href="#projects">Projects</a>
+            <a href="#about">About</a>
+            <a href="https://github.com/ProgrammingPaddy" target="_blank" rel="noopener">GitHub</a>
+        </nav>
+    </header>
+
+    <main class="page">
+        <section class="hero">
+            <p class="hero__eyebrow reveal">Personal site &amp; project shelf</p>
+            <h1 class="hero__title reveal">
+                <span class="hero__line">Small things,</span>
+                <span class="hero__line">built for the browser.</span>
+            </h1>
+            <p class="hero__lead reveal">
+                Pick something from the menu below. Every entry is a standalone
+                HTML project that lives in its own repository and is mounted here.
+            </p>
+            <div class="hero__actions reveal">
+                <a class="button button--primary" href="#projects">Browse the menu</a>
+                <a class="button button--ghost" href="#about">How it works</a>
+            </div>
+        </section>
+
+        <section id="projects" class="section">
+            <div class="section__heading reveal">
+                <h2 class="section__title">Menu</h2>
+                <p class="section__count" id="project-count" aria-live="polite"></p>
+            </div>
+
+            <div class="filter reveal" id="filter" role="group" aria-label="Filter projects by tag"></div>
+
+            <ul class="card-grid" id="project-grid" aria-busy="true"></ul>
+
+            <p class="empty-state" id="empty-state" hidden>
+                Nothing on the shelf yet. Add a project with
+                <code>scripts/add-project.ps1</code>.
+            </p>
+        </section>
+
+        <section id="about" class="section section--narrow">
+            <div class="section__heading reveal">
+                <h2 class="section__title">How this works</h2>
+            </div>
+            <div class="prose reveal">
+                <p>
+                    Each project on this site is its own git repository. They are
+                    pulled in as submodules under <code>projects/</code>, and a
+                    small manifest tells the homepage what to show on each card.
+                </p>
+                <p>
+                    Updating a project means pulling its latest commit and
+                    re-publishing this site. No build step, no framework, just
+                    files served as they are.
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <p>&copy; <span id="year"></span> Piddicus</p>
+        <p><a href="https://github.com/ProgrammingPaddy/piddicuscom" target="_blank" rel="noopener">Source</a></p>
+    </footer>
+
+    <template id="card-template">
+        <li class="card">
+            <a class="card__link" href="#">
+                <div class="card__top">
+                    <span class="card__icon" aria-hidden="true"></span>
+                    <span class="card__arrow" aria-hidden="true">&rarr;</span>
+                </div>
+                <h3 class="card__title"></h3>
+                <p class="card__description"></p>
+                <ul class="card__tags"></ul>
+            </a>
+        </li>
+    </template>
+
+    <script src="js/main.js" defer></script>
+</body>
+</html>
