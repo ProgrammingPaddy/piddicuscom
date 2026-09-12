@@ -1,21 +1,31 @@
 <#
 .SYNOPSIS
-    Mount an external git repository as a project on the site.
+    Add a project to the site.
 
 .DESCRIPTION
-    Adds the repository as a git submodule under projects/<slug> and appends
-    an entry to projects/projects.json so it shows up on the homepage menu.
+    Creates public/projects/<slug> and appends an entry to
+    public/projects/projects.json so the project shows up on the homepage.
+
+    Where the files come from depends on which parameter you pass:
+
+      -Url   Copy the files from a git repository (pinned to its latest commit;
+             refresh later with update-projects.ps1).
+      -Path  Copy the files from a local folder.
+      none   Create an empty project with a starter index.html.
 
     Nothing is committed. Review the staged changes and commit them yourself.
-
-.PARAMETER Url
-    Clone URL of the project repository.
 
 .PARAMETER Title
     Display name shown on the card.
 
+.PARAMETER Url
+    Clone URL of the project's repository.
+
+.PARAMETER Path
+    Local folder containing the project's files.
+
 .PARAMETER Slug
-    Folder name under projects/. Defaults to a slugified Title.
+    Folder name under public/projects. Defaults to a slugified Title.
 
 .PARAMETER Description
     One or two sentences shown on the card.
@@ -27,23 +37,30 @@
     Tags used for the homepage filter chips.
 
 .PARAMETER Entry
-    Path to the project's entry page, relative to its repo root.
+    The project's entry page, relative to its folder.
 
 .PARAMETER Branch
-    Branch to track when running update-projects.ps1. Defaults to the
-    repository's default branch.
+    Branch to copy from and track when using -Url. Defaults to the repo's
+    default branch.
 
 .EXAMPLE
-    .\scripts\add-project.ps1 -Url https://github.com/you/snake.git -Title "Snake" -Description "Classic snake in canvas." -Icon "🐍" -Tags game,canvas
+    .\scripts\add-project.ps1 -Title "Snake" -Url https://github.com/you/snake.git -Icon "🐍" -Tags game
+
+.EXAMPLE
+    .\scripts\add-project.ps1 -Title "Colour Mixer" -Path ..\colour-mixer -Tags tool
+
+.EXAMPLE
+    .\scripts\add-project.ps1 -Title "Scratch Pad"
 #>
 
 [CmdletBinding()]
 param (
     [Parameter(Mandatory)]
+    [string] $Title,
+
     [string] $Url,
 
-    [Parameter(Mandatory)]
-    [string] $Title,
+    [string] $Path,
 
     [string] $Slug,
 
@@ -61,6 +78,10 @@ param (
 $ErrorActionPreference = "Stop"
 Import-Module (Join-Path $PSScriptRoot "Manifest.psm1") -Force
 
+if ($Url -and $Path) {
+    throw "Pass either -Url or -Path, not both."
+}
+
 if (-not $Slug) {
     $Slug = ConvertTo-Slug $Title
 }
@@ -75,30 +96,63 @@ if ($manifest.projects | Where-Object { $_.slug -eq $Slug }) {
     throw "A project with slug '$Slug' is already in the manifest."
 }
 
-$relativePath = "projects/$Slug"
+$relativePath = Get-ProjectRelativePath $Slug
 $absolutePath = Join-Path (Get-ProjectsDir) $Slug
 
 if (Test-Path $absolutePath) {
     throw "Folder '$relativePath' already exists."
 }
 
+$repo = $null
+$trackedBranch = $null
+$commit = $null
+$tempClone = $null
+
 Push-Location (Get-RepoRoot)
 try {
-    $submoduleArgs = @("submodule", "add")
-    if ($Branch) {
-        $submoduleArgs += @("-b", $Branch)
-    }
-    $submoduleArgs += @("--", $Url, $relativePath)
+    if ($Url) {
+        Write-Host "Fetching $Url ..." -ForegroundColor Cyan
+        $remote = Get-RemoteProject -Url $Url -Branch $Branch
+        $tempClone = $remote.Path
+        Copy-ProjectFiles -Source $remote.Path -Destination $absolutePath
 
-    Write-Host "Adding submodule $relativePath ..." -ForegroundColor Cyan
-    & git @submoduleArgs
-    if ($LASTEXITCODE -ne 0) {
-        throw "git submodule add failed."
+        $repo = $Url
+        $trackedBranch = $remote.Branch
+        $commit = $remote.Commit
+        Write-Host "  copied commit $($commit.Substring(0, 7)) from branch $trackedBranch"
+    }
+    elseif ($Path) {
+        if (-not (Test-Path $Path -PathType Container)) {
+            throw "Folder '$Path' does not exist."
+        }
+        Write-Host "Copying from $Path ..." -ForegroundColor Cyan
+        Copy-ProjectFiles -Source (Resolve-Path $Path) -Destination $absolutePath
+    }
+    else {
+        Write-Host "Creating empty project ..." -ForegroundColor Cyan
+        New-Item -ItemType Directory -Path $absolutePath | Out-Null
+
+        $starter = @(
+            "<!DOCTYPE html>",
+            "<html lang=`"en`">",
+            "<head>",
+            "    <meta charset=`"UTF-8`">",
+            "    <meta name=`"viewport`" content=`"width=device-width, initial-scale=1.0`">",
+            "    <title>$Title</title>",
+            "</head>",
+            "<body>",
+            "    <h1>$Title</h1>",
+            "    <p><a href=`"../../`">Back to Piddicus</a></p>",
+            "</body>",
+            "</html>"
+        ) -join "`n"
+
+        $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+        [System.IO.File]::WriteAllText((Join-Path $absolutePath "index.html"), $starter + "`n", $utf8NoBom)
     }
 
-    $entryPath = Join-Path $absolutePath $Entry
-    if (-not (Test-Path $entryPath)) {
-        Write-Warning "Entry page '$Entry' was not found in the cloned repo. The card will link to a missing page until you fix -Entry."
+    if (-not (Test-Path (Join-Path $absolutePath $Entry))) {
+        Write-Warning "Entry page '$Entry' was not found in the project. The card will link to a missing page until you fix -Entry."
     }
 
     $project = [ordered]@{
@@ -108,19 +162,23 @@ try {
         icon        = $Icon
         tags        = @($Tags)
         entry       = $Entry
-        repo        = $Url
+        repo        = $repo
+        branch      = $trackedBranch
+        commit      = $commit
     }
 
     $manifest.projects = @($manifest.projects) + [pscustomobject]$project
     Save-Manifest $manifest
 
-    & git add "projects/projects.json"
+    & git add -A -- $relativePath "public/projects/projects.json"
 
     Write-Host ""
     Write-Host "Added '$Title' at $relativePath." -ForegroundColor Green
-    Write-Host "Staged: .gitmodules, $relativePath, projects/projects.json"
     Write-Host "Review with 'git status' and commit when ready."
 }
 finally {
     Pop-Location
+    if ($tempClone -and (Test-Path $tempClone)) {
+        Remove-Item -Recurse -Force $tempClone
+    }
 }

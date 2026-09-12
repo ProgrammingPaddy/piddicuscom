@@ -1,11 +1,15 @@
 <#
 .SYNOPSIS
-    Shared helpers for reading and writing projects/projects.json.
+    Shared helpers for the project scripts: manifest I/O, slugs, and
+    fetching / copying project files.
 #>
 
 $script:RepoRoot = Split-Path -Parent $PSScriptRoot
-$script:ManifestPath = Join-Path $script:RepoRoot "projects\projects.json"
-$script:ProjectsDir = Join-Path $script:RepoRoot "projects"
+$script:ProjectsDir = Join-Path $script:RepoRoot "public\projects"
+$script:ManifestPath = Join-Path $script:ProjectsDir "projects.json"
+
+# Files that belong to a project's own repo, not to the published copy.
+$script:ExcludedNames = @(".git", ".github", ".gitignore", ".gitattributes", ".gitmodules")
 
 function Get-RepoRoot {
     return $script:RepoRoot
@@ -14,6 +18,13 @@ function Get-RepoRoot {
 function Get-ProjectsDir {
     return $script:ProjectsDir
 }
+
+function Get-ProjectRelativePath {
+    param ([Parameter(Mandatory)] [string] $Slug)
+    return "public/projects/$Slug"
+}
+
+# Manifest ------------------------------------------------------------------
 
 function Get-Manifest {
     if (-not (Test-Path $script:ManifestPath)) {
@@ -30,10 +41,7 @@ function Get-Manifest {
 }
 
 function Save-Manifest {
-    param (
-        [Parameter(Mandatory)]
-        [object] $Manifest
-    )
+    param ([Parameter(Mandatory)] [object] $Manifest)
 
     $Manifest.projects = @($Manifest.projects)
     $json = $Manifest | ConvertTo-Json -Depth 5 -Compress
@@ -52,10 +60,7 @@ function Format-Json {
         Re-indent compact JSON with two spaces. Windows PowerShell's own
         pretty printer uses very deep indentation that is hard to edit by hand.
     #>
-    param (
-        [Parameter(Mandatory)]
-        [string] $Json
-    )
+    param ([Parameter(Mandatory)] [string] $Json)
 
     $indent = 0
     $inString = $false
@@ -106,23 +111,86 @@ function Format-Json {
     return $output.ToString() -replace '\[\s+\]', '[]' -replace '\{\s+\}', '{}'
 }
 
-function Test-Slug {
-    param (
-        [Parameter(Mandatory)]
-        [string] $Slug
-    )
+# Slugs ---------------------------------------------------------------------
 
+function Test-Slug {
+    param ([Parameter(Mandatory)] [string] $Slug)
     return $Slug -match '^[a-z0-9]+(?:-[a-z0-9]+)*$'
 }
 
 function ConvertTo-Slug {
-    param (
-        [Parameter(Mandatory)]
-        [string] $Text
-    )
+    param ([Parameter(Mandatory)] [string] $Text)
 
     $slug = $Text.ToLowerInvariant() -replace '[^a-z0-9]+', '-'
     return $slug.Trim('-')
 }
 
-Export-ModuleMember -Function Get-RepoRoot, Get-ProjectsDir, Get-Manifest, Save-Manifest, Test-Slug, ConvertTo-Slug
+# Fetching and copying ------------------------------------------------------
+
+function New-TempDirectory {
+    $path = Join-Path ([System.IO.Path]::GetTempPath()) ("piddicus-" + [guid]::NewGuid().ToString("N"))
+    New-Item -ItemType Directory -Path $path | Out-Null
+    return $path
+}
+
+function Get-RemoteProject {
+    <#
+    .SYNOPSIS
+        Shallow-clone a project repo into a temp folder. Returns an object with
+        Path, Commit and Branch. The caller must delete Path when done.
+    #>
+    param (
+        [Parameter(Mandatory)] [string] $Url,
+        [string] $Branch
+    )
+
+    $tempDir = New-TempDirectory
+    $cloneArgs = @("clone", "--quiet", "--depth", "1")
+    if ($Branch) {
+        $cloneArgs += @("--branch", $Branch)
+    }
+    $cloneArgs += @("--", $Url, $tempDir)
+
+    & git @cloneArgs
+    if ($LASTEXITCODE -ne 0) {
+        Remove-Item -Recurse -Force $tempDir
+        throw "git clone failed for $Url"
+    }
+
+    return [pscustomobject]@{
+        Path   = $tempDir
+        Commit = (& git -C $tempDir rev-parse HEAD).Trim()
+        Branch = (& git -C $tempDir rev-parse --abbrev-ref HEAD).Trim()
+    }
+}
+
+function Copy-ProjectFiles {
+    <#
+    .SYNOPSIS
+        Copy a project's files into its published folder, skipping git metadata.
+    #>
+    param (
+        [Parameter(Mandatory)] [string] $Source,
+        [Parameter(Mandatory)] [string] $Destination
+    )
+
+    New-Item -ItemType Directory -Force -Path $Destination | Out-Null
+
+    Get-ChildItem -Path $Source -Force |
+        Where-Object { $script:ExcludedNames -notcontains $_.Name } |
+        ForEach-Object { Copy-Item -Path $_.FullName -Destination $Destination -Recurse -Force }
+}
+
+function Clear-Directory {
+    param ([Parameter(Mandatory)] [string] $Path)
+
+    if (Test-Path $Path) {
+        Get-ChildItem -Path $Path -Force | Remove-Item -Recurse -Force
+    }
+}
+
+Export-ModuleMember -Function `
+    Get-RepoRoot, Get-ProjectsDir, Get-ProjectRelativePath, `
+    Get-Manifest, Save-Manifest, `
+    Test-Slug, ConvertTo-Slug, `
+    Get-RemoteProject, Copy-ProjectFiles, Clear-Directory

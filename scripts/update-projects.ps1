@@ -1,15 +1,20 @@
 <#
 .SYNOPSIS
-    Pull the latest commit for one or all mounted projects.
+    Refresh projects that came from a git repository.
 
 .DESCRIPTION
-    Runs `git submodule update --remote` so each project submodule points at
-    the newest commit on its tracked branch, then stages the new pointers.
+    For each project with a "repo" in the manifest, fetches the latest commit
+    on its tracked branch. If it differs from the recorded commit, the
+    project's folder is replaced with the new files and the manifest is
+    updated. Projects without a repo are edited in place and are skipped.
 
     Nothing is committed. Review the staged changes and commit them yourself.
 
 .PARAMETER Slug
-    Update only this project. Omit to update every project.
+    Update only this project. Omit to update every repo-backed project.
+
+.PARAMETER Force
+    Re-copy the files even when the commit has not changed.
 
 .EXAMPLE
     .\scripts\update-projects.ps1
@@ -20,7 +25,9 @@
 
 [CmdletBinding()]
 param (
-    [string] $Slug
+    [string] $Slug,
+
+    [switch] $Force
 )
 
 $ErrorActionPreference = "Stop"
@@ -39,39 +46,68 @@ else {
 }
 
 if ($targets.Count -eq 0) {
-    Write-Host "No projects to update."
+    Write-Host "No projects in the manifest."
     return
 }
 
+$changed = $false
+
 Push-Location (Get-RepoRoot)
 try {
-    # Make sure freshly cloned checkouts have the submodules populated.
-    & git submodule init | Out-Null
-
     foreach ($project in $targets) {
-        $path = "projects/$($project.slug)"
-        $before = (& git -C $path rev-parse --short HEAD 2>$null)
+        $relativePath = Get-ProjectRelativePath $project.slug
+        $absolutePath = Join-Path (Get-ProjectsDir) $project.slug
 
-        Write-Host "Updating $path ..." -ForegroundColor Cyan
-        & git submodule update --remote --merge -- $path
-        if ($LASTEXITCODE -ne 0) {
-            Write-Warning "Update failed for $path."
+        if (-not $project.repo) {
+            Write-Host "Skipping $relativePath (no repo; edit it in place)." -ForegroundColor DarkGray
             continue
         }
 
-        $after = (& git -C $path rev-parse --short HEAD)
+        Write-Host "Checking $relativePath ..." -ForegroundColor Cyan
 
-        if ($before -eq $after) {
-            Write-Host "  already at $after"
-        }
-        else {
+        $tempClone = $null
+        try {
+            $remote = Get-RemoteProject -Url $project.repo -Branch $project.branch
+            $tempClone = $remote.Path
+
+            $before = if ($project.commit) { $project.commit.Substring(0, 7) } else { "none" }
+            $after = $remote.Commit.Substring(0, 7)
+
+            if ($remote.Commit -eq $project.commit -and -not $Force) {
+                Write-Host "  already at $after"
+                continue
+            }
+
+            Clear-Directory $absolutePath
+            Copy-ProjectFiles -Source $remote.Path -Destination $absolutePath
+
+            $project.commit = $remote.Commit
+            $project.branch = $remote.Branch
+            $changed = $true
+
+            & git add -A -- $relativePath
             Write-Host "  $before -> $after" -ForegroundColor Green
-            & git add -- $path
+        }
+        catch {
+            Write-Warning "Update failed for $relativePath : $_"
+        }
+        finally {
+            if ($tempClone -and (Test-Path $tempClone)) {
+                Remove-Item -Recurse -Force $tempClone
+            }
         }
     }
 
-    Write-Host ""
-    Write-Host "Review with 'git status' and commit when ready."
+    if ($changed) {
+        Save-Manifest $manifest
+        & git add -- "public/projects/projects.json"
+        Write-Host ""
+        Write-Host "Review with 'git status' and commit when ready."
+    }
+    else {
+        Write-Host ""
+        Write-Host "Everything is up to date."
+    }
 }
 finally {
     Pop-Location

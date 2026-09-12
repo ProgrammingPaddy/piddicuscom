@@ -1,0 +1,15 @@
+// Cloudflare Workers configuration.
+//
+// This is an assets-only deployment: everything under public/ is served as
+// static files and there is no Worker script. Do not add a "main" key unless
+// a project needs a server-side endpoint (see README, "Future expansion").
+//
+// compatibility_date is pinned to the project start date. Leave it alone;
+// bumping it changes Workers runtime behaviour.
+{
+  "name": "piddicuscom",
+  "compatibility_date": "2026-09-12",
+  "assets": {
+    "directory": "./public"
+  }
+}

@@ -1,15 +1,15 @@
 <#
 .SYNOPSIS
-    Unmount a project from the site.
+    Remove a project from the site.
 
 .DESCRIPTION
-    Removes the submodule under projects/<slug>, cleans up git's internal
-    module storage, and drops the entry from projects/projects.json.
+    Deletes public/projects/<slug> and drops the entry from
+    public/projects/projects.json.
 
     Nothing is committed. Review the staged changes and commit them yourself.
 
 .PARAMETER Slug
-    The project's folder name under projects/.
+    The project's folder name under public/projects.
 
 .EXAMPLE
     .\scripts\remove-project.ps1 -Slug snake
@@ -25,31 +25,29 @@ $ErrorActionPreference = "Stop"
 Import-Module (Join-Path $PSScriptRoot "Manifest.psm1") -Force
 
 $manifest = Get-Manifest
-$relativePath = "projects/$Slug"
+$relativePath = Get-ProjectRelativePath $Slug
+$absolutePath = Join-Path (Get-ProjectsDir) $Slug
 
 Push-Location (Get-RepoRoot)
 try {
-    if (Test-Path $relativePath) {
-        Write-Host "Removing submodule $relativePath ..." -ForegroundColor Cyan
-        & git submodule deinit -f -- $relativePath
-        & git rm -f -- $relativePath
-        if ($LASTEXITCODE -ne 0) {
-            throw "git rm failed."
+    if (Test-Path $absolutePath) {
+        Write-Host "Removing $relativePath ..." -ForegroundColor Cyan
+
+        $tracked = & git ls-files -- $relativePath
+        if ($tracked) {
+            & git rm -r -q -f -- $relativePath
+            if ($LASTEXITCODE -ne 0) {
+                throw "git rm failed."
+            }
+        }
+
+        # Catch anything git rm did not know about (untracked files).
+        if (Test-Path $absolutePath) {
+            Remove-Item -Recurse -Force $absolutePath
         }
     }
     else {
         Write-Warning "Folder '$relativePath' does not exist; only cleaning the manifest."
-    }
-
-    $moduleStore = Join-Path ".git\modules" $relativePath
-    if (Test-Path $moduleStore) {
-        Remove-Item -Recurse -Force $moduleStore
-    }
-
-    # git rm leaves an empty .gitmodules behind once the last submodule goes.
-    if ((Test-Path ".gitmodules") -and -not (Select-String -Path ".gitmodules" -Pattern '^\[submodule' -Quiet)) {
-        & git rm -q -f --cached -- .gitmodules 2>$null
-        Remove-Item -Force ".gitmodules"
     }
 
     $remaining = @($manifest.projects | Where-Object { $_.slug -ne $Slug })
@@ -59,7 +57,7 @@ try {
     else {
         $manifest.projects = $remaining
         Save-Manifest $manifest
-        & git add "projects/projects.json"
+        & git add -- "public/projects/projects.json"
     }
 
     Write-Host ""

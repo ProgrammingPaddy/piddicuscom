@@ -43,7 +43,7 @@
             </h1>
             <p class="hero__lead reveal">
                 Pick something from the menu below. Every entry is a standalone
-                HTML project that lives in its own repository and is mounted here.
+                HTML project that runs entirely in your browser.
             </p>
             <div class="hero__actions reveal">
                 <a class="button button--primary" href="#projects">Browse the menu</a>
@@ -73,14 +73,16 @@
             </div>
             <div class="prose reveal">
                 <p>
-                    Each project on this site is its own git repository. They are
-                    pulled in as submodules under <code>projects/</code>, and a
-                    small manifest tells the homepage what to show on each card.
+                    Each project is a self-contained folder under
+                    <code>projects/</code>. Some are written here directly;
+                    others live in their own repository and are copied in at a
+                    pinned commit. A small manifest tells the homepage what to
+                    show on each card.
                 </p>
                 <p>
                     Updating a project means pulling its latest commit and
-                    re-publishing this site. No build step, no framework, just
-                    files served as they are.
+                    pushing this repo. No build step, no framework, just files
+                    served as they are.
                 </p>
             </div>
         </section>
