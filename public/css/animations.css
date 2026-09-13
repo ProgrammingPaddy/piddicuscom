@@ -102,11 +102,31 @@
     transform: scaleY(0.06);
 }
 
-/* Pupils are moved from JS; the transform-box keeps the origin local. */
+/* Pupils are moved from JS; the transform-box keeps the origin local. No
+   will-change here: promoting the path to its own layer blurs it. */
 .logo-pupil {
     transform-box: fill-box;
     transform-origin: center;
-    will-change: transform;
+}
+
+/* The smile swaps for a small "o" while a project card is hovered. */
+.logo-mouth,
+.logo-mouth-open {
+    transform-box: fill-box;
+    transform-origin: center;
+    transition: transform var(--duration-base) var(--ease-bounce);
+}
+
+.logo-mouth-open {
+    transform: scale(0);
+}
+
+.logo.is-surprised .logo-mouth {
+    transform: scale(0);
+}
+
+.logo.is-surprised .logo-mouth-open {
+    transform: scale(1);
 }
 
 /* Card entrance, staggered by index set in JS ---------------------------- */
@@ -152,7 +172,9 @@
         animation: none;
     }
 
-    .logo-eyeball {
+    .logo-eyeball,
+    .logo-mouth,
+    .logo-mouth-open {
         transition: none;
     }
 

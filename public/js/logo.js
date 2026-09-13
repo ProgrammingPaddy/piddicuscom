@@ -11,12 +11,16 @@
  *
  * Each eye becomes:
  *
- *   g.logo-eye
- *     path.logo-eyelid    pink socket, slightly oversized, stays put on blink
+ *   path.logo-eyelid      pink socket BEHIND the letters, so the hole in the
+ *                         letter always has pink under it (blinks, seams)
+ *   g.logo-eye            after the letters
  *     g.logo-eyeball      squashes shut on blink
  *       path.logo-white   full white socket
  *       g[clip-path]      clipped to the socket so the pupil never escapes
  *         path.logo-pupil translated to look around
+ *
+ * The mouth gets the same pink patch behind the letters, the smile on top,
+ * and a small "o" that swaps in while a project card is hovered.
  */
 
 const LOGO_URL = "logo.svg";
@@ -45,8 +49,11 @@ const LOOK_EASE = 0.14;
 /** Pupils drift back to centre after the pointer has been still this long. */
 const LOOK_TIMEOUT = 3500;
 
-/** How much bigger the eyelid is than the socket hole, to hide the seam. */
-const EYELID_OVERLAP = 2;
+/** How much bigger the pink patches behind the holes are than the holes. */
+const PATCH_OVERLAP = 1;
+
+/** Radius of the open "o" mouth, as a fraction of the mouth's smaller side. */
+const OPEN_MOUTH_RADIUS = 0.36;
 
 const BLINK_DURATION = 150;
 const BLINK_GAP_MIN = 2500;
@@ -204,6 +211,17 @@ function createPath(d, fill, className, strokeWidth = 0) {
     return path;
 }
 
+function createOpenMouth(box) {
+    const centre = centreOf(box);
+    const circle = document.createElementNS(SVG_NS, "circle");
+    circle.setAttribute("cx", centre.x.toFixed(2));
+    circle.setAttribute("cy", centre.y.toFixed(2));
+    circle.setAttribute("r", (Math.min(box.width, box.height) * OPEN_MOUTH_RADIUS).toFixed(2));
+    circle.setAttribute("fill", FILL.pupils);
+    circle.setAttribute("class", "logo-mouth-open");
+    return circle;
+}
+
 function createGroup(className) {
     const group = document.createElementNS(SVG_NS, "g");
     group.setAttribute("class", className);
@@ -284,9 +302,9 @@ function buildFace(svg) {
         clip.setAttribute("id", clipId);
         clip.append(createPath(socketData, "none", "logo-clip"));
 
-        const eyelid = createPath(socketData, lettersFill, "logo-eyelid", EYELID_OVERLAP);
+        const eyelid = createPath(socketData, lettersFill, "logo-eyelid", PATCH_OVERLAP);
         const whitePath = createPath(socketData, FILL.whites, "logo-white", 0.25);
-        const pupilPath = createPath(pupil.d, FILL.pupils, "logo-pupil", 0.25);
+        const pupilPath = createPath(pupil.d, FILL.pupils, "logo-pupil");
 
         const clipped = createGroup("logo-pupil-clip");
         clipped.setAttribute("clip-path", `url(#${clipId})`);
@@ -296,7 +314,9 @@ function buildFace(svg) {
         eyeball.append(whitePath, clipped);
 
         const eye = createGroup("logo-eye");
-        eye.append(clip, eyelid, eyeball);
+        eye.append(clip, eyeball);
+
+        lettersPath.before(eyelid);
         fragment.append(eye);
 
         eyes.push({
@@ -311,10 +331,13 @@ function buildFace(svg) {
         });
     });
 
-    /* Whatever is left in the mauve path (the mouth) keeps its place. */
+    /* Whatever is left in the mauve path is the mouth: a pink patch behind
+       the letters, the smile on top, and a hidden "o" for later. */
     for (const mark of marks) {
         if (!paired.used.has(mark)) {
+            lettersPath.before(createPath(mark.d, lettersFill, "logo-mouth-patch", PATCH_OVERLAP));
             fragment.append(createPath(mark.d, FILL.pupils, "logo-mouth", 0.25));
+            fragment.append(createOpenMouth(mark.box));
         }
     }
 
@@ -394,6 +417,29 @@ function lookAround(svg, eyes) {
     document.addEventListener("pointerleave", () => {
         pointer = null;
         wake();
+    });
+}
+
+/** Open the mouth while any project card is hovered or focused. */
+function reactToCards(svg) {
+    const cardFrom = (node) => (node instanceof Element ? node.closest(".card__link") : null);
+
+    document.addEventListener("pointerover", (event) => {
+        if (cardFrom(event.target)) {
+            svg.classList.add("is-surprised");
+        }
+    });
+
+    document.addEventListener("pointerout", (event) => {
+        const leaving = cardFrom(event.target);
+
+        if (leaving && cardFrom(event.relatedTarget) !== leaving) {
+            svg.classList.remove("is-surprised");
+        }
+    });
+
+    document.addEventListener("focusin", (event) => {
+        svg.classList.toggle("is-surprised", Boolean(cardFrom(event.target)));
     });
 }
 
@@ -478,6 +524,7 @@ async function init() {
 
     lookAround(svg, eyes);
     blinkNowAndThen(svg);
+    reactToCards(svg);
 }
 
 init();

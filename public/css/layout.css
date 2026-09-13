@@ -145,8 +145,14 @@
 
 .hero__tagline {
     font-family: var(--font-display);
-    font-size: var(--text-xl);
-    font-weight: 400;
+    font-size: var(--text-tagline);
+    font-weight: 500;
+    line-height: 1.15;
+    letter-spacing: 0.005em;
+    text-wrap: balance;
+}
+
+.hero__tagline-soft {
     color: var(--color-text-muted);
 }
 
