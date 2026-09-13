@@ -1,3 +1,28 @@
 {
-  "projects": []
+  "projects": [
+    {
+      "slug": "chord-vis",
+      "title": "Chord Vis",
+      "description": "Build a chord, see it on the fretboard and keyboard, and hear it against the key and scale you pick.",
+      "icon": null,
+      "tags": [
+        "music",
+        "tools"
+      ],
+      "href": "projects/chord-vis/",
+      "repo": null
+    },
+    {
+      "slug": "noita-slot-machine",
+      "title": "Noita Slot Machine",
+      "description": "Roll a random perk, spell and enemy for a Noita challenge run. Filter the pools, build custom groups, save presets.",
+      "icon": null,
+      "tags": [
+        "games",
+        "tools"
+      ],
+      "href": "projects/noita-slot-machine/",
+      "repo": null
+    }
+  ]
 }

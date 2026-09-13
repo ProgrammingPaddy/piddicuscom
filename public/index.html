@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Piddicus — a home for small web projects and experiments.">
+    <meta name="description" content="Piddicus: a menu of small browser projects.">
+    <meta name="theme-color" content="#171015">
     <title>Piddicus</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/layout.css">
@@ -20,45 +21,31 @@
     <div class="backdrop" aria-hidden="true">
         <div class="backdrop__orb backdrop__orb--one"></div>
         <div class="backdrop__orb backdrop__orb--two"></div>
-        <div class="backdrop__grid"></div>
+        <div class="backdrop__dots"></div>
     </div>
 
     <header class="site-header">
-        <a class="site-header__brand" href="./">
-            <span class="site-header__mark" aria-hidden="true">P</span>
-            <span class="site-header__name">Piddicus</span>
+        <a class="site-header__brand" href="./" aria-label="Piddicus home">
+            <img class="site-header__logo" src="logo.svg" alt="Piddicus" width="968" height="348">
         </a>
-        <nav class="site-header__nav" aria-label="Primary">
-            <a href="#projects">Projects</a>
-            <a href="#about">About</a>
+        <nav class="site-header__nav" aria-label="Links">
             <a href="https://github.com/ProgrammingPaddy" target="_blank" rel="noopener">GitHub</a>
         </nav>
     </header>
 
     <main class="page">
         <section class="hero">
-            <p class="hero__eyebrow reveal">Personal site &amp; project shelf</p>
-            <h1 class="hero__title reveal">
-                <span class="hero__line">Small things,</span>
-                <span class="hero__line">built for the browser.</span>
+            <h1 class="hero__logo reveal">
+                <img src="logo.svg" alt="Piddicus" width="968" height="348">
             </h1>
-            <p class="hero__lead reveal">
-                Pick something from the menu below. Every entry is a standalone
-                HTML project that runs entirely in your browser.
-            </p>
-            <div class="hero__actions reveal">
-                <a class="button button--primary" href="#projects">Browse the menu</a>
-                <a class="button button--ghost" href="#about">How it works</a>
-            </div>
+            <p class="hero__tagline reveal">Fun projects and data visualization.</p>
         </section>
 
-        <section id="projects" class="section">
-            <div class="section__heading reveal">
-                <h2 class="section__title">Menu</h2>
-                <p class="section__count" id="project-count" aria-live="polite"></p>
+        <section id="projects" class="menu" aria-label="Projects">
+            <div class="menu__bar reveal">
+                <div class="filter" id="filter" role="group" aria-label="Filter by category"></div>
+                <p class="menu__count" id="project-count" aria-live="polite"></p>
             </div>
-
-            <div class="filter reveal" id="filter" role="group" aria-label="Filter projects by tag"></div>
 
             <ul class="card-grid" id="project-grid" aria-busy="true"></ul>
 
@@ -67,29 +54,13 @@
                 <code>public/projects</code> to add one.
             </p>
         </section>
-
-        <section id="about" class="section section--narrow">
-            <div class="section__heading reveal">
-                <h2 class="section__title">How this works</h2>
-            </div>
-            <div class="prose reveal">
-                <p>
-                    Every entry on the menu is a folder dropped into
-                    <code>projects/</code>. Some are written here directly;
-                    others live in their own repository and are copied in at a
-                    pinned commit. A small script scans that folder and writes
-                    the menu you see above.
-                </p>
-                <p>
-                    No framework, no bundler. Each project is plain HTML served
-                    exactly as it was written.
-                </p>
-            </div>
-        </section>
     </main>
 
     <footer class="site-footer">
-        <p>&copy; <span id="year"></span> Piddicus</p>
+        <p class="site-footer__brand">
+            <img class="site-footer__logo" src="logo.svg" alt="" width="968" height="348">
+            <span>&copy; <span id="year"></span></span>
+        </p>
         <p><a href="https://github.com/ProgrammingPaddy/piddicuscom" target="_blank" rel="noopener">Source</a></p>
     </footer>
 
@@ -97,13 +68,13 @@
         <li class="card">
             <a class="card__link" href="#">
                 <div class="card__top">
-                    <span class="card__icon" aria-hidden="true"></span>
+                    <span class="card__mark" aria-hidden="true"></span>
                     <span class="card__meta" aria-hidden="true">
                         <span class="card__index"></span>
                         <span class="card__arrow">&rarr;</span>
                     </span>
                 </div>
-                <h3 class="card__title"></h3>
+                <h2 class="card__title"></h2>
                 <p class="card__description"></p>
                 <ul class="card__tags"></ul>
             </a>
@@ -114,5 +85,6 @@
     </template>
 
     <script src="js/main.js" defer></script>
+    <script src="js/logo.js" defer></script>
 </body>
 </html>

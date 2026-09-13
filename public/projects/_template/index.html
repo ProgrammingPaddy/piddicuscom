@@ -5,28 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- The homepage reads these when there is no project.json. -->
     <meta name="description" content="One sentence about what this project does.">
-    <meta name="keywords" content="demo, canvas">
+    <meta name="keywords" content="games">
     <title>New Project</title>
     <style>
         body {
             margin: 0;
-            min-height: 100vh;
+            font-family: system-ui, sans-serif;
+            color: #f7edf1;
+            background: #171015;
+        }
+
+        main {
+            min-height: calc(100vh - 42px);
             display: grid;
             place-items: center;
-            font-family: system-ui, sans-serif;
-            color: #e8eaf0;
-            background: #0b0d12;
         }
 
         a {
-            color: #7cf5c8;
+            color: #fec6d9;
         }
     </style>
 </head>
 <body>
     <main>
         <h1>New Project</h1>
-        <p><a href="../../">&larr; Back to Piddicus</a></p>
     </main>
+
+    <!-- Adds the "back to the menu" bar at the top of the page. -->
+    <script src="../../js/return-home.js" defer></script>
 </body>
 </html>

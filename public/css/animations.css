@@ -14,6 +14,17 @@
     }
 }
 
+@keyframes float {
+    0%,
+    100% {
+        transform: translateY(0) rotate(0deg);
+    }
+
+    50% {
+        transform: translateY(-8px) rotate(-1deg);
+    }
+}
+
 @keyframes drift {
     0%,
     100% {
@@ -59,15 +70,43 @@
 }
 
 .hero .reveal:nth-child(2) {
-    --reveal-delay: 90ms;
+    --reveal-delay: 120ms;
 }
 
 .hero .reveal:nth-child(3) {
-    --reveal-delay: 180ms;
+    --reveal-delay: 220ms;
 }
 
 .hero .reveal:nth-child(4) {
-    --reveal-delay: 270ms;
+    --reveal-delay: 320ms;
+}
+
+/* The wordmark bobs gently once it has arrived. The reveal transition owns
+   the transform until then, so the float runs on the artwork inside. */
+.hero__logo img,
+.hero__logo svg {
+    animation: float 6s var(--ease-in-out) infinite;
+}
+
+/* Logo face (built by js/logo.js) ---------------------------------------- */
+
+/* Each eyeball squashes shut around its own centre; the pink eyelid behind
+   it stays put so the letter never shows a hole. */
+.logo-eyeball {
+    transform-box: fill-box;
+    transform-origin: center;
+    transition: transform 90ms ease-in;
+}
+
+.logo.is-blinking .logo-eyeball {
+    transform: scaleY(0.06);
+}
+
+/* Pupils are moved from JS; the transform-box keeps the origin local. */
+.logo-pupil {
+    transform-box: fill-box;
+    transform-origin: center;
+    will-change: transform;
 }
 
 /* Card entrance, staggered by index set in JS ---------------------------- */
@@ -106,13 +145,21 @@
         animation: none;
     }
 
+    .hero__logo img,
+    .hero__logo svg,
     .backdrop__orb--one,
     .backdrop__orb--two {
         animation: none;
     }
 
-    .button:hover,
-    .card__link:hover {
+    .logo-eyeball {
+        transition: none;
+    }
+
+    .chip:hover,
+    .card__link:hover,
+    .card__link:hover .card__mark,
+    .site-header__brand:hover .site-header__logo {
         transform: none;
     }
 }

@@ -1,0 +1,9 @@
+{
+  "title": "Chord Vis",
+  "description": "Build a chord, see it on the fretboard and keyboard, and hear it against the key and scale you pick.",
+  "tags": [
+    "music",
+    "tools"
+  ],
+  "order": 1
+}

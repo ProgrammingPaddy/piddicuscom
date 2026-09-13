@@ -1,6 +1,6 @@
 /**
  * Homepage behaviour: load the generated project manifest, render the menu,
- * wire up tag filtering, card hover spotlight and scroll-reveal animations.
+ * wire up category filtering, card hover spotlight and scroll-reveal.
  */
 
 const MANIFEST_URL = "projects/projects.json";
@@ -27,52 +27,91 @@ async function loadManifest() {
     return Array.isArray(data.projects) ? data.projects : [];
 }
 
-/* Helpers ----------------------------------------------------------------- */
+/* Marks ------------------------------------------------------------------- */
 
-/** Stable 0-359 hue from a string, so a project keeps its colour between visits. */
-function hueFromString(text) {
-    let hash = 0;
+/**
+ * Projects without an icon get a pink blob with their initials. The blob's
+ * shape is seeded from the slug so it is different for every project but
+ * the same on every visit.
+ */
+
+function hashString(text) {
+    let hash = 2166136261;
 
     for (const char of text) {
-        hash = (hash * 31 + char.codePointAt(0)) % 360;
+        hash ^= char.codePointAt(0);
+        hash = Math.imul(hash, 16777619) >>> 0;
     }
 
     return hash;
 }
 
-function firstGrapheme(text) {
-    const [first] = Array.from(text.trim());
-    return first ? first.toUpperCase() : "?";
+/** Small deterministic PRNG (mulberry32), returns numbers in [0, 1). */
+function createRandom(seed) {
+    let state = seed >>> 0;
+
+    return () => {
+        state = (state + 0x6d2b79f5) >>> 0;
+        let t = state;
+        t = Math.imul(t ^ (t >>> 15), t | 1);
+        t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
 }
+
+/** An organic border-radius: four horizontal and four vertical radii. */
+function blobRadius(random) {
+    const pick = () => Math.round(30 + random() * 40);
+    const [a, b, c, d] = [pick(), pick(), pick(), pick()];
+
+    return `${a}% ${100 - a}% ${100 - b}% ${b}% / ${c}% ${d}% ${100 - d}% ${100 - c}%`;
+}
+
+function initials(title) {
+    const words = title.trim().split(/\s+/).filter(Boolean);
+    const letters = words.slice(0, 2).map((word) => Array.from(word)[0].toUpperCase());
+
+    return letters.join("") || "?";
+}
+
+function fillMark(mark, project) {
+    const random = createRandom(hashString(project.slug));
+
+    mark.style.setProperty("--blob-rest", blobRadius(random));
+    mark.style.setProperty("--blob-hover", blobRadius(random));
+
+    if (project.icon) {
+        const image = document.createElement("img");
+        image.src = project.icon;
+        image.alt = "";
+        image.loading = "lazy";
+        mark.append(image);
+        mark.classList.add("card__mark--image");
+    } else {
+        mark.textContent = initials(project.title);
+    }
+}
+
+/* Rendering --------------------------------------------------------------- */
 
 function formatIndex(index) {
     return String(index + 1).padStart(2, "0");
 }
 
-/* Rendering --------------------------------------------------------------- */
-
 function createCard(project, index) {
     const fragment = cardTemplate.content.cloneNode(true);
     const card = fragment.querySelector(".card");
     const link = fragment.querySelector(".card__link");
-    const icon = fragment.querySelector(".card__icon");
     const source = fragment.querySelector(".card__source");
     const tagList = fragment.querySelector(".card__tags");
 
     card.style.setProperty("--card-index", index);
-    card.style.setProperty("--card-hue", hueFromString(project.slug));
 
     link.href = project.href;
     fragment.querySelector(".card__title").textContent = project.title;
     fragment.querySelector(".card__description").textContent = project.description || "";
     fragment.querySelector(".card__index").textContent = formatIndex(index);
-
-    if (project.icon) {
-        icon.textContent = project.icon;
-    } else {
-        icon.textContent = firstGrapheme(project.title);
-        icon.classList.add("card__icon--letter");
-    }
+    fillMark(fragment.querySelector(".card__mark"), project);
 
     for (const tag of project.tags || []) {
         const item = document.createElement("li");

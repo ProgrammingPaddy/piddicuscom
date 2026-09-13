@@ -11,7 +11,9 @@
  *
  * Metadata comes from project.json in the folder when there is one, and
  * otherwise from the entry page itself: <title>, <meta name="description">
- * and <meta name="keywords"> (used as tags).
+ * and <meta name="keywords"> (used as tags). An "icon" in project.json is an
+ * image inside the folder (or a URL); without one the homepage draws a mark
+ * from the project's initials.
  *
  * Usage: node scripts/build.mjs [--quiet]
  */
@@ -82,18 +84,34 @@ function readFolderProject(slug, warn) {
     }
 
     const page = readPageMetadata(entryFile);
-    const href = entry === "index.html"
-        ? `projects/${encodeURIComponent(slug)}/`
-        : `projects/${encodeURIComponent(slug)}/${encodeURI(entry)}`;
+    const base = `projects/${encodeURIComponent(slug)}/`;
+    const href = entry === "index.html" ? base : base + encodeURI(entry);
 
-    return buildEntry(slug, href, config, page);
+    return buildEntry(slug, href, config, page, resolveIcon(config.icon, folder, base, warn));
+}
+
+function resolveIcon(icon, folder, base, warn) {
+    if (!icon || typeof icon !== "string") {
+        return null;
+    }
+
+    if (/^https?:\/\//i.test(icon)) {
+        return icon;
+    }
+
+    if (!fs.existsSync(path.join(folder, icon))) {
+        warn(`${relative(folder)}: icon "${icon}" does not exist, using the generated mark.`);
+        return null;
+    }
+
+    return base + encodeURI(icon);
 }
 
 function readFileProject(fileName) {
     const slug = fileName.slice(0, -".html".length);
     const page = readPageMetadata(path.join(projectsDir, fileName));
 
-    return buildEntry(slug, `projects/${encodeURIComponent(fileName)}`, {}, page);
+    return buildEntry(slug, `projects/${encodeURIComponent(fileName)}`, {}, page, null);
 }
 
 function findEntryPage(folder) {
@@ -110,14 +128,14 @@ function findEntryPage(folder) {
 
 /* Metadata ----------------------------------------------------------------- */
 
-function buildEntry(slug, href, config, page) {
+function buildEntry(slug, href, config, page, icon) {
     const tags = config.tags ?? splitKeywords(page.keywords);
 
     return {
         slug,
         title: config.title || page.title || titleFromSlug(slug),
         description: config.description ?? page.description ?? "",
-        icon: config.icon ?? "",
+        icon,
         tags: normaliseTags(tags),
         href,
         repo: config.repo ?? null,

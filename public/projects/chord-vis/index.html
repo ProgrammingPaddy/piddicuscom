@@ -1,0 +1,1620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Chord Vis</title>
+<style>
+:root{
+  --bg:#141519; --panel:#1d1f24; --panel2:#23252b; --inset:#17181c;
+  --line:#2c2f36; --line2:#383c45;
+  --text:#e9eaee; --muted:#9aa0ab; --faint:#6b7078;
+  --accent:#4f8cff; --accentSoft:rgba(79,140,255,.14);
+  --amber:#e8b04b; --green:#45b86a; --red:#e5484d; --violet:#9f7dff;
+}
+*{box-sizing:border-box}
+html{height:100%}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--text);
+  font-family:Inter,ui-sans-serif,system-ui,'Segoe UI',Arial,sans-serif;font-size:13px}
+*{scrollbar-width:thin;scrollbar-color:#3a3e47 #1a1b1f}
+*::-webkit-scrollbar{width:8px;height:8px}
+*::-webkit-scrollbar-track{background:#1a1b1f}
+*::-webkit-scrollbar-thumb{background:#3a3e47;border-radius:4px}
+*::-webkit-scrollbar-thumb:hover{background:#4a4f5a}
+
+.app{display:flex;flex-direction:column;gap:8px;padding:10px clamp(8px,1.5vw,20px) 16px;max-width:1900px;margin:0 auto}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px}
+
+.btn{border:1px solid var(--line2);background:var(--panel2);color:var(--text);border-radius:6px;
+  padding:6px 10px;font:inherit;font-size:12.5px;cursor:pointer;user-select:none;white-space:nowrap}
+.btn:hover{background:#2b2e35}
+.btn:active{background:#31353d}
+.btn.active{background:var(--accentSoft);border-color:var(--accent);color:#cfe0ff}
+.btn.detected{border-color:rgba(69,184,106,.75);background:rgba(69,184,106,.07)}
+.btn:disabled{opacity:.4;cursor:default;background:var(--panel2)}
+.btn.small{font-size:12px;padding:5px 9px}
+.btn.tiny{font-size:11px;padding:3px 8px;border-radius:5px}
+select{background:var(--panel2);color:var(--text);border:1px solid var(--line2);border-radius:6px;padding:5px 7px;font:inherit;font-size:12px}
+.seg{display:inline-flex;border:1px solid var(--line2);border-radius:6px;overflow:hidden}
+.seg button{border:0;background:transparent;color:var(--muted);padding:5px 10px;font:inherit;font-size:11.5px;cursor:pointer}
+.seg button+button{border-left:1px solid var(--line2)}
+.seg button.on{background:var(--accentSoft);color:#cfe0ff}
+.seg button:disabled{opacity:.35;cursor:default}
+.lbl{font-size:10px;color:var(--faint);text-transform:uppercase;letter-spacing:.12em}
+.sep{width:1px;height:20px;background:var(--line);flex:none}
+
+input[type=range]{-webkit-appearance:none;appearance:none;width:82px;height:16px;background:transparent;cursor:pointer}
+input[type=range]::-webkit-slider-runnable-track{height:3px;background:#3a3e47;border-radius:2px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:10px;height:12px;border-radius:3px;background:#aeb4bf;margin-top:-4.5px}
+input[type=range]:hover::-webkit-slider-thumb{background:#d6dae2}
+input[type=range]::-moz-range-track{height:3px;background:#3a3e47;border-radius:2px}
+input[type=range]::-moz-range-thumb{width:10px;height:12px;border:0;border-radius:3px;background:#aeb4bf}
+.vol{display:flex;align-items:center;gap:6px}
+.vol span{font-size:10px;color:var(--faint);text-transform:uppercase;letter-spacing:.08em}
+
+/* ---------- key / scale strip ---------- */
+.keystrip{padding:8px 12px;display:grid;grid-template-columns:minmax(0,1fr) 430px;gap:12px;align-items:start}
+.ks-left{display:flex;flex-direction:column;gap:6px;min-width:0}
+.scale-info{border-left:1px solid var(--line);padding-left:12px;font-size:11.5px;line-height:1.45;color:var(--muted);max-height:158px;overflow-y:auto}
+.si-head{display:flex;align-items:center;gap:8px;color:var(--text);font-size:12.5px}
+.si-alias{color:var(--faint);font-size:10.5px}
+.si-head .btn{margin-left:auto}
+.si-blurb{font-style:italic;margin:3px 0;color:#b8bdc7}
+.si-line{margin-top:3px}
+.si-cap{margin-top:7px;font-size:10.5px;color:var(--faint)}
+.modesbar{display:flex;gap:3px;margin-top:3px}
+.modecell{flex:1;border:1px solid var(--line2);background:var(--panel2);color:var(--muted);font-size:9.5px;padding:3px 1px;border-radius:4px;cursor:pointer;text-align:center;font-family:inherit}
+.modecell:hover{color:var(--text);background:#2b2e35}
+.modecell.cur{background:var(--accentSoft);border-color:var(--accent);color:#cfe0ff}
+.ks-row{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.ks-row .lbl{min-width:40px}
+.pillrow{display:flex;gap:4px;flex-wrap:wrap}
+.kbtn{border:1px solid var(--line2);background:var(--panel2);color:var(--muted);border-radius:5px;
+  padding:4px 10px;font:inherit;font-size:12px;cursor:pointer}
+.kbtn:hover{background:#2b2e35;color:var(--text)}
+.kbtn.active{border-color:var(--amber);background:rgba(232,176,75,.12);color:var(--amber);font-weight:600}
+.kbtn.scale.active{border-color:var(--accent);background:var(--accentSoft);color:#cfe0ff}
+.ks-spacer{flex:1}
+.scale-chips{display:flex;gap:3px;flex-wrap:wrap;align-items:center}
+.chip{border:1px solid var(--line);border-radius:4px;padding:2px 7px;font-size:11px;background:var(--inset);cursor:pointer;color:var(--muted)}
+.chip b{color:var(--text);font-weight:600}
+.chip .dg{opacity:.5;font-size:9.5px;margin-right:3px}
+.chip.tonic{border-color:rgba(232,176,75,.55);color:var(--amber)}
+.chip.tonic b{color:var(--amber)}
+.chip.char{border-color:rgba(159,125,255,.55)}
+.chip.char b{color:var(--violet)}
+.chip.inchord{background:rgba(69,184,106,.1);border-color:rgba(69,184,106,.5)}
+
+/* ---------- middle band ---------- */
+.mid{display:grid;grid-template-columns:288px minmax(0,1fr);gap:8px;align-items:stretch}
+.builder{padding:10px;display:flex;flex-direction:column;gap:10px}
+.grid{display:grid;gap:4px}
+.root-grid{grid-template-columns:repeat(6,1fr)}
+.quality-grid{grid-template-columns:repeat(4,1fr)}
+.ext-grid{grid-template-columns:repeat(5,1fr)}
+.grid .btn{padding:5px 2px;font-size:11px;border-radius:5px;text-align:center}
+
+.center{padding:10px 12px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.readout{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(0,1fr);gap:12px;min-height:0}
+.ro-left{min-width:0;display:flex;flex-direction:column}
+.chord-line{display:flex;align-items:baseline;gap:10px;min-width:0}
+.chord-name{font-weight:750;font-size:30px;letter-spacing:-.03em;line-height:1.05;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.roman-badge{border:1px solid rgba(232,176,75,.5);background:rgba(232,176,75,.08);color:var(--amber);border-radius:5px;padding:2px 8px;font-size:12.5px;font-weight:650;white-space:nowrap}
+.roman-badge.chromatic{border-color:var(--line2);background:var(--inset);color:var(--muted);font-weight:450;font-size:11.5px}
+.note-list{color:var(--muted);font-size:12px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.matches{display:flex;gap:4px;flex-wrap:wrap;margin-top:7px;overflow-y:auto;max-height:88px;align-content:flex-start;padding-right:4px}
+.pill{border:1px solid var(--line2);background:var(--inset);border-radius:4px;padding:3px 8px;font-size:11px;white-space:nowrap;cursor:pointer;color:var(--muted)}
+.pill:hover{color:var(--text);background:var(--panel2)}
+.pill.best{border-color:rgba(69,184,106,.55);color:#9fd9b2}
+
+.why{border:1px solid var(--line);border-radius:8px;background:var(--inset);display:flex;flex-direction:column;min-width:0;min-height:196px;max-height:240px}
+.why-body{padding:8px 11px 10px;overflow-y:auto;font-size:12.5px;line-height:1.45;color:#cfd3da}
+.why-body h4{margin:0 0 4px;font-size:12px;color:var(--text);letter-spacing:.01em}
+.why-body .flavor{color:var(--muted);font-style:italic;margin:4px 0 6px}
+.itable{width:100%;border-collapse:collapse;margin:4px 0 6px}
+.itable td{padding:2px 8px 2px 0;font-size:12px;border-bottom:1px solid #24262c}
+.itable td:first-child{color:var(--amber);font-weight:650;width:38px}
+.itable td:nth-child(2){font-weight:600;width:46px}
+.itable td:last-child{color:var(--muted)}
+.tag-in{color:var(--green)} .tag-out{color:var(--amber)}
+.why-note{color:var(--muted);font-size:11.5px}
+.kbd{display:inline-block;border:1px solid var(--line2);border-radius:4px;padding:0 5px;background:var(--panel2);font-size:11px}
+
+/* ---------- diatonic palette ---------- */
+.palette{display:flex;align-items:center;gap:8px}
+.pal-head{display:flex;flex-direction:column;gap:5px;flex:none}
+.pal-row{display:flex;gap:5px;flex:1;min-width:0}
+.pal-btn{border:1px solid var(--line2);background:var(--panel2);color:var(--text);border-radius:6px;
+  padding:5px 6px;font:inherit;cursor:pointer;text-align:center;flex:1;min-width:0;position:relative}
+.pal-btn:hover{background:#2b2e35}
+.pal-btn.cur{border-color:var(--accent);background:var(--accentSoft)}
+.pal-btn:disabled{opacity:.4;cursor:default}
+.pal-btn .rn{font-weight:700;font-size:13.5px;letter-spacing:-.01em}
+.pal-btn .nm{font-size:10.5px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pal-btn .fn{position:absolute;top:2px;right:3px;font-size:8.5px;color:var(--faint)}
+.pal-btn .fn.T{color:var(--green)} .pal-btn .fn.PD{color:var(--accent)} .pal-btn .fn.D{color:var(--red)}
+.pal-btn .ch{position:absolute;top:2px;left:3px;width:5px;height:5px;border-radius:50%;background:var(--violet)}
+
+/* ---------- instruments ---------- */
+.instruments{padding:8px 10px;display:flex;flex-direction:column;gap:8px}
+.inst-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.keyboard-area{overflow-x:auto;overflow-y:hidden}
+.keyboard{position:relative;height:142px;min-width:940px;user-select:none}
+.white-keys{display:flex;height:100%;position:relative;z-index:1}
+.key.white{flex:1 0 0;height:100%;background:#f2f0ea;border:1px solid #b6b3aa;border-right-width:0;color:#333;
+  display:flex;align-items:end;justify-content:center;padding-bottom:7px;cursor:pointer;position:relative;font-weight:600;font-size:11px}
+.key.white:last-child{border-right-width:1px}
+.key.white:first-child{border-radius:3px 0 0 3px}
+.key.white.active{background:#a8ccff;border-color:#5d8fd6;color:#123}
+.black-keys{position:absolute;inset:0;z-index:2;pointer-events:none}
+.key.black{position:absolute;top:0;width:3.4%;height:60%;background:#222327;border:1px solid #000;border-radius:0 0 4px 4px;color:#cfd3da;
+  display:flex;align-items:end;justify-content:center;padding-bottom:5px;cursor:pointer;pointer-events:auto;font-size:10px;box-shadow:0 2px 4px rgba(0,0,0,.45)}
+.key.black.active{background:#3d6fd1;border-color:#2a4f9e;color:#fff}
+.key .mini{display:block;font-size:8.5px;opacity:.5;margin-top:1px;font-weight:400}
+.key.root:after{content:"root";position:absolute;top:5px;left:50%;transform:translateX(-50%);font-size:8px;opacity:.7;text-transform:uppercase;letter-spacing:.09em}
+/* scale dots: at the front of the key, above the label, always visible */
+.key.white.scale-tone::before{content:"";position:absolute;bottom:34px;left:50%;transform:translateX(-50%);
+  width:7px;height:7px;border-radius:50%;background:var(--green);z-index:3;pointer-events:none}
+.key.black.scale-tone::before{content:"";position:absolute;bottom:30px;left:50%;transform:translateX(-50%);
+  width:6px;height:6px;border-radius:50%;background:var(--green);z-index:3;pointer-events:none}
+.key.key-center.scale-tone::before{background:var(--amber);width:8px;height:8px;box-shadow:0 0 0 2px rgba(232,176,75,.35)}
+.key.black.key-center.scale-tone::before{width:7px;height:7px}
+
+.guitar-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.voice-nav{display:flex;align-items:center;gap:5px}
+.voice-label{font-size:12px;min-width:96px;text-align:center;color:var(--text)}
+.voice-sig{font-family:ui-monospace,Consolas,monospace;font-size:13px;color:var(--accent);letter-spacing:.14em}
+.voice-info{font-size:11px;color:var(--muted);flex:1;min-width:150px}
+.guitar-main{display:flex;gap:8px;align-items:stretch}
+.gv-panel{flex:none;width:256px;border:1px solid var(--line);border-radius:8px;background:var(--inset);padding:8px 10px;overflow-y:auto;max-height:206px;font-size:12px;line-height:1.4;color:#cfd3da}
+.gv-panel h4{margin:0 0 4px;font-size:12px;color:var(--text)}
+.neck-wrap{flex:1;min-width:0;overflow-x:auto;overflow-y:hidden;background:var(--inset);border:1px solid var(--line);border-radius:8px}
+#neckSvg{display:block;min-width:1020px;width:100%;height:206px;user-select:none}
+#neckSvg text{font-family:Inter,ui-sans-serif,system-ui,sans-serif}
+#gHit rect:hover{fill:rgba(233,234,238,.07)}
+.hidden{display:none !important}
+
+/* ---------- modal ---------- */
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.62);display:none;align-items:center;justify-content:center;padding:18px;z-index:50}
+.modal-backdrop.open{display:flex}
+.modal{width:min(780px,96vw);max-height:min(840px,92vh);overflow:auto;background:var(--panel);border:1px solid var(--line2);border-radius:10px;padding:18px}
+.modal h2{margin:0 0 10px;font-size:20px;letter-spacing:-.02em}
+.modal h3{margin:15px 0 6px;font-size:13.5px;color:var(--accent)}
+.modal p,.modal li{color:#cfd3da;font-size:13px;line-height:1.5}
+.modal ul{margin:6px 0 0;padding-left:20px}
+.modal-close{float:right}
+
+@media(max-width:1050px){
+  .keystrip{grid-template-columns:1fr}
+  .scale-info{border-left:0;padding-left:0;border-top:1px solid var(--line);padding-top:8px}
+  .mid{grid-template-columns:1fr}
+  .readout{grid-template-columns:1fr}
+  .why{max-height:260px}
+  .palette{flex-direction:column;align-items:stretch}
+  .guitar-main{flex-direction:column}
+  .gv-panel{width:auto;max-height:180px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ======= KEY / SCALE STRIP ======= -->
+  <div class="card keystrip">
+    <div class="ks-left">
+      <div class="ks-row">
+        <span class="lbl">Key</span>
+        <div class="pillrow" id="keyButtons"></div>
+        <button class="btn tiny" id="pinBtn" title="While on, the key follows whatever chord root you select">Pin key to root</button>
+        <div class="ks-spacer"></div>
+        <button class="btn tiny" id="helpBtn" title="How it works">?</button>
+      </div>
+      <div class="ks-row">
+        <span class="lbl">Scale</span>
+        <div class="pillrow" id="scaleButtons"></div>
+      </div>
+      <div class="ks-row">
+        <button class="btn tiny active" id="scaleToggle" title="Show scale dots on the instruments">Overlay</button>
+        <div class="scale-chips" id="scaleChips"></div>
+      </div>
+    </div>
+    <div class="scale-info" id="scaleInfo"></div>
+  </div>
+
+  <!-- ======= BUILDER + READOUT ======= -->
+  <div class="mid">
+    <aside class="card builder">
+      <div>
+        <div class="lbl" style="margin-bottom:5px">Root</div>
+        <div class="grid root-grid" id="rootButtons"></div>
+      </div>
+      <div>
+        <div class="lbl" style="margin-bottom:5px">Quality</div>
+        <div class="grid quality-grid" id="qualityButtons"></div>
+      </div>
+      <div>
+        <div class="lbl" style="margin-bottom:5px">Extensions / Adds / Alters</div>
+        <div class="grid ext-grid" id="extensionButtons"></div>
+      </div>
+    </aside>
+
+    <section class="card center">
+      <div class="readout">
+        <div class="ro-left">
+          <div class="chord-line">
+            <div class="chord-name" id="currentChord">No chord</div>
+            <div class="roman-badge" id="romanBadge">I</div>
+          </div>
+          <div class="note-list" id="noteList">Select notes or choose a chord.</div>
+          <div class="matches" id="matches"></div>
+        </div>
+        <div class="why">
+          <div class="why-body" id="whyBody"></div>
+        </div>
+      </div>
+      <div class="palette">
+        <div class="pal-head">
+          <span class="lbl">In this key</span>
+          <div class="seg" id="palSeg">
+            <button data-size="3">Triads</button>
+            <button data-size="4" class="on">7ths</button>
+            <button data-size="5">9ths</button>
+          </div>
+          <button class="btn tiny" id="numHelpBtn">How numerals work</button>
+          <button class="btn tiny" id="chordHelpBtn">How chord names work</button>
+        </div>
+        <div class="pal-row" id="paletteRow"></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ======= INSTRUMENTS ======= -->
+  <section class="card instruments">
+    <div class="inst-bar">
+      <button class="btn small" id="playBtn">▶ Play</button>
+      <button class="btn small" id="clearBtn">Clear</button>
+      <span class="lbl">Play as</span>
+      <div class="seg" id="primarySeg">
+        <button data-pi="piano" class="on">Piano</button>
+        <button data-pi="guitar">Guitar</button>
+      </div>
+      <div class="sep"></div>
+      <button class="btn small active" id="pianoToggle">Piano</button>
+      <button class="btn small active" id="guitarToggle">Guitar</button>
+      <div class="sep"></div>
+      <span class="lbl">Inversion</span>
+      <span style="display:flex;gap:4px" id="inversionButtons"></span>
+      <div class="sep"></div>
+      <button class="btn small active" id="multiToggle">Multi-press</button>
+      <button class="btn small active" id="arpToggle">Arpeggio</button>
+      <button class="btn small" id="sustainToggle">Sustain off</button>
+      <button class="btn small" id="octaveDown">Oct −</button>
+      <button class="btn small" id="octaveUp">Oct +</button>
+      <div class="ks-spacer"></div>
+      <div class="vol"><span>Keys</span><input type="range" id="volKeys" min="0" max="100" value="80"></div>
+      <div class="vol"><span>Guitar</span><input type="range" id="volGuitar" min="0" max="100" value="40"></div>
+      <div class="vol"><span>Master</span><input type="range" id="volMaster" min="0" max="100" value="85"></div>
+      <span class="lbl" id="sndStatus"></span>
+    </div>
+
+    <div class="keyboard-area" id="pianoWrap">
+      <div class="keyboard">
+        <div class="white-keys" id="whiteKeys"></div>
+        <div class="black-keys" id="blackKeys"></div>
+      </div>
+    </div>
+
+    <div id="guitarWrap">
+      <div class="guitar-bar">
+        <select id="tuningSelect" title="Tuning"></select>
+        <select id="capoSelect" title="Capo"></select>
+        <span class="lbl">Frets</span>
+        <div class="seg" id="fretSeg">
+          <button data-fr="18" class="on">18</button>
+          <button data-fr="24">24</button>
+        </div>
+        <button class="btn small" id="leftyToggle">Right-handed</button>
+        <div class="sep"></div>
+        <span class="lbl">Note labels</span>
+        <div class="seg" id="neckSeg">
+          <button data-nm="chord" class="on">Chord</button>
+          <button data-nm="scale">Scale</button>
+          <button data-nm="all">All notes</button>
+        </div>
+        <div class="seg" id="fingerSeg" title="Chord dot labels">
+          <button data-fm="notes" class="on">Notes</button>
+          <button data-fm="fingers">Fingers</button>
+        </div>
+        <div class="sep"></div>
+        <div class="voice-nav">
+          <button class="btn small" id="voicePrev">◀</button>
+          <div class="voice-label" id="voiceLabel">–</div>
+          <button class="btn small" id="voiceNext">▶</button>
+          <button class="btn small" id="strumBtn">Strum</button>
+        </div>
+        <button class="btn small" id="gvToggle" title="Analysis of the current shape">Voicing info</button>
+        <div class="voice-sig" id="voiceSig"></div>
+        <div class="voice-info" id="voiceInfo"></div>
+      </div>
+      <div class="guitar-main">
+        <div class="gv-panel hidden" id="gvPanel"></div>
+        <div class="neck-wrap"><svg id="neckSvg" xmlns="http://www.w3.org/2000/svg"></svg></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ======= NUMERALS GUIDE ======= -->
+<div class="modal-backdrop" id="numModal" role="dialog" aria-modal="true">
+  <div class="modal">
+    <button class="btn small modal-close" id="numClose">Close</button>
+    <h2>How roman numerals work</h2>
+    <p>A numeral names a chord by the scale degree it is built on, not by its letter. In C major the chord on degree 5 is G, so G is written <b>V</b>. In E major, V is B. The letter changes with the key; the relationship does not. That is the whole point: numerals describe the job a chord does in its key, so a progression written in numerals works in every key. Tell a band "one, five, six, four" and it works whether the singer wants G or E♭.</p>
+    <h3>Reading the symbols</h3>
+    <ul>
+      <li><b>UPPERCASE</b> means major: I, IV, V.</li>
+      <li><b>lowercase</b> means minor: ii, iii, vi.</li>
+      <li><b>°</b> means diminished (vii°); <b>ø</b> means half-diminished, an m7♭5 chord (viiø7); <b>+</b> means augmented (III+).</li>
+      <li>A trailing <b>7</b>, <b>9</b>, or <b>13</b> means those extensions are stacked on top: V7, ii9. <b>maj7</b> marks the major seventh specifically: Imaj7.</li>
+      <li><b>sus</b> written out means the 3rd is replaced (Vsus4), so the chord is neither major nor minor. Power chords take the plain numeral by rock convention; with no 3rd, the letter case cannot mean anything anyway.</li>
+    </ul>
+    <p>How professionals actually use these: analysis keeps numerals to standard chord types. Added color tones do not change the numeral (a Cadd4 chord in C major is still just <b>I</b>; the 4 is treated as texture, not harmony), and sonorities without a conventional label, like quartal stacks or a seventh chord missing its 3rd, simply do not get a numeral. This tool follows that practice: if no honest standard numeral exists, none is shown.</p>
+    <h3>Why numerals change when the scale changes</h3>
+    <p>Each chord in the palette is built by stacking every other note of the current scale. Change the scale and the ingredient notes change, so the chords built from them change too. Natural minor stacks a weak minor chord on degree 5 (v). Harmonic minor exists largely to fix that: raising the 7th degree turns v into a real V7 that pulls hard back to home. Switch between Minor and Harm. Minor and watch degree 5 change.</p>
+    <h3>Functions: T, PD, D</h3>
+    <p>In major and minor keys, chords group into three jobs. <b>Tonic</b> (T) is home: I and vi. <b>Pre-dominant</b> (PD) moves away from home: ii and IV. <b>Dominant</b> (D) builds the tension that resolves home: V and vii°. Most progressions are loops through home, away, tension, home.</p>
+    <h3>Numerals in the wild</h3>
+    <ul>
+      <li><b>Pop:</b> the four-chord loop <b>I V vi IV</b> (or rotated, <b>vi IV I V</b>) powers an enormous share of the charts. Same numerals, thousands of songs.</li>
+      <li><b>50s and doo-wop:</b> <b>I vi IV V</b>, the "Stand By Me" changes.</li>
+      <li><b>Rock:</b> loves borrowing from Mixolydian: <b>I ♭VII IV</b> is the classic-rock move, and minor-key rock leans on <b>i ♭VI ♭VII</b>.</li>
+      <li><b>Blues:</b> the 12-bar form is <b>I7 IV7 V7</b> with dominant 7ths on every chord, cheerfully breaking diatonic rules. That rule-breaking is the blues sound.</li>
+      <li><b>Jazz:</b> the basic cell is <b>ii7 V7 Imaj7</b>, chained through different keys.</li>
+      <li><b>Flamenco and surf:</b> the Andalusian cadence <b>i ♭VII ♭VI V</b>.</li>
+    </ul>
+    <p>A good exercise: pick a key, then play any of these patterns from the palette in order and listen for the pull back to I.</p>
+  </div>
+</div>
+
+<!-- ======= 12-TET GUIDE ======= -->
+<div class="modal-backdrop" id="tetModal" role="dialog" aria-modal="true">
+  <div class="modal">
+    <button class="btn small modal-close" id="tetClose">Close</button>
+    <h2>The 12-note system</h2>
+    <p>Western music runs on 12 notes: C, C♯, D, E♭, E, F, F♯, G, A♭, A, B♭, B, then C again. That second C is an octave up, and its frequency is exactly double. Every octave repeats the same 12 names, higher or lower; that is why the piano keyboard is the same pattern over and over.</p>
+    <h3>Equal temperament</h3>
+    <p>12-tone equal temperament (12-TET) divides the octave into 12 identical steps called semitones. Each semitone multiplies the frequency by the 12th root of 2, about 1.0595, so twelve steps land exactly on the doubled frequency. A4 is 440 Hz, so A5 is 880.</p>
+    <p>The payoff of making every step identical: every key sounds the same, just higher or lower. A major scale starting on C uses the same step recipe as one starting on F♯, and the recipe is all that matters. That is why the key pills work at all; change the key and every relationship survives intact.</p>
+    <h3>What it looks like on the instruments</h3>
+    <p>On the piano, one semitone is the very next key, black or white. On the guitar, one fret is one semitone, and the frets crowd together up the neck because each step is a frequency ratio rather than a fixed distance; the fret spacing drawn here is the real geometry.</p>
+    <h3>Sharps and flats</h3>
+    <p>In 12-TET, C♯ and D♭ are the same pitch. Which spelling is correct depends on musical context (the same key on the piano is spelled C♯ in D major but D♭ in A♭ major); this tool uses one fixed spelling per note to keep the interface simple.</p>
+    <h3>Scales, keys, chords</h3>
+    <p>A scale is a subset of the 12 notes, usually 7 of them, chosen by a step recipe. A key is a scale plus a home note. Chords are built by stacking scale members. Everything on this page is arithmetic on the same 12 notes.</p>
+    <p>Why 12 in the first place? Dividing the octave into 12 lands remarkably close to the pure ratios ears gravitate toward: 7 semitones is within a tenth of a percent of a perfect 3:2 fifth. Musicians tuned to pure ratios for centuries; 12-TET trades a sliver of that purity for the freedom to play equally well in every key.</p>
+  </div>
+</div>
+
+<!-- ======= CHORD NAMES GUIDE ======= -->
+<div class="modal-backdrop" id="chordModal" role="dialog" aria-modal="true">
+  <div class="modal">
+    <button class="btn small modal-close" id="chordClose">Close</button>
+    <h2>How chord names work</h2>
+    <p>A chord symbol is a recipe read left to right: root letter, then quality, then extras. A bare letter like <b>C</b> means a C major triad (C E G); everything after the letter modifies that default.</p>
+    <h3>Quality</h3>
+    <ul>
+      <li><b>C</b>: major triad, 1 3 5. Major is the unmarked default.</li>
+      <li><b>Cm</b>: minor. The 3rd is lowered a semitone (1 ♭3 5) and nothing else changes.</li>
+      <li><b>Cdim</b> (1 ♭3 ♭5) and <b>Caug</b> (1 3 ♯5): the triad squeezed smaller or stretched larger.</li>
+      <li><b>Csus2 / Csus4</b>: the 3rd is replaced by the 2nd or 4th. With no 3rd, the chord is neither major nor minor.</li>
+      <li><b>C5</b>: root and 5th only, the power chord. Also no 3rd.</li>
+    </ul>
+    <h3>Sevenths and extensions</h3>
+    <ul>
+      <li><b>C7</b>: major triad plus the lowered 7th (♭7). A plain "7" always means the ♭7; this is the dominant sound.</li>
+      <li><b>Cmaj7</b>: the raised (major) 7th instead. One semitone, completely different mood.</li>
+      <li><b>Cm7</b>: minor triad plus ♭7. <b>Cm(maj7)</b>: minor triad with the major 7th.</li>
+      <li><b>C9, C11, C13</b>: keep stacking every other note above the 7th. A 13 chord implies the 7 and 9 underneath it; players drop what they cannot reach.</li>
+    </ul>
+    <h3>Add, alter, omit</h3>
+    <ul>
+      <li><b>add</b> means the tone joins WITHOUT a 7th: Cadd9 = C E G D. Compare C9, which includes the ♭7.</li>
+      <li><b>♭ or ♯ before a number</b> alters that tone: C7♭9, C7♯11. These are the "altered dominant" colors.</li>
+      <li><b>(no3)</b> means the chord omits its 3rd, the tone that decides major versus minor. C7(no3) is C G B♭: a dominant 7th skeleton with no gender. Rock plays this constantly (a power chord with a ♭7 on top), and big voicings drop the 3rd for space. It is spelled out here so a chord never claims a major or minor sound it does not actually contain.</li>
+      <li><b>ø7</b> is half-diminished (m7♭5); <b>°7</b> is fully diminished. Compact symbols for two dark 7th chords.</li>
+    </ul>
+    <h3>Same notes, several names</h3>
+    <p>C6 (C E G A) and Am7 (A C E G) are the same four notes. Which name is right depends on the bass note and the key around it. The interpretation pills exist because that ambiguity is real, not a bug.</p>
+  </div>
+</div>
+
+<!-- ======= HELP ======= -->
+<div class="modal-backdrop" id="helpModal" role="dialog" aria-modal="true">
+  <div class="modal">
+    <button class="btn small modal-close" id="helpClose">Close</button>
+    <h2>How this tool works</h2>
+    <p>Everything responds to everything: pick a chord and both instruments light up; click notes on the piano or guitar and the app names what you played; change the key or scale and the palette, overlays, and explanations follow.</p>
+    <h3>Key &amp; scale strip (top)</h3>
+    <ul>
+      <li><b>Key pills</b> set the tonal center; <b>scale pills</b> set the scale, ordered roughly by how common they are. <b>Pin key to root</b> is a toggle: while on, the key follows whatever chord root you select.</li>
+      <li><b>Scale chips</b> (right) show the scale tones with degree numbers: green background = currently in your chord, gold = tonic, violet = the scale's characteristic tone. Click a chip to hear it.</li>
+      <li><b>Overlay</b> toggles scale dots on the piano and neck: green dot = in scale, gold dot = the key center.</li>
+    </ul>
+    <h3>Chord builder (left)</h3>
+    <ul>
+      <li><b>Root / Quality / Extensions</b> build the chord. Blue = selected; green outline = consistent with the notes you clicked by hand.</li>
+      <li>The readout shows the chord name, its <b>roman numeral</b> in the current key, and every reasonable interpretation of the selected notes; click one to adopt it.</li>
+    </ul>
+    <h3>Where the explanations live</h3>
+    <ul>
+      <li><b>Chord panel</b> (beside the readout): interval-by-interval construction and how the chord relates to the current key.</li>
+      <li><b>Scale panel</b> (right side of the key strip): the current scale's character, step pattern in semitones, characteristic tone, parent major, and a clickable modes-of-the-major-scale bar from Lydian down to Locrian. <b>The 12-note system</b> button there explains equal temperament, octaves, and why frets crowd together.</li>
+      <li><b>Voicing info</b> (toggle in the guitar bar): opens an analysis panel beside the neck showing string roles, omissions, and barres for the current shape.</li>
+    </ul>
+    <h3>"In this key" palette</h3>
+    <p>The chords that live in the selected key, as <b>Triads / 7ths / 9ths</b> (9ths fall back to the 7th where the diatonic 9th would be a ♭9). The numeral is the scale degree the chord is built on; the <b>How numerals work</b> button next to the palette is the full guide, symbols and real-world progression examples included. Hovering any chord shows exactly which scale tones were stacked to build it. Corner letters: <b>T</b> tonic, <b>PD</b> pre-dominant, <b>D</b> dominant (major/minor keys). A violet dot marks chords containing the scale's characteristic tone; lean on those to sound like the mode. Pentatonic/blues scales show their degree stacks as triads.</p>
+    <h3>Guitar neck</h3>
+    <ul>
+      <li>The voicing engine searches real string/fret combinations under hand constraints and ranks playable shapes; classic shapes rank first when they exist. Browse with <b>◀ ▶</b>.</li>
+      <li>Muted strings show a red <b>×</b> and a red-tinted string. <b>○</b> = open string. Gold dot = root. The engine drops the most expendable tones (5th first) when a chord has more notes than strings.</li>
+      <li><b>Labels</b>: <i>Chord</i> shows just the voicing (plus small scale dots on the string when Overlay is on); <i>Scale</i> names every in-key note on the whole neck; <i>All notes</i> names everything, with out-of-key notes dimmed.</li>
+      <li><b>Notes / Fingers</b> switches chord-dot labels between note names and a suggested fingering (barres shown as finger 1; it's a heuristic, trust your hands).</li>
+      <li><b>Tuning</b> and <b>capo</b> recompute everything; fret numbers with a capo are relative to the capo, like real chord charts. The neck shows 18 frets by default and can switch to 24. Voicings respect the selected <b>inversion</b>: the lowest sounding string carries the bass.</li>
+      <li><b>Clicking frets builds your own shape</b>: one note per string, exactly where you click. The app names what you built but never adds notes to it. Click a placed note to remove it; clicking a fret on an occupied string moves that string's note. Choosing a chord (builder, palette, or a pill) switches back to engine voicings and replaces your shape.</li>
+      <li><b>Each string has three states</b>: untouched (nothing shown), open, or muted. The column at the nut cycles them: click once for an open string (○), again to mute it (red ×), again to clear. Fretted, open, and muted are all part of the shape; untouched strings are simply undecided.</li>
+    </ul>
+    <h3>Playback &amp; mixing</h3>
+    <ul>
+      <li><b>Play as</b> chooses which instrument sounds when you select chords or hit Play: piano plays the selected notes, guitar strums the current voicing.</li>
+      <li><b>Multi-press</b> stacks clicked notes; single-note mode replaces. <b>Arpeggio</b> vs block, <b>sustain</b>, <b>Oct −/+</b> as labeled. <b>Strum</b> plays the guitar voicing low-to-high.</li>
+      <li><b>Keys / Guitar / Master</b> sliders mix the two instruments.</li>
+      <li>Computer keys <span class="kbd">A W S E D F T G Y H U J K</span> play a chromatic octave from C.</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+'use strict';
+/* =====================================================================
+   Chord Vis — v2.0 (flat UI rework)
+   Sections: theory data · state · utils · audio · detection · scale
+   · voicing engine (modular, swappable) · guitar render · teaching
+   · palette · piano · render loop · wiring
+   ===================================================================== */
+
+/* ---------------- theory data ---------------- */
+const NOTE_NAMES=['C','C#','D','Eb','E','F','F#','G','Ab','A','Bb','B'];
+const ROOTS=NOTE_NAMES, BLACK_PCS=new Set([1,3,6,8,10]);
+
+const QUALITIES=[
+  {id:'maj',label:'Major',suffix:'',base:[0,4,7]},
+  {id:'min',label:'Minor',suffix:'m',base:[0,3,7]},
+  {id:'dim',label:'Dim',suffix:'dim',base:[0,3,6]},
+  {id:'aug',label:'Aug',suffix:'aug',base:[0,4,8]},
+  {id:'sus2',label:'Sus2',suffix:'sus2',base:[0,2,7]},
+  {id:'sus4',label:'Sus4',suffix:'sus4',base:[0,5,7]},
+  {id:'5',label:'Power 5',suffix:'5',base:[0,7]},
+  {id:'quartal',label:'Quartal',suffix:'quartal',base:[0,5,10]}];
+
+const EXTENSIONS=[
+  {id:'plain',label:'Plain',suffix:'',add:[]},
+  {id:'add2',label:'add2',suffix:'add2',add:[2]},
+  {id:'add4',label:'add4',suffix:'add4',add:[5]},
+  {id:'add6',label:'6',suffix:'6',add:[9]},
+  {id:'add9',label:'add9',suffix:'add9',add:[14]},
+  {id:'add11',label:'add11',suffix:'add11',add:[17]},
+  {id:'add13',label:'add13',suffix:'add13',add:[21]},
+  {id:'7',label:'7',suffix:'7',add:[10]},
+  {id:'maj7',label:'maj7',suffix:'maj7',add:[11]},
+  {id:'mMaj7',label:'m(maj7)',suffix:'m(maj7)',add:[11],forceQuality:'min'},
+  {id:'9',label:'9',suffix:'9',add:[10,14]},
+  {id:'maj9',label:'maj9',suffix:'maj9',add:[11,14]},
+  {id:'m9',label:'m9',suffix:'m9',add:[10,14],forceQuality:'min'},
+  {id:'11',label:'11',suffix:'11',add:[10,14,17]},
+  {id:'maj11',label:'maj11',suffix:'maj11',add:[11,14,17]},
+  {id:'m11',label:'m11',suffix:'m11',add:[10,14,17],forceQuality:'min'},
+  {id:'13',label:'13',suffix:'13',add:[10,14,17,21]},
+  {id:'maj13',label:'maj13',suffix:'maj13',add:[11,14,17,21]},
+  {id:'m13',label:'m13',suffix:'m13',add:[10,14,17,21],forceQuality:'min'},
+  {id:'7b9',label:'7♭9',suffix:'7♭9',add:[10,13]},
+  {id:'7s9',label:'7♯9',suffix:'7♯9',add:[10,15]},
+  {id:'7s11',label:'7♯11',suffix:'7♯11',add:[10,14,18]},
+  {id:'7b13',label:'7♭13',suffix:'7♭13',add:[10,14,20]},
+  {id:'7sus4',label:'7sus4',suffix:'7sus4',add:[10],forceQuality:'sus4'},
+  {id:'dim7',label:'dim7',suffix:'dim7',add:[9],forceQuality:'dim'},
+  {id:'m7b5',label:'m7♭5',suffix:'m7♭5',override:[0,3,6,10]},
+  {id:'aug7',label:'aug7',suffix:'aug7',add:[10],forceQuality:'aug'},
+  {id:'augMaj7',label:'maj7♯5',suffix:'maj7♯5',add:[11],forceQuality:'aug'}];
+
+/* Scales ordered by how common / simple they are */
+const SCALES=[
+  {id:'major',label:'Major',ints:[0,2,4,5,7,9,11]},
+  {id:'minor',label:'Minor',ints:[0,2,3,5,7,8,10]},
+  {id:'minpent',label:'Minor Pent',ints:[0,3,5,7,10]},
+  {id:'majpent',label:'Major Pent',ints:[0,2,4,7,9]},
+  {id:'blues',label:'Blues',ints:[0,3,5,6,7,10]},
+  {id:'mixolydian',label:'Mixolydian',ints:[0,2,4,5,7,9,10]},
+  {id:'dorian',label:'Dorian',ints:[0,2,3,5,7,9,10]},
+  {id:'lydian',label:'Lydian',ints:[0,2,4,6,7,9,11]},
+  {id:'phrygian',label:'Phrygian',ints:[0,1,3,5,7,8,10]},
+  {id:'harmminor',label:'Harm. Minor',ints:[0,2,3,5,7,8,11]},
+  {id:'melminor',label:'Mel. Minor',ints:[0,2,3,5,7,9,11]},
+  {id:'locrian',label:'Locrian',ints:[0,1,3,5,6,8,10]}];
+const ROMANS=['I','II','III','IV','V','VI','VII'];
+const BRIGHT_IDS=['lydian','major','mixolydian','dorian','minor','phrygian','locrian']; // bright → dark
+const DIATONIC_OFFSET={major:0,dorian:2,phrygian:4,lydian:5,mixolydian:7,minor:9,locrian:11};
+
+const SCALE_INFO={
+  major:{alias:'Ionian',char:null,blurb:'The major scale: the reference point everything else is measured against. Bright, stable, resolved.',vs:'This IS the yardstick: every other scale is described by how it bends major.'},
+  minor:{alias:'Aeolian / natural minor',char:null,blurb:'The natural minor scale: the serious, melancholy baseline of minor-key music.',vs:'Major with lowered 3rd, 6th, and 7th.'},
+  minpent:{alias:null,char:null,blurb:'The universal solo scale: minor without the friction notes (no 2, no ♭6), so nothing clashes. Box shapes live here.',vs:'Natural minor minus the 2nd and ♭6th.'},
+  majpent:{alias:null,char:null,blurb:'Major minus its half steps (no 4, no 7), so it is nearly impossible to play a wrong note. Country, folk, and gospel bedrock.',vs:'Major minus the 4th and 7th.'},
+  blues:{alias:null,char:6,blurb:'Minor pentatonic plus the ♭5 "blue note": a passing tone you bend and slide through, not sit on.',vs:'Minor pentatonic + ♭5.'},
+  mixolydian:{alias:null,char:10,blurb:'The sound of dominant 7th chords, blues-rock, and jam bands. Major swagger without the polite leading tone.',vs:'Major with a lowered 7th.'},
+  dorian:{alias:null,char:9,blurb:'Minor, but with a glimmer of hope. The backbone of "So What", "Oye Como Va", and half of funk.',vs:'Natural minor with a raised 6th.'},
+  lydian:{alias:null,char:6,blurb:'Floaty, dreamlike, cinematic; the ♯4 refuses to resolve downward.',vs:'Major with a raised 4th.'},
+  phrygian:{alias:null,char:1,blurb:'Dark and Spanish-tinged; metal and flamenco both live here.',vs:'Natural minor with a lowered 2nd.'},
+  harmminor:{alias:null,char:11,blurb:'Natural minor with a raised 7th. That one change creates the V7 chord powering most minor-key harmony, plus the exotic 1½-step gap.',vs:'Natural minor with a raised 7th.'},
+  melminor:{alias:'Jazz minor',char:9,blurb:'Minor with raised 6th AND 7th, smoothing harmonic minor\'s gap. The jazz minor: minor at the bottom, major at the top.',vs:'Natural minor with raised 6th and 7th.'},
+  locrian:{alias:null,char:6,blurb:'No stable home: even the tonic chord is diminished. More a color to visit than a key to live in.',vs:'Minor with lowered 2nd AND 5th.'}};
+
+const INTERVAL_NAMES={0:'root',1:'minor 2nd',2:'major 2nd',3:'minor 3rd',4:'major 3rd',5:'perfect 4th',
+  6:'tritone (♯4/♭5)',7:'perfect 5th',8:'minor 6th / ♯5',9:'major 6th',10:'minor 7th',11:'major 7th',
+  12:'octave',13:'flat 9th',14:'9th',15:'sharp 9th',17:'11th',18:'sharp 11th',20:'flat 13th',21:'13th'};
+const DEGREE_LABELS={0:'1',1:'♭2',2:'2',3:'♭3',4:'3',5:'4',6:'♭5',7:'5',8:'♯5',9:'6',10:'♭7',11:'7',
+  13:'♭9',14:'9',15:'♯9',17:'11',18:'♯11',20:'♭13',21:'13'};
+
+const FLAVOR={
+  maj:'The plain major triad: bright, at rest. The major 3rd is what makes it "happy".',
+  min:'The minor triad: the 3rd drops one semitone from major and the whole mood changes.',
+  dim:'A stack of two minor 3rds. Tense and unstable; it wants to resolve, usually up a half step.',
+  aug:'Two major 3rds. Symmetrical and dreamlike; it divides the octave evenly, so it belongs to no single key.',
+  sus2:'The 3rd is replaced by the 2nd: open and ambiguous, neither major nor minor.',
+  sus4:'The 3rd is replaced by the 4th, which leans hard on the 3rd it displaced. Resolve it and you hear why "suspension" is the name.',
+  '5':'Root and 5th only. No 3rd means no major/minor identity, which is why it works under distortion.',
+  quartal:'Built from stacked 4ths instead of 3rds. Modern, open, modally vague; McCoy Tyner territory.',
+  add6:'A major triad with the 6th added: vintage sweetness (think doo-wop endings). Same notes as the relative m7.',
+  7:'The dominant 7th: a major triad plus minor 7th. The 3rd and ♭7 form a tritone that begs to resolve, the engine of Western harmony.',
+  maj7:'Major triad plus major 7th: lush and settled. The 7th sits one semitone under the root and shimmers instead of pulling.',
+  mMaj7:'A minor triad with a MAJOR 7th: noir and unsettling. The James Bond chord.',
+  9:'A dominant 7th with the 9th stacked on. Funk and gospel color.',
+  maj9:'maj7 plus the 9th: even more shimmer.',
+  m9:'m7 plus the 9th: smooth, neo-soul minor.',
+  11:'Dominant 7th with 9 and 11. The 11 clashes with the major 3rd, so real voicings usually drop the 3rd; listen for the sus-like openness.',
+  m11:'In minor the 11th does NOT clash with the ♭3; this is the huge, warm minor chord of R&B.',
+  13:'The full dominant stack. In practice you keep root, 3rd, ♭7, 13 and drop the rest.',
+  maj13:'maj7 with 9 and 13: the most notes a "pretty" chord can carry.',
+  m13:'Minor 13: m7 with 9, 11, 13 available. Deep-cushion jazz minor.',
+  '7b9':'Dominant with a flattened 9: flamenco/bebop tension. Contains a dim7 chord inside itself.',
+  '7s9':'The Hendrix chord (Purple Haze): major 3rd AND ♯9 (which sounds like a minor 3rd) at once. Major/minor collision on purpose.',
+  '7s11':'Dominant with a Lydian ♯11: bright tension, no avoid notes.',
+  '7b13':'Dominant with a darkened 13: altered, urgent, wants minor.',
+  '7sus4':'Dominant 7th with the 4th instead of the 3rd: the classic "hold" before resolution.',
+  dim7:'Three stacked minor 3rds, perfectly symmetrical. Any note can be the root; it resolves in four directions. Old horror-movie tension.',
+  m7b5:'Half-diminished: a m7 with lowered 5th. The classic "ii" chord in minor keys; melancholy but functional.',
+  aug7:'Dominant 7th with raised 5th: whole-tone flavor, pushes hard to resolve.',
+  augMaj7:'Major 7th with raised 5th: the dreamlike III chord of harmonic and melodic minor.',
+  add2:'Major triad with the 2nd tucked in next to the root: pop sparkle without a 7th.',
+  add4:'Triad plus the 4th, no 7th. Crunchy adjacent-tone color.',
+  add9:'Triad plus the 9th, no 7th: the default "make it prettier" move in pop piano and acoustic guitar.',
+  add11:'Triad plus the 11th, no 7th.',
+  add13:'Triad plus the 13th (6th an octave up), no 7th.'};
+
+/* ---------------- state ---------------- */
+const state={root:'C',quality:'maj',extension:'plain',inversion:0,selected:new Set(),
+  source:'chord',multi:true,arpeggio:true,sustain:false,octave:3,primary:'piano',
+  volMaster:.85,volKeys:.8,volGuitar:.4};
+const scaleState={key:'C',scaleId:'major',enabled:true,pinned:false};
+const G={on:true,pianoOn:true,tuningId:'standard',capo:0,lefty:false,showFingers:false,
+  neckMode:'chord',frets:18,showInfo:false,voicings:[],vIndex:0,specKey:'',spec:null,
+  userFrets:null,userShape:null,bestExact:null};
+let palSize=4;
+
+const TUNINGS=[
+  {id:'standard',label:'Standard EADGBE',midis:[40,45,50,55,59,64]},
+  {id:'dropd',label:'Drop D',midis:[38,45,50,55,59,64]},
+  {id:'dadgad',label:'DADGAD',midis:[38,45,50,55,57,62]},
+  {id:'openg',label:'Open G',midis:[38,43,50,55,59,62]},
+  {id:'opend',label:'Open D',midis:[38,45,50,54,57,62]},
+  {id:'halfdown',label:'E♭ standard (½ down)',midis:[39,44,49,54,58,63]}];
+
+/* ---------------- utils ---------------- */
+const $=id=>document.getElementById(id);
+function mod(n,m=12){return ((n%m)+m)%m}
+function pc(name){return NOTE_NAMES.indexOf(name)}
+function pcName(n){return NOTE_NAMES[mod(n)]}
+function midiName(m){return pcName(m)+(Math.floor(m/12)-1)}
+function freq(m){return 440*Math.pow(2,(m-69)/12)}
+function q(){return QUALITIES.find(x=>x.id===state.quality)}
+function e(){return EXTENSIONS.find(x=>x.id===state.extension)}
+function curScale(){return SCALES.find(s=>s.id===scaleState.scaleId)}
+function intervals(quality=q(),ext=e()){if(ext.override)return[...ext.override];
+  return [...new Set([...quality.base,...ext.add])].sort((a,b)=>a-b)}
+function nameFor(root,quality=q(),ext=e()){
+  if(quality.id==='5'&&['7','maj7'].includes(ext.id))return root+ext.suffix+'(no3)'; // root+5th+7th: a real sound, honestly named
+  if(ext.override)return root+ext.suffix;
+  if(ext.forceQuality){
+    if(['m9','m11','m13','m(maj7)','7sus4','dim7','aug7','maj7♯5'].includes(ext.suffix))return root+ext.suffix;
+    const fq=QUALITIES.find(x=>x.id===ext.forceQuality);return root+fq.suffix+ext.suffix}
+  if(ext.id==='plain')return root+quality.suffix;
+  if(quality.id==='maj')return root+ext.suffix;
+  if(quality.id==='min'&&['7','9','11','13'].includes(ext.id))return root+'m'+ext.suffix;
+  if(quality.id==='min'&&ext.id==='maj7')return root+'m(maj7)';
+  return root+quality.suffix+ext.suffix}
+function chordMidi(){
+  const root=pc(state.root);let notes=intervals().map(i=>12*(state.octave+1)+root+i);
+  const inv=Math.min(state.inversion,notes.length-1);
+  for(let i=0;i<inv;i++)notes[i]+=12;
+  return notes.sort((a,b)=>a-b)}
+function selectedPCs(){return [...new Set([...state.selected].map(m=>mod(m)))].sort((a,b)=>a-b)}
+
+/* ---------------- audio ---------------- */
+let audioCtx=null,masterGain=null,keysBus=null,guitarBus=null;
+const active=new Map();const pluckCache=new Map();
+/* Sampled instruments: real recordings fetched once from a CDN (cached by the browser).
+   Salamander piano + acoustic guitar. If offline, the synth voices below take over. */
+const SAMPLES={
+  piano:{buffers:new Map(),ready:false,base:'https://tonejs.github.io/audio/salamander/',
+    files:(()=>{const o={};for(let oct=2;oct<=6;oct++)[['C',0],['Ds',3],['Fs',6],['A',9]].forEach(([n,off])=>{o[12*(oct+1)+off]=n+oct+'.mp3'});o[96]='C7.mp3';return o})()},
+  guitar:{buffers:new Map(),ready:false,base:'https://cdn.jsdelivr.net/gh/nbrosowsky/tonejs-instruments@master/samples/guitar-acoustic/',
+    files:{40:'E2.mp3',42:'Fs2.mp3',45:'A2.mp3',48:'C3.mp3',50:'D3.mp3',55:'G3.mp3',59:'B3.mp3',64:'E4.mp3',69:'A4.mp3',74:'D5.mp3'}}};
+let samplesKicked=false,sampleFetchesDone=0;
+function sampleTotal(){return Object.values(SAMPLES).reduce((a,l)=>a+Object.keys(l.files).length,0)}
+function updateSndStatus(){
+  const el=$('sndStatus');if(!el)return;
+  const got=Object.values(SAMPLES).reduce((a,l)=>a+l.buffers.size,0);
+  el.textContent=(sampleFetchesDone>=sampleTotal()&&got===0)?'synth sounds (offline)':''}
+function makeCtx(){
+  if(audioCtx)return;
+  audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+  masterGain=audioCtx.createGain();masterGain.gain.value=state.volMaster;masterGain.connect(audioCtx.destination);
+  keysBus=audioCtx.createGain();keysBus.gain.value=state.volKeys;keysBus.connect(masterGain);
+  guitarBus=audioCtx.createGain();guitarBus.gain.value=state.volGuitar;guitarBus.connect(masterGain)}
+function loadSamples(){
+  if(samplesKicked)return;samplesKicked=true;
+  try{makeCtx()}catch(err){return}
+  for(const lib of Object.values(SAMPLES))
+    for(const [midi,file] of Object.entries(lib.files))
+      fetch(lib.base+file)
+        .then(r=>{if(!r.ok)throw 0;return r.arrayBuffer()})
+        .then(ab=>audioCtx.decodeAudioData(ab))
+        .then(buf=>{lib.buffers.set(+midi,buf);lib.ready=true;sampleFetchesDone++;updateSndStatus()})
+        .catch(()=>{sampleFetchesDone++;updateSndStatus()})}
+function ensureAudio(){
+  makeCtx();loadSamples();
+  if(audioCtx.state==='suspended')audioCtx.resume()}
+function playSample(lib,midi,dur,bus,vel=.9,when=0){
+  const now=audioCtx.currentTime;
+  let best=null,bd=1e9;
+  for(const k of lib.buffers.keys()){const d=Math.abs(k-midi);if(d<bd){bd=d;best=k}}
+  const src=audioCtx.createBufferSource();src.buffer=lib.buffers.get(best);
+  src.playbackRate.value=Math.pow(2,(midi-best)/12);
+  const g=audioCtx.createGain();g.gain.value=vel;
+  g.gain.setTargetAtTime(.0001,now+when+dur,.12);
+  src.connect(g).connect(bus);src.start(now+when);src.stop(now+when+dur+1.2);
+  return {osc:src,gain:g}}
+function playGuitarNote(midi,when=0,vel=.85){
+  ensureAudio();
+  if(SAMPLES.guitar.ready)return playSample(SAMPLES.guitar,midi,state.sustain?8:3,guitarBus,vel,when);
+  return playPluck(midi,when,vel)}
+function stopNote(midi){const nodes=active.get(midi);if(!nodes||!audioCtx)return;
+  const now=audioCtx.currentTime;
+  nodes.forEach(({osc,gain})=>{try{gain.gain.cancelScheduledValues(now);gain.gain.setTargetAtTime(.0001,now,.025);osc.stop(now+.12)}catch{}});
+  active.delete(midi)}
+function pluckBuffer(midi){
+  if(pluckCache.has(midi))return pluckCache.get(midi);
+  const sr=audioCtx.sampleRate,f=freq(midi),N=Math.max(2,Math.round(sr/f));
+  const dur=Math.min(3,1.2+120/f),len=Math.floor(sr*dur);
+  const buf=audioCtx.createBuffer(1,len,sr),d=buf.getChannelData(0);
+  const ring=new Float32Array(N);
+  for(let i=0;i<N;i++)ring[i]=Math.random()*2-1;
+  for(let r=0;r<2;r++)for(let i=0;i<N;i++)ring[i]=.5*(ring[i]+ring[(i+1)%N]);
+  const damp=.994+.0045*Math.min(1,f/900);
+  let idx=0;
+  for(let i=0;i<len;i++){
+    const cur=ring[idx],nxt=ring[(idx+1)%N];
+    d[i]=cur;
+    ring[idx]=(cur+nxt)*.5*Math.min(.9995,damp);
+    idx=(idx+1)%N}
+  pluckCache.set(midi,buf);return buf}
+function playPluck(midi,when=0,vel=.9,bus=null){
+  ensureAudio();const now=audioCtx.currentTime;
+  const src=audioCtx.createBufferSource();src.buffer=pluckBuffer(midi);
+  const gain=audioCtx.createGain();gain.gain.value=.6*vel;
+  src.connect(gain).connect(bus||guitarBus);src.start(now+when);
+  return {osc:src,gain}}
+function pianoVoice(midi,duration){
+  const now=audioCtx.currentTime,f=freq(midi);
+  const lp=audioCtx.createBiquadFilter();lp.type='lowpass';
+  lp.frequency.value=Math.min(11000,f*9);lp.Q.value=.35;lp.connect(keysBus);
+  const partials=[[1,.30],[2.001,.15],[3.004,.068],[4.01,.031],[5.02,.013],[6.04,.006]];
+  const made=[];
+  for(const [n,amp] of partials){
+    if(f*n>10500)continue;
+    const osc=audioCtx.createOscillator(),g=audioCtx.createGain();
+    osc.type='sine';osc.frequency.value=f*n;
+    g.gain.setValueAtTime(.0001,now);
+    g.gain.exponentialRampToValueAtTime(amp,now+.006);
+    g.gain.setTargetAtTime(amp*.16,now+.02,.24+.75/n);  // higher partials fade faster, like real strings
+    g.gain.setTargetAtTime(.0001,now+duration,.08);
+    osc.connect(g).connect(lp);osc.start(now);osc.stop(now+duration+.6);
+    made.push({osc,gain:g})}
+  return made}
+function startNote(midi,dur=null){
+  // keyboard voice is always piano: sampled when loaded, additive synth offline
+  ensureAudio();stopNote(midi);
+  const duration=dur??(state.sustain?8:1.4);
+  const made=SAMPLES.piano.ready?[playSample(SAMPLES.piano,midi,duration,keysBus,.95)]:pianoVoice(midi,duration);
+  active.set(midi,made);
+  setTimeout(()=>active.delete(midi),(duration+.6)*1000)}
+function playNotes(notes=[...state.selected]){
+  const arr=[...notes].sort((a,b)=>a-b);if(!arr.length)return;
+  if(state.arpeggio)arr.forEach((m,i)=>setTimeout(()=>startNote(m,state.sustain?8:1.4),i*145));
+  else arr.forEach(m=>startNote(m,state.sustain?8:1.7))}
+function strumVoicing(v){
+  if(!v)return;ensureAudio();
+  const open=openMidis();
+  const sounding=[];
+  v.frets.forEach((f,s)=>{if(f>=0)sounding.push(open[s]+f)});
+  const gap=state.arpeggio?.16:.045; // arpeggio picks note by note; block chord strums
+  sounding.forEach((m,i)=>playGuitarNote(m,i*gap,.85))}
+
+/* ---------------- chord selection & detection ---------------- */
+function selectChord(play=true){
+  state.source='chord';G.userFrets=null;state.selected=new Set(chordMidi());
+  if(scaleState.pinned)scaleState.key=state.root;
+  render(); // render first so the guitar voicing exists before we play it
+  if(play)playSelection()}
+function playSelection(){
+  if(state.primary==='guitar'){
+    const v=currentVoicing()||(G.userShape&&G.userShape.midis.length?G.userShape:null);
+    if(v){strumVoicing(v);return}}
+  playNotes()}
+function detect(){
+  const pcs=selectedPCs();if(!pcs.length)return[];
+  const set=new Set(pcs),out=[];
+  for(const root of ROOTS)for(const qual of QUALITIES)for(const ext of EXTENSIONS){
+    if(ext.forceQuality&&qual.id!==ext.forceQuality)continue;
+    // extensions only make honest names on maj/min (or via their forced quality);
+    // exception: power chord + 7th is a real sound, named as 7(no3)
+    if(!ext.forceQuality&&!ext.override&&ext.id!=='plain'
+      &&!['maj','min'].includes(qual.id)
+      &&!(qual.id==='5'&&['7','maj7'].includes(ext.id)))continue;
+    // altered dominants are major-quality by definition (a minor ♯9 just duplicates the ♭3)
+    if(['7b9','7s9','7s11','7b13'].includes(ext.id)&&qual.id!=='maj')continue;
+    if(ext.id==='m7b5'&&qual.id!=='min')continue;
+    const chordSet=new Set(intervals(qual,ext).map(i=>mod(pc(root)+i)));
+    const exact=pcs.length===chordSet.size&&pcs.every(x=>chordSet.has(x));
+    const contains=[...chordSet].every(x=>set.has(x));
+    const subset=pcs.every(x=>chordSet.has(x));
+    if(exact||contains||subset){
+      let score=(exact?100:contains?72:45)-Math.abs(chordSet.size-pcs.length)*3;
+      const bassPc=state.selected.size?mod(Math.min(...state.selected)):pcs[0];
+      if(pc(root)===bassPc)score+=4; // the note actually in the bass is the likeliest root
+      out.push({name:nameFor(root,qual,ext),root,quality:qual.id,extension:ext.id,exact,score})}}
+  const seen=new Set(),uniq=[];
+  out.sort((a,b)=>b.score-a.score||a.name.length-b.name.length);
+  for(const r of out){if(!seen.has(r.name)){seen.add(r.name);uniq.push(r)}}
+  return uniq.slice(0,34)}
+function detectedInversions(matches,selected){
+  if(!selected.length)return new Set();
+  const exact=matches.filter(m=>m.exact);if(!exact.length)return new Set();
+  const bassPc=mod(Math.min(...selected));const found=new Set();
+  for(const m of exact){
+    const qual=QUALITIES.find(x=>x.id===m.quality),ext=EXTENSIONS.find(x=>x.id===m.extension);
+    const ints=intervals(qual,ext),rootPc=pc(m.root);
+    ints.forEach((iv,i)=>{if(mod(rootPc+iv)===bassPc)found.add(i)})}
+  return found}
+function bestNameForPcs(pcsArr,preferRootPc){
+  const set=new Set(pcsArr.map(p=>mod(p)));
+  let best=null;
+  for(const root of ROOTS)for(const qual of QUALITIES)for(const ext of EXTENSIONS){
+    if(ext.forceQuality&&qual.id!==ext.forceQuality)continue;
+    if(!ext.forceQuality&&!ext.override&&ext.id!=='plain'
+      &&!['maj','min'].includes(qual.id)
+      &&!(qual.id==='5'&&['7','maj7'].includes(ext.id)))continue;
+    if(ext.id==='m7b5'&&qual.id!=='min')continue;
+    const ivs=intervals(qual,ext);
+    if(ivs.length!==set.size)continue;
+    let ok=true;
+    for(const iv of ivs)if(!set.has(mod(pc(root)+iv))){ok=false;break}
+    if(!ok)continue;
+    const name=nameFor(root,qual,ext);
+    const score=(pc(root)===preferRootPc?50:0)-name.length;
+    if(!best||score>best.score)best={root,quality:qual.id,extension:ext.id,name,score}}
+  return best}
+
+/* ---------------- scale / key ---------------- */
+function scalePcs(){return curScale().ints.map(i=>mod(pc(scaleState.key)+i))}
+function romanFor(rootName,qualityId,extId){
+  // Numerals follow professional usage: standard chord types get standard
+  // symbols, color-tone adds keep the plain triad numeral (an analyst calls
+  // Cadd4 in C simply "I"), and sonorities with no conventional numeral
+  // (quartal stacks, no-3rd sevenths) get none.
+  const pcs=scalePcs(),r=pc(rootName),idx=pcs.indexOf(r);
+  if(idx<0||idx>6)return null;
+  const upper=ROMANS[idx],lower=upper.toLowerCase();
+  switch(extId){
+    case 'm7b5':return lower+'ø7';
+    case 'dim7':return lower+'°7';
+    case 'mMaj7':return lower+'(maj7)';
+    case 'augMaj7':return upper+'maj7♯5';
+    case 'aug7':return upper+'+7';
+    case '7sus4':return upper+'7sus4'}
+  if(qualityId==='quartal')return null;
+  if(qualityId==='5')return extId==='plain'?upper:null;
+  if(qualityId==='sus2'||qualityId==='sus4')return extId==='plain'?upper+qualityId:null;
+  if(qualityId==='dim')return extId==='plain'?lower+'°':null;
+  if(qualityId==='aug')return extId==='plain'?upper+'+':null;
+  if(qualityId==='min'&&extId==='maj7')return lower+'(maj7)';
+  if(qualityId==='min'&&['7b9','7s9','7s11','7b13'].includes(extId))return null;
+  const base=qualityId==='min'?lower:upper;
+  const SUF={plain:'',add2:'',add4:'',add6:'6',add9:'add9',add11:'',add13:'',
+    '7':'7',maj7:'maj7','9':'9',maj9:'maj9',m9:'9','11':'11',maj11:'maj11',m11:'11',
+    '13':'13',maj13:'maj13',m13:'13','7b9':'7♭9','7s9':'7♯9','7s11':'7♯11','7b13':'7♭13'};
+  const s=SUF[extId];
+  return s===undefined?null:base+s}
+const FUNC_MAJOR=['T','PD','T','PD','D','T','D'];
+const FUNC_MINOR=['T','PD','T','PD','D','PD','D'];
+const SEV_MAP={'4,7,11':['maj','maj7'],'4,7,10':['maj','7'],'3,7,10':['min','7'],'3,6,10':['min','m7b5'],
+  '3,6,9':['dim','dim7'],'3,7,11':['min','mMaj7'],'4,8,11':['aug','augMaj7'],'4,8,10':['aug','aug7'],'5,7,10':['sus4','7sus4']};
+const NINE_MAP={'4,7,11,2':['maj','maj9'],'4,7,10,2':['maj','9'],'3,7,10,2':['min','m9']};
+function paletteChords(size){
+  const pcs=scalePcs(),N=pcs.length,out=[];
+  const info=SCALE_INFO[scaleState.scaleId];
+  const charPc=info.char!=null?mod(pc(scaleState.key)+info.char):null;
+  const effSize=N===7?size:3;
+  for(let d=0;d<N;d++){
+    const rootPc=pcs[d];
+    const tonePcs=[0,2,4,6,8].slice(0,effSize).map(k=>pcs[(d+k)%N]);
+    const rel=tonePcs.map(t=>mod(t-rootPc));
+    const third=rel[1],fifth=rel[2];
+    let sel=null,fell=false;
+    const triadQ=third===4?(fifth===8?'aug':fifth===7?'maj':null)
+      :third===3?(fifth===6?'dim':fifth===7?'min':null)
+      :third===2&&fifth===7?'sus2':third===5&&fifth===7?'sus4':null;
+    if(effSize===3){if(triadQ)sel={root:pcName(rootPc),quality:triadQ,extension:'plain'}}
+    else if(effSize===4){
+      const hit=SEV_MAP[third+','+fifth+','+rel[3]];
+      if(hit)sel={root:pcName(rootPc),quality:hit[0],extension:hit[1]}}
+    else{
+      const hit9=NINE_MAP[[third,fifth,rel[3],rel[4]].join(',')];
+      if(hit9)sel={root:pcName(rootPc),quality:hit9[0],extension:hit9[1]};
+      else{const hit7=SEV_MAP[third+','+fifth+','+rel[3]];
+        if(hit7){sel={root:pcName(rootPc),quality:hit7[0],extension:hit7[1]};fell=true}}}
+    if(!sel){const best=bestNameForPcs(tonePcs,rootPc);
+      if(best)sel={root:best.root,quality:best.quality,extension:best.extension}}
+    const name=sel?nameFor(sel.root,QUALITIES.find(x=>x.id===sel.quality),EXTENSIONS.find(x=>x.id===sel.extension)):'—';
+    let lbl;
+    if(N===7&&sel&&pc(sel.root)===rootPc){
+      lbl=romanFor(sel.root,sel.quality,sel.extension)||ROMANS[d];
+      if(sel.extension==='m7b5')lbl=ROMANS[d].toLowerCase()+'ø7'}
+    else lbl=''+(d+1);
+    out.push({sel,name,lbl,fell,degree:d,rootPc,tones:tonePcs,
+      func:scaleState.scaleId==='major'?FUNC_MAJOR[d]:scaleState.scaleId==='minor'?FUNC_MINOR[d]:null,
+      hasChar:charPc!==null&&tonePcs.some(t=>mod(t)===charPc)})}
+  return out}
+
+/* =====================================================================
+   VOICING ENGINE — modular on purpose. To swap approaches, replace
+   buildChordSpec() + findVoicings() with anything returning the same
+   voicing shape: {frets:[6], midis:[], covered:Set, omitted:[], barre,
+   fingers:[6], sig, score}. Frets are relative to the capo; -1 = mute.
+   ===================================================================== */
+function tuning(){return TUNINGS.find(t=>t.id===G.tuningId)}
+function openMidis(){return tuning().midis.map(m=>m+G.capo)}
+
+function buildChordSpec(){
+  // From current selection: chord-source uses the built chord; keyboard-source
+  // uses the best exact detection (bass = actual lowest note) — context aware.
+  if(!state.selected.size)return null;
+  let rootPc,ivs,bassPc,label,qualObj,extObj;
+  if(state.source==='chord'){
+    rootPc=pc(state.root);ivs=intervals();qualObj=q();extObj=e();
+    bassPc=mod(chordMidi()[0]);label=nameFor(state.root)}
+  else{
+    const m=detect().find(x=>x.exact);
+    if(!m)return null;
+    qualObj=QUALITIES.find(x=>x.id===m.quality);extObj=EXTENSIONS.find(x=>x.id===m.extension);
+    rootPc=pc(m.root);ivs=intervals(qualObj,extObj);
+    bassPc=state.selected.size?mod(Math.min(...state.selected)):rootPc;
+    label=m.name}
+  const maxAdd=extObj.add&&extObj.add.length?Math.max(...extObj.add):null;
+  const pri=new Map();
+  const bump=(p,v)=>{const k=mod(p);pri.set(k,Math.max(pri.get(k)||0,v))};
+  for(const iv of ivs){
+    let v;
+    if(iv===0)v=100;
+    else if(extObj.override)v=90;
+    else if(qualObj.base.includes(iv))v=(iv===7?(qualObj.id==='5'?95:35):90);
+    else if([13,15,18,20].includes(iv))v=85;
+    else if(iv===10||iv===11)v=82;
+    else if(iv===maxAdd)v=78;
+    else if(iv===21)v=50;
+    else if(iv===14)v=45;
+    else if(iv===17)v=40;
+    else v=45;
+    // major-11 chords: 3rd clashes with 11 — make it droppable
+    if(['11','maj11'].includes(extObj.id)&&iv===4)v=25;
+    bump(rootPc+iv,v)}
+  bump(bassPc,100);
+  let entries=[...pri.entries()].sort((a,b)=>b[1]-a[1]);
+  let required=entries.filter(x=>x[1]>=70).map(x=>x[0]);
+  const optional=entries.filter(x=>x[1]<70).map(x=>({pc:x[0],pri:x[1]}));
+  // guitar has 6 strings: if too many required, drop lowest-priority required tones
+  const dropped=[];
+  while(required.length>6){
+    const drop=entries.filter(x=>x[1]>=70&&x[0]!==mod(rootPc)&&x[0]!==bassPc).pop();
+    if(!drop)break;
+    required=required.filter(p=>p!==drop[0]);
+    entries=entries.filter(x=>x[0]!==drop[0]);
+    dropped.push(drop[0]);optional.push({pc:drop[0],pri:69})}
+  return {label,rootPc,bassPc,required:new Set(required),optional,forcedDrops:dropped,
+    minStrings:qualObj.id==='5'?2:3,priMap:pri}}
+
+const CLASSIC_SIGS=new Set(['x32010','x32000','x32310','x32030','x02220','x02210','x02020','x02010','x02120',
+  'x02200','x02230','022100','022000','020100','022030','020000','022200','320003','320033','320001',
+  'xx0232','xx0231','xx0212','xx0222','xx0211','xx0230','xx0233','xx3210','x21202','133211','133111',
+  'x13331','x24432','244222','x35553','133200']);
+const BARRE_FORMS=new Set(['022100','022000','020100','020000','022130','x02220','x02210','x02020','x02010','x02120','x02100']);
+function sigOf(frets){return frets.map(f=>f<0?'x':(f>9?'('+f+')':''+f)).join('')}
+
+function findVoicings(spec){
+  if(!spec)return[];
+  const open=openMidis(),results=new Map();
+  const allPcs=new Set([...spec.required,...spec.optional.map(o=>o.pc)]);
+  const maxRel=G.frets-G.capo;
+  const isStd=G.tuningId==='standard'&&G.capo===0;
+  for(let base=1;base<=Math.min(11,maxRel-1);base++){
+    const per=[];
+    for(let s=0;s<6;s++){
+      const opts=[{fret:-1,midi:-1,pc:-1}];
+      const consider=f=>{const m=open[s]+f,p=mod(m);if(allPcs.has(p))opts.push({fret:f,midi:m,pc:p})};
+      consider(0);
+      for(let f=base;f<base+4&&f<=maxRel;f++)consider(f);
+      per.push(opts)}
+    const chosen=new Array(6);
+    (function dfs(s,firstSoundIdx){
+      if(s===6){evaluate(chosen,spec,results,isStd);return}
+      for(const o of per[s]){
+        if(o.fret>=0&&firstSoundIdx<0&&o.pc!==spec.bassPc)continue; // lowest sounding string = bass
+        chosen[s]=o;
+        dfs(s+1,firstSoundIdx>=0?firstSoundIdx:(o.fret>=0?s:-1))}
+    })(0,-1)}
+  const arr=[...results.values()].sort((a,b)=>b.score-a.score);
+  return arr.slice(0,12)}
+
+function evaluate(chosen,spec,results,isStd){
+  const sounding=[],frets=[];
+  for(let s=0;s<6;s++){frets.push(chosen[s].fret);if(chosen[s].fret>=0)sounding.push({s,...chosen[s]})}
+  const n=sounding.length;
+  if(n<spec.minStrings)return;
+  const covered=new Set(sounding.map(x=>x.pc));
+  for(const r of spec.required)if(!covered.has(r))return;
+  const fretted=sounding.filter(x=>x.fret>0);
+  let barre=false,fingersNeeded=fretted.length,minF=0,maxF=0;
+  if(fretted.length){
+    minF=Math.min(...fretted.map(x=>x.fret));maxF=Math.max(...fretted.map(x=>x.fret));
+    if(fretted.length>4){
+      const atMin=fretted.filter(x=>x.fret===minF);
+      if(atMin.length<2)return;
+      const firstBarre=Math.min(...atMin.map(x=>x.s));
+      if(sounding.some(x=>x.fret===0&&x.s>firstBarre))return; // barre would press open strings
+      barre=true;fingersNeeded=1+fretted.filter(x=>x.fret>minF).length;
+      if(fingersNeeded>4)return}}
+  const lo=sounding[0].s,hi=sounding[sounding.length-1].s;
+  let innerMutes=0;
+  for(let s=lo;s<=hi;s++)if(frets[s]<0)innerMutes++;
+  if(innerMutes>1)return;
+  const opens=sounding.filter(x=>x.fret===0).length;
+  const span=fretted.length?maxF-minF:0;
+  if(span>3&&!(span===4&&opens>0))return;
+  let score=0;
+  score+=2.5*(n-3);
+  score+=opens*3.2;
+  if(fretted.length){
+    // open strings mixed into high positions: legal but rarely idiomatic in standard tuning;
+    // alt tunings legitimately drone open strings, so only penalize very high positions there
+    const highOpen=isStd?(minF>=3?opens*Math.min(minF,8):0):(minF>=7?opens*2:0);
+    score-=highOpen;
+    score-=(minF-1)*1.15+span*1.8}
+  score-=innerMutes*4;
+  if(barre)score-=3;
+  if(n<4)score-=4;
+  let optCovered=0;
+  for(const o of spec.optional)if(covered.has(o.pc)){score+=o.pri/14;optCovered++}
+  if(covered.size>=spec.required.size+spec.optional.length)score+=5;
+  const sig=sigOf(frets);
+  if(isStd&&CLASSIC_SIGS.has(sig))score+=10;
+  else if(isStd&&fretted.length&&opens===0&&minF>=1){
+    // movable barre families: normalize to the open form they transpose (E/A/Em/Am/E7/A7/Em7/Am7…)
+    const norm=sigOf(frets.map(f=>f<0?-1:f-minF));
+    if(BARRE_FORMS.has(norm))score+=8}
+  const midis=sounding.map(x=>x.midi);
+  const omitted=spec.optional.filter(o=>!covered.has(o.pc)).map(o=>o.pc);
+  const prev=results.get(sig);
+  if(!prev||prev.score<score)
+    results.set(sig,{frets:[...frets],midis,covered,omitted,barre,minF,score,sig,
+      fingers:assignFingers(frets,barre,minF)})}
+
+function fingersForFrets(frets){
+  const fretted=frets.map((f,s)=>({f,s})).filter(x=>x.f>0);
+  if(!fretted.length)return frets.map(f=>f<0?'x':'0');
+  const minF=Math.min(...fretted.map(x=>x.f));
+  const atMin=fretted.filter(x=>x.f===minF);
+  const barre=fretted.length>4&&atMin.length>=2;
+  return assignFingers(frets,barre,minF)}
+function assignFingers(frets,barre,minF){
+  const out=frets.map(f=>f<0?'x':f===0?'0':'');
+  const fretted=[];
+  frets.forEach((f,s)=>{if(f>0)fretted.push({s,f})});
+  fretted.sort((a,b)=>a.f-b.f||a.s-b.s);
+  let finger=1;
+  if(barre){fretted.forEach(x=>{if(x.f===minF)out[x.s]='1'});finger=2}
+  const rest=fretted.filter(x=>!(barre&&x.f===minF));
+  rest.forEach(x=>{out[x.s]=''+Math.min(4,finger);finger++});
+  return out}
+
+function currentVoicing(){return G.voicings[G.vIndex]||null}
+function refreshVoicings(){
+  if(state.source==='guitar'&&G.userFrets){
+    // manual guitar mode: the display IS the user's shape — no engine re-voicing
+    const key='user:'+G.userFrets.join(',')+':'+G.tuningId+':'+G.capo;
+    G.spec=null;G.voicings=[];G.vIndex=0;
+    if(key===G.specKey&&G.userShape)return;
+    G.specKey=key;
+    const rel=G.userFrets.map(f=>typeof f==='number'?f-G.capo:-1); // 'x' and untouched both silent
+    const midis=[];G.userFrets.forEach((f,s)=>{if(typeof f==='number')midis.push(tuning().midis[s]+f)});
+    G.userShape={frets:rel,midis,sig:sigOf(rel),fingers:fingersForFrets(rel)};
+    return}
+  G.userShape=null;
+  const spec=buildChordSpec();
+  const key=spec?JSON.stringify([spec.label,[...spec.required].sort(),spec.bassPc,G.tuningId,G.capo]):'none';
+  if(key===G.specKey)return;
+  G.specKey=key;G.spec=spec;
+  G.voicings=spec?findVoicings(spec):[];
+  G.vIndex=0}
+
+/* ---------------- guitar rendering (SVG) ---------------- */
+const NECK={W:1320,H:206,x0:96,xEnd:1300,yTop:30,yBot:158}; // x0 leaves room for string labels left of the open-note column
+const SCALE_PX=1900; // pixel scale length; fret spacing is physically proportioned
+function rawFretX(f){return NECK.x0+SCALE_PX*(1-Math.pow(2,-f/12))}
+function mirrorX(x){return G.lefty?NECK.W-x:x}
+function posX(f){
+  if(f===0)return mirrorX(NECK.x0-26);
+  return mirrorX((rawFretX(f-1)+rawFretX(f))/2)}
+function stringY(s){ // s=0 low E … 5 high e ; high string drawn at top
+  return NECK.yTop+(5-s)*((NECK.yBot-NECK.yTop)/5)}
+function buildNeck(){
+  const svg=$('neckSvg');
+  NECK.xEnd=NECK.x0+SCALE_PX*(1-Math.pow(2,-G.frets/12));
+  NECK.W=NECK.xEnd+22;
+  svg.setAttribute('viewBox',`0 0 ${NECK.W} ${NECK.H}`);
+  svg.style.minWidth=G.frets>=24?'1300px':'1080px';
+  const base=tuning().midis;
+  let g='';
+  const bx1=Math.min(mirrorX(NECK.x0),mirrorX(NECK.xEnd)),bx2=Math.max(mirrorX(NECK.x0),mirrorX(NECK.xEnd));
+  g+=`<rect x="${bx1}" y="${NECK.yTop-12}" width="${bx2-bx1}" height="${NECK.yBot-NECK.yTop+24}" fill="#1f2126" stroke="#2c2f36"/>`;
+  for(let f=0;f<=G.frets;f++){
+    const x=mirrorX(rawFretX(f));
+    g+=`<line x1="${x}" y1="${NECK.yTop-12}" x2="${x}" y2="${NECK.yBot+12}" stroke="${f===0?'#b9bec9':'#3a3e47'}" stroke-width="${f===0?6:2}"/>`}
+  for(const f of [3,5,7,9,15,17,19,21]){
+    if(f>G.frets)continue;
+    g+=`<circle cx="${posX(f)}" cy="${(NECK.yTop+NECK.yBot)/2}" r="6" fill="#2b2e35"/>`}
+  for(const f of [12,24]){
+    if(f>G.frets)continue;
+    g+=`<circle cx="${posX(f)}" cy="${(NECK.yTop+NECK.yBot)/2-26}" r="6" fill="#2b2e35"/>`;
+    g+=`<circle cx="${posX(f)}" cy="${(NECK.yTop+NECK.yBot)/2+26}" r="6" fill="#2b2e35"/>`}
+  for(const f of [1,3,5,7,9,12,15,17,19,21,24]){
+    if(f>G.frets)continue;
+    g+=`<text x="${posX(f)}" y="${NECK.yBot+34}" font-size="10.5" fill="#6b7078" text-anchor="middle">${f}</text>`}
+  for(let s=0;s<6;s++){
+    const y=stringY(s),w=2.4-s*.26;
+    const lx1=Math.min(mirrorX(NECK.x0-4),mirrorX(NECK.xEnd)),lx2=Math.max(mirrorX(NECK.x0-4),mirrorX(NECK.xEnd));
+    g+=`<line x1="${lx1}" y1="${y}" x2="${lx2}" y2="${y}" stroke="#8a909c" stroke-width="${w}"/>`;
+    g+=`<text x="${mirrorX(16)}" y="${y+4}" font-size="12" font-weight="600" fill="#9aa0ab" text-anchor="middle">${s===5?pcName(base[s]).toLowerCase():pcName(base[s])}</text>`;
+    g+=`<text x="${mirrorX(38)}" y="${y+3.5}" font-size="8.5" fill="#565b64" text-anchor="middle">${midiName(base[s])}</text>`}
+  if(G.capo>0){
+    const x=posX(G.capo);
+    g+=`<rect x="${x-8}" y="${NECK.yTop-16}" width="16" height="${NECK.yBot-NECK.yTop+32}" rx="6" fill="rgba(232,176,75,.22)" stroke="rgba(232,176,75,.55)"/>`;
+    g+=`<text x="${x}" y="${NECK.yTop-19}" font-size="9.5" fill="var(--amber)" text-anchor="middle">capo</text>`}
+  svg.innerHTML=g+`<g id="gMuted"></g><g id="gScale"></g><g id="gDots"></g><g id="gHit"></g>`;
+  const hit=svg.querySelector('#gHit');let h='';
+  for(let s=0;s<6;s++){
+    const y=stringY(s),hh=(NECK.yBot-NECK.yTop)/5;
+    for(let f=G.capo;f<=G.frets;f++){
+      const x=f===G.capo?posX(0):posX(f);
+      const x1=f===G.capo?x-16:mirrorX(rawFretX(f-1)),x2=f===G.capo?x+16:mirrorX(rawFretX(f));
+      const rx=Math.min(x1,x2),rw=Math.abs(x2-x1);
+      const tip=f===G.capo?'<title>open · click again: mute · again: clear</title>':'';
+      h+=`<rect x="${rx}" y="${y-hh/2}" width="${rw}" height="${hh}" fill="transparent" style="cursor:pointer" data-s="${s}" data-f="${f}">${tip}</rect>`}}
+  hit.innerHTML=h;
+  hit.querySelectorAll('rect').forEach(r=>{
+    r.addEventListener('pointerdown',()=>pressGuitar(+r.dataset.s,+r.dataset.f))})}
+function pressGuitar(s,f){
+  // Build YOUR shape: one note per string, exactly where you click. Click again to remove.
+  // A string is one of three states: untouched (nothing), open (○), or muted (×).
+  // The nut column cycles them: click for open, again for muted, again to clear.
+  ensureAudio();
+  if(state.source!=='guitar'||!G.userFrets){
+    G.userFrets=[null,null,null,null,null,null];
+    state.selected.clear();state.source='guitar'}
+  if(!state.multi){const keep=G.userFrets[s];G.userFrets=[null,null,null,null,null,null];G.userFrets[s]=keep}
+  const cur=G.userFrets[s];
+  if(f===G.capo){
+    if(cur==='x')G.userFrets[s]=null;
+    else if(cur===G.capo)G.userFrets[s]='x';
+    else{G.userFrets[s]=G.capo;playGuitarNote(tuning().midis[s]+G.capo)}}
+  else if(cur===f)G.userFrets[s]=null;
+  else{G.userFrets[s]=f;playGuitarNote(tuning().midis[s]+f)}
+  const sel=new Set();
+  G.userFrets.forEach((fr,ss)=>{if(typeof fr==='number')sel.add(tuning().midis[ss]+fr)});
+  state.selected=sel;
+  render()}
+function renderGuitar(){
+  if(!G.on)return;
+  const svg=$('neckSvg');
+  const mutedG=svg.querySelector('#gMuted'),scaleG=svg.querySelector('#gScale'),dotsG=svg.querySelector('#gDots');
+  if(!scaleG)return;
+  const open=openMidis(),v=currentVoicing();
+  const scaleSet=new Set(scalePcs()),keyPc=pc(scaleState.key);
+  const info=SCALE_INFO[scaleState.scaleId];
+  const charPc=info.char!=null?mod(pc(scaleState.key)+info.char):null;
+  // positions occupied by the chord layer (so labels never sit underneath)
+  const occupied=new Set();
+  if(state.source==='guitar'&&G.userShape){
+    G.userFrets.forEach((f,s)=>{if(f!=null)occupied.add(f==='x'||f===G.capo?s+':nut':s+':'+f)})}
+  else if(v){for(let s=0;s<6;s++){
+    if(v.frets[s]<0||v.frets[s]===0)occupied.add(s+':nut');
+    else occupied.add(s+':'+(v.frets[s]+G.capo))}}
+  /* ----- label / scale layer ----- */
+  let sg='';
+  if(G.neckMode!=='chord'){
+    for(let s=0;s<6;s++)for(let f=G.capo;f<=G.frets;f++){
+      const m=tuning().midis[s]+f,p=mod(m);
+      const inScale=scaleSet.has(p);
+      if(G.neckMode==='scale'&&!inScale)continue;
+      const posKey=f===G.capo?s+':nut':s+':'+f;
+      if(occupied.has(posKey))continue;
+      const x=f===G.capo?posX(0):posX(f),y=stringY(s);
+      const isKey=p===keyPc,isChar=p===charPc;
+      const fill=isKey?'rgba(232,176,75,.24)':isChar?'rgba(159,125,255,.2)':inScale?'rgba(69,184,106,.16)':'rgba(255,255,255,.035)';
+      const stroke=isKey?'rgba(232,176,75,.75)':isChar?'rgba(159,125,255,.6)':inScale?'rgba(69,184,106,.5)':'#33363d';
+      const txt=isKey?'#e8b04b':isChar?'#b9a3ff':inScale?'#9fd9b2':'#6b7078';
+      sg+=`<circle cx="${x}" cy="${y}" r="8.5" fill="${fill}" stroke="${stroke}" stroke-width="1"/>`;
+      sg+=`<text x="${x}" y="${y+3.2}" font-size="8.5" font-weight="600" fill="${txt}" text-anchor="middle">${pcName(m)}</text>`}}
+  else if(scaleState.enabled){
+    // small in-scale markers ON the string, offset toward the nut so chord dots never cover them
+    const dx=G.lefty?13:-13;
+    for(let s=0;s<6;s++)for(let f=G.capo+1;f<=G.frets;f++){
+      const m=tuning().midis[s]+f,p=mod(m);
+      if(!scaleSet.has(p))continue;
+      const x=posX(f)+dx,y=stringY(s);
+      sg+=`<circle cx="${x}" cy="${y}" r="2.6" fill="${p===keyPc?'rgba(232,176,75,.9)':'rgba(69,184,106,.65)'}"/>`}}
+  scaleG.innerHTML=sg;
+  /* ----- muted-string tint + chord dots ----- */
+  let mg='',dg='';
+  if(state.source==='guitar'&&G.userShape){
+    // manual mode: draw EXACTLY the frets the user clicked — nothing added, nothing re-voiced
+    const rootPc=G.bestExact?pc(G.bestExact.root):null;
+    const bx1=Math.min(mirrorX(NECK.x0),mirrorX(NECK.xEnd)),bx2=Math.max(mirrorX(NECK.x0),mirrorX(NECK.xEnd));
+    for(let s=0;s<6;s++){
+      const fAbs=G.userFrets[s];if(fAbs==null)continue;
+      const y=stringY(s);
+      if(fAbs==='x'){
+        mg+=`<line x1="${bx1}" y1="${y}" x2="${bx2}" y2="${y}" stroke="rgba(229,72,77,.4)" stroke-width="3"/>`;
+        dg+=`<text x="${posX(0)}" y="${y+4.5}" font-size="15" font-weight="800" fill="#e5484d" text-anchor="middle">×</text>`;
+        continue}
+      const m=tuning().midis[s]+fAbs,p=mod(m);
+      const isRoot=rootPc!==null&&p===rootPc;
+      const label=G.showFingers?G.userShape.fingers[s]:pcName(m);
+      const x=fAbs===G.capo?posX(0):posX(fAbs);
+      if(fAbs===G.capo){
+        dg+=`<circle cx="${x}" cy="${y}" r="9.5" fill="#1f2126" stroke="${isRoot?'var(--amber)':'var(--accent)'}" stroke-width="2"/>`;
+        dg+=`<text x="${x}" y="${y+3.4}" font-size="9.5" font-weight="600" fill="${isRoot?'#e8b04b':'#cfe0ff'}" text-anchor="middle">${label}</text>`}
+      else{
+        dg+=`<circle cx="${x}" cy="${y}" r="10.5" fill="${isRoot?'var(--amber)':'var(--accent)'}"/>`;
+        dg+=`<text x="${x}" y="${y+3.6}" font-size="10" font-weight="700" fill="${isRoot?'#241a05':'#0c1526'}" text-anchor="middle">${label}</text>`}}
+  }else if(v&&G.spec){
+    const bx1=Math.min(mirrorX(NECK.x0),mirrorX(NECK.xEnd)),bx2=Math.max(mirrorX(NECK.x0),mirrorX(NECK.xEnd));
+    for(let s=0;s<6;s++){
+      const f=v.frets[s],y=stringY(s);
+      const xNut=posX(0);
+      if(f<0){
+        mg+=`<line x1="${bx1}" y1="${y}" x2="${bx2}" y2="${y}" stroke="rgba(229,72,77,.4)" stroke-width="3"/>`;
+        dg+=`<text x="${xNut}" y="${y+4.5}" font-size="15" font-weight="800" fill="#e5484d" text-anchor="middle">×</text>`;
+        continue}
+      const absF=f===0?G.capo:f+G.capo;
+      const m=open[s]+f,p=mod(m);
+      const isRoot=p===G.spec.rootPc;
+      const label=G.showFingers?v.fingers[s]:pcName(m);
+      if(f===0){
+        dg+=`<circle cx="${xNut}" cy="${y}" r="9.5" fill="#1f2126" stroke="${isRoot?'var(--amber)':'var(--accent)'}" stroke-width="2"/>`;
+        dg+=`<text x="${xNut}" y="${y+3.4}" font-size="9.5" font-weight="600" fill="${isRoot?'#e8b04b':'#cfe0ff'}" text-anchor="middle">${label}</text>`}
+      else{
+        const x=posX(absF);
+        dg+=`<circle cx="${x}" cy="${y}" r="10.5" fill="${isRoot?'var(--amber)':'var(--accent)'}"/>`;
+        dg+=`<text x="${x}" y="${y+3.6}" font-size="10" font-weight="700" fill="${isRoot?'#241a05':'#0c1526'}" text-anchor="middle">${label}</text>`}}
+  }else{
+    const pcsSel=new Set(selectedPCs());
+    if(pcsSel.size){
+      for(let s=0;s<6;s++)for(let f=G.capo;f<=G.frets;f++){
+        const m=tuning().midis[s]+f,p=mod(m);
+        if(!pcsSel.has(p))continue;
+        const x=f===G.capo?posX(0):posX(f),y=stringY(s);
+        dg+=`<circle cx="${x}" cy="${y}" r="8" fill="rgba(159,125,255,.35)" stroke="rgba(159,125,255,.7)"/>`;
+        dg+=`<text x="${x}" y="${y+3.2}" font-size="8.5" font-weight="600" fill="#d9ccff" text-anchor="middle">${pcName(m)}</text>`}}}
+  mutedG.innerHTML=mg;dotsG.innerHTML=dg;
+  /* ----- controls text ----- */
+  const label=$('voiceLabel'),sig=$('voiceSig'),infoEl=$('voiceInfo');
+  const nav=!!v;
+  $('voicePrev').disabled=!nav;$('voiceNext').disabled=!nav;
+  $('strumBtn').disabled=!(v||(state.source==='guitar'&&G.userShape&&G.userShape.midis.length));
+  if(state.source==='guitar'&&G.userShape){
+    label.textContent='Your shape';
+    sig.textContent=G.userShape.sig;
+    infoEl.textContent=''}
+  else if(v){
+    label.textContent=`Voicing ${G.vIndex+1} / ${G.voicings.length}`;
+    sig.textContent=v.sig;
+    const om=v.omitted.length?`omits ${v.omitted.map(pcName).join(', ')}`:'all tones present';
+    const drops=G.spec.forcedDrops.length?` · dropped ${G.spec.forcedDrops.map(pcName).join(', ')}`:'';
+    infoEl.textContent=`${om}${v.barre?' · barre':''}${G.capo?` · frets relative to capo ${G.capo}`:''}${drops}`}
+  else if(state.selected.size&&!G.spec){
+    label.textContent='free notes';sig.textContent='';infoEl.textContent=''}
+  else if(G.spec&&!G.voicings.length){
+    label.textContent='no shape';sig.textContent='';
+    infoEl.textContent='no playable shape in this tuning'}
+  else{label.textContent='–';sig.textContent='';infoEl.textContent=''}
+  if(G.showInfo)$('gvPanel').innerHTML=explainVoicingHTML()}
+
+/* ---------------- teaching: why panel ---------------- */
+function chordFlavorKey(){
+  const ext=e();
+  if(ext.id==='plain')return q().id;
+  return ext.id}
+function explainChordHTML(){
+  const selected=[...state.selected].sort((a,b)=>a-b);
+  if(!selected.length)return '<h4>Nothing selected</h4>';
+  let rootPc,ivs,label,qualObj,extObj;
+  const matches=detect();
+  if(state.source==='chord'){rootPc=pc(state.root);qualObj=q();extObj=e();ivs=intervals();label=nameFor(state.root)}
+  else{
+    const m=matches.find(x=>x.exact);
+    if(!m){
+      const pcs=selectedPCs();
+      return `<h4>Free notes: ${pcs.map(pcName).join(' · ')}</h4><div class="why-note">No exact match.</div>`}
+    rootPc=pc(m.root);qualObj=QUALITIES.find(x=>x.id===m.quality);extObj=EXTENSIONS.find(x=>x.id===m.extension);
+    ivs=intervals(qualObj,extObj);label=m.name}
+  let html=`<h4>${label}: individual notes</h4>`;
+  const flav=FLAVOR[state.source==='chord'?chordFlavorKey():(extObj.id==='plain'?qualObj.id:extObj.id)]||'';
+  if(flav)html+=`<div class="flavor">${flav}</div>`;
+  html+='<table class="itable">';
+  for(const iv of ivs){
+    const p=mod(rootPc+iv);
+    html+=`<tr><td>${DEGREE_LABELS[iv]??iv}</td><td>${pcName(p)}</td><td>${INTERVAL_NAMES[iv]??INTERVAL_NAMES[mod(iv)]} · ${iv} semitones</td></tr>`}
+  html+='</table>';
+  if(ivs.some(iv=>/[♭♯]/.test(DEGREE_LABELS[iv]||'')))
+    html+=`<div class="why-note">Degree labels compare each note to the major scale, so a minor 3rd reads as ♭3: the 3 of major, lowered one semitone. Standard chord-formula shorthand.</div>`;
+  const has7=ivs.some(i=>i===10||i===11),has3=ivs.some(i=>i===3||i===4);
+  if(has7&&has3)html+=`<div class="why-note">Guide tones: the 3rd (${pcName(rootPc+(ivs.includes(4)?4:3))}) and 7th (${pcName(rootPc+(ivs.includes(11)?11:10))}) carry the chord's identity; a voicing keeps them before anything else.</div>`;
+  const scale=new Set(scalePcs());
+  const chordPcs=ivs.map(i=>mod(rootPc+i));
+  const outside=chordPcs.filter(p=>!scale.has(p));
+  const roman=romanFor(pcName(rootPc),qualObj.id,extObj.id);
+  const scLabel=`${scaleState.key} ${curScale().label}`;
+  if(!outside.length&&roman)
+    html+=`<div class="why-note" style="margin-top:5px">In <b>${scLabel}</b>: <b class="tag-in">${roman}</b>, diatonic.</div>`;
+  else if(!outside.length)
+    html+=`<div class="why-note" style="margin-top:5px">Every note fits <b>${scLabel}</b>.</div>`;
+  else
+    html+=`<div class="why-note" style="margin-top:5px">In ${scLabel}: <span class="tag-out">${outside.map(pcName).join(', ')} ${outside.length>1?'are':'is'} outside the scale</span>, borrowed/chromatic color.</div>`;
+  return html}
+function renderScaleInfo(){
+  const el=$('scaleInfo');if(!el)return;
+  const info=SCALE_INFO[scaleState.scaleId],sc=curScale(),ints=sc.ints,N=ints.length;
+  const steps=[];for(let i=0;i<N;i++)steps.push(mod(ints[(i+1)%N]-ints[i]));
+  let html=`<div class="si-head"><b>${scaleState.key} ${sc.label}</b>${info.alias?`<span class="si-alias">${info.alias}</span>`:''}<button class="btn tiny" id="tetBtn">The 12-note system</button></div>`;
+  html+=`<div class="si-blurb">${info.blurb}</div>`;
+  html+=`<div class="si-line"><b>${info.vs}</b> Steps between notes: ${steps.join(' · ')} semitones.</div>`;
+  if(info.char!=null){
+    const cp=mod(pc(scaleState.key)+info.char);
+    html+=`<div class="si-line">Characteristic tone: <b style="color:var(--violet)">${pcName(cp)}</b> (${DEGREE_LABELS[info.char]}), the note that sets it apart from plain major or minor.</div>`}
+  if(DIATONIC_OFFSET[scaleState.scaleId]!==undefined&&scaleState.scaleId!=='major'){
+    const parent=mod(pc(scaleState.key)-DIATONIC_OFFSET[scaleState.scaleId]);
+    html+=`<div class="si-line">Same notes as <b>${pcName(parent)} major</b>; ${scaleState.key} is home base, and that re-centering is what a mode is.</div>`}
+  if(scaleState.scaleId==='minpent')
+    html+=`<div class="si-line">Same notes as <b>${pcName(mod(pc(scaleState.key)+3))} major pentatonic</b>: relative shapes, different home.</div>`;
+  const SHORT={lydian:'Lydian',major:'Major',mixolydian:'Mixolyd.',dorian:'Dorian',minor:'Minor',phrygian:'Phrygian',locrian:'Locrian'};
+  const FLAT_CHAIN=['restores the ♯4','flattens the 7','flattens the 3','flattens the 6','flattens the 2','flattens the 5'];
+  const curIdx=BRIGHT_IDS.indexOf(scaleState.scaleId);
+  html+=`<div class="si-cap">Modes of the major scale, brightest to darkest. Each step right lowers exactly one degree (the 4, then 7, 3, 6, 2, 5):</div>`;
+  html+=`<div class="modesbar">${BRIGHT_IDS.map(id=>`<button class="modecell ${id===scaleState.scaleId?'cur':''}" data-bm="${id}" title="${SCALES.find(s=>s.id===id).label}: ${SCALE_INFO[id].vs}">${SHORT[id]}</button>`).join('')}</div>`;
+  if(curIdx>0)html+=`<div class="si-cap">One step brighter ${curIdx<=1?'raises the 4':'restores the '+['','','7','3','6','2','5'][curIdx]}; one step darker ${curIdx<6?FLAT_CHAIN[curIdx].replace('restores the ♯4','flattens the 7'):'is as dark as it gets'}.</div>`;
+  else if(curIdx===0)html+=`<div class="si-cap">Lydian is the brightest mode; one step darker restores the natural 4 (plain major).</div>`;
+  el.innerHTML=html;
+  el.querySelectorAll('[data-bm]').forEach(b=>b.onclick=()=>{scaleState.scaleId=b.dataset.bm;render()});
+  const tb=el.querySelector('#tetBtn');if(tb)tb.onclick=()=>$('tetModal').classList.add('open')}
+function roleForPc(p,rootPc){
+  const base=rootPc??(G.spec?G.spec.rootPc:null);
+  if(base===null)return 'tone';
+  const rel=mod(p-base);
+  const names={0:'root',1:'♭9',2:'9th/2nd',3:'minor 3rd',4:'major 3rd',5:'4th/11th',6:'♭5/♯11',7:'5th',8:'♯5/♭13',9:'6th/13th',10:'♭7',11:'maj 7'};
+  return names[rel]??'tone'}
+function explainVoicingHTML(){
+  if(!G.on)return '<h4>Guitar hidden</h4><div class="why-note">Turn the guitar back on to see voicing analysis.</div>';
+  if(state.source==='guitar'&&G.userShape){
+    if(!G.userShape.midis.length)return '<h4>Your shape</h4><div class="why-note">No notes placed.</div>';
+    const rootPc=G.bestExact?pc(G.bestExact.root):null;
+    let html=`<h4>Your shape: ${G.userShape.sig}</h4>`;
+    html+='<table class="itable">';
+    G.userFrets.map((f,s)=>typeof f!=='number'?null:{s,f,m:tuning().midis[s]+f}).filter(Boolean).reverse().forEach(x=>{
+      html+=`<tr><td>${x.f===G.capo?'○':x.f-G.capo}</td><td>${midiName(x.m)}</td><td>string ${6-x.s} · ${roleForPc(mod(x.m),rootPc)}</td></tr>`});
+    html+='</table>';
+    return html}
+  const v=currentVoicing();
+  if(!v||!G.spec)return '<h4>No voicing</h4><div class="why-note">Choose a chord (or click an exact-match pill) and the engine will search the neck for playable shapes.</div>';
+  const open=openMidis();
+  const sounding=v.frets.map((f,s)=>f>=0?{s,f,m:open[s]+f}:null).filter(Boolean);
+  let html=`<h4>${G.spec.label}: shape ${v.sig}</h4>`;
+  html+='<table class="itable">';
+  sounding.slice().reverse().forEach(x=>{
+    html+=`<tr><td>${x.f===0?'○':x.f}</td><td>${midiName(x.m)}</td><td>string ${6-x.s} · ${roleForPc(mod(x.m))}</td></tr>`});
+  html+='</table>';
+  const bits=[];
+  bits.push(`bass = ${pcName(mod(sounding[0].m))} on string ${6-sounding[0].s}${mod(sounding[0].m)===G.spec.bassPc?' ✓ matches the requested inversion':''}`);
+  const opens=sounding.filter(x=>x.f===0).length;
+  if(opens)bits.push(`${opens} open string${opens>1?'s':''}: free sustain, easier fingering`);
+  if(v.barre)bits.push('uses a barre: one finger lies flat across the lowest fret');
+  if(v.omitted.length)bits.push(`omits ${v.omitted.map(pcName).join(', ')} (${v.omitted.map(p=>roleForPc(p)).join(', ')}), the most expendable tone${v.omitted.length>1?'s':''} here; the 5th adds mass, not identity`);
+  if(G.spec.forcedDrops.length)bits.push(`this chord has more tones than strings; dropped ${G.spec.forcedDrops.map(pcName).join(', ')} by priority`);
+  html+=`<div class="why-note">${bits.map(b=>'• '+b).join('<br>')}</div>`;
+  return html}
+function renderChordInfo(){$('whyBody').innerHTML=explainChordHTML()}
+
+/* ---------------- key strip + palette ---------------- */
+function buildKeyStrip(){
+  ROOTS.forEach(r=>{
+    const b=document.createElement('button');b.className='kbtn';b.textContent=r;b.dataset.key=r;
+    b.onclick=()=>{scaleState.key=r;
+      if(scaleState.pinned&&r!==state.root){scaleState.pinned=false;$('pinBtn').classList.remove('active')}
+      render()};
+    $('keyButtons').appendChild(b)});
+  SCALES.forEach(sc=>{
+    const b=document.createElement('button');b.className='kbtn scale';b.dataset.scale=sc.id;
+    b.textContent=sc.label;b.title=SCALE_INFO[sc.id].alias||sc.label;
+    b.onclick=()=>{scaleState.scaleId=sc.id;render()};
+    $('scaleButtons').appendChild(b)});
+  $('pinBtn').onclick=()=>{
+    scaleState.pinned=!scaleState.pinned;
+    $('pinBtn').classList.toggle('active',scaleState.pinned);
+    if(scaleState.pinned)scaleState.key=state.root;
+    render()};
+  $('scaleToggle').onclick=()=>{scaleState.enabled=!scaleState.enabled;
+    $('scaleToggle').classList.toggle('active',scaleState.enabled);render()}}
+function renderKeyStrip(){
+  document.querySelectorAll('[data-key]').forEach(b=>b.classList.toggle('active',b.dataset.key===scaleState.key));
+  document.querySelectorAll('[data-scale]').forEach(b=>b.classList.toggle('active',b.dataset.scale===scaleState.scaleId));
+  const chips=$('scaleChips');chips.innerHTML='';
+  const pcs=scalePcs(),sel=new Set(selectedPCs()),info=SCALE_INFO[scaleState.scaleId];
+  const charPc=info.char!=null?mod(pc(scaleState.key)+info.char):null;
+  const tonicMidi=60+mod(pc(scaleState.key));
+  pcs.forEach((p,i)=>{
+    const c=document.createElement('span');
+    c.className='chip'+(i===0?' tonic':'')+(p===charPc?' char':'')+(sel.has(p)?' inchord':'');
+    c.innerHTML=`<span class="dg">${i+1}</span><b>${pcName(p)}</b>`;
+    c.title=`degree ${i+1}`;
+    const m=tonicMidi+curScale().ints[i];
+    c.onclick=()=>{ensureAudio();startNote(m)};
+    chips.appendChild(c)})}
+function renderPalette(){
+  const row=$('paletteRow');row.innerHTML='';
+  const N=scalePcs().length;
+  document.querySelectorAll('#palSeg button').forEach(b=>{
+    b.disabled=N!==7&&b.dataset.size!=='3';
+    b.classList.toggle('on',+b.dataset.size===(N===7?palSize:3))});
+  const cur=state.source==='chord'?nameFor(state.root):null;
+  paletteChords(palSize).forEach(ch=>{
+    const b=document.createElement('button');
+    b.className='pal-btn'+(cur&&cur===ch.name?' cur':'');
+    b.innerHTML=`<div class="rn">${ch.lbl}</div><div class="nm">${ch.name}</div>`
+      +(ch.func?`<span class="fn ${ch.func}">${ch.func}</span>`:'')
+      +(ch.hasChar?`<span class="ch" title="contains the scale's characteristic tone"></span>`:'');
+    const funcWord=ch.func==='T'?'Function: tonic (home).':ch.func==='PD'?'Function: pre-dominant (motion away from home).':ch.func==='D'?'Function: dominant (tension pulling home).':'';
+    b.title=`${ch.lbl} = the chord built on degree ${ch.degree+1} (${pcName(ch.rootPc)}) by stacking every other scale tone: ${ch.tones.map(pcName).join(' ')} = ${ch.name}. ${funcWord}`.trim();
+    if(!ch.sel)b.disabled=true;
+    else b.onclick=()=>{
+      state.root=ch.sel.root;state.quality=ch.sel.quality;state.extension=ch.sel.extension;state.inversion=0;
+      selectChord(true)};
+    row.appendChild(b)})}
+
+/* ---------------- piano ---------------- */
+function buildKeyboard(){
+  const start=36,end=84,whites=[];
+  for(let m=start;m<=end;m++)if(!BLACK_PCS.has(mod(m)))whites.push(m);
+  const whiteIndex=new Map(whites.map((m,i)=>[m,i]));
+  whites.forEach(m=>{
+    const k=document.createElement('div');
+    k.className='key white';k.dataset.midi=m;
+    k.innerHTML=`<div>${pcName(m)}<span class="mini">${midiName(m)}</span></div>`;
+    k.onpointerdown=()=>press(m);$('whiteKeys').appendChild(k)});
+  for(let m=start;m<=end;m++){
+    if(!BLACK_PCS.has(mod(m)))continue;
+    let prev=m-1;while(!whiteIndex.has(prev))prev--;
+    const idx=whiteIndex.get(prev),k=document.createElement('div');
+    k.className='key black';k.dataset.midi=m;
+    k.style.left=`calc(${((idx+1)/whites.length)*100}% - 1.7%)`;
+    k.innerHTML=`<div>${pcName(m)}<span class="mini">${midiName(m)}</span></div>`;
+    k.onpointerdown=()=>press(m);$('blackKeys').appendChild(k)}}
+function press(midi){
+  if(state.source==='guitar'){G.userFrets=null;state.selected.clear()} // switching instruments starts fresh
+  state.source='piano';
+  if(!state.multi){[...state.selected].forEach(stopNote);state.selected.clear();state.selected.add(midi);startNote(midi)}
+  else if(state.selected.has(midi)){state.selected.delete(midi);stopNote(midi)}
+  else{state.selected.add(midi);startNote(midi)}
+  render()}
+
+/* ---------------- builder controls ---------------- */
+function makeBtn(text,fn,cls='btn'){const b=document.createElement('button');b.className=cls;b.textContent=text;b.onclick=fn;return b}
+function buildControls(){
+  ROOTS.forEach(r=>{const b=makeBtn(r,()=>{state.root=r;selectChord()});b.dataset.root=r;$('rootButtons').appendChild(b)});
+  QUALITIES.forEach(qu=>{const b=makeBtn(qu.label,()=>{state.quality=qu.id;
+    if(e().forceQuality&&e().forceQuality!==qu.id)state.extension='plain';selectChord()});
+    b.dataset.quality=qu.id;$('qualityButtons').appendChild(b)});
+  EXTENSIONS.forEach(ex=>{const b=makeBtn(ex.label,()=>{state.extension=ex.id;
+    if(ex.forceQuality)state.quality=ex.forceQuality;
+    if(ex.id==='m7b5')state.quality='min';selectChord()});
+    b.dataset.extension=ex.id;$('extensionButtons').appendChild(b)})}
+function renderInversions(){
+  const count=intervals().length;
+  state.inversion=Math.min(state.inversion,count-1);
+  const box=$('inversionButtons');box.innerHTML='';
+  for(let i=0;i<count;i++){
+    const label=i===0?'Root':i===1?'1st':i===2?'2nd':i===3?'3rd':`${i}th`;
+    const b=makeBtn(label,()=>{state.inversion=i;selectChord()},'btn tiny');
+    b.dataset.inversion=i;b.classList.toggle('active',state.source==='chord'&&state.inversion===i);
+    box.appendChild(b)}}
+
+/* ---------------- master render ---------------- */
+function render(){
+  refreshVoicings();
+  const matches=detect(),selected=[...state.selected].sort((a,b)=>a-b);
+  const selPcsNow=selectedPCs();
+  const manual=state.source!=='chord';
+  // one interpretation drives the UI: the top-ranked exact match (alternates stay in the pills)
+  const bestExact=matches.length&&matches[0].exact?matches[0]:null;
+  G.bestExact=bestExact;
+  renderInversions();
+  $('currentChord').textContent=!selected.length?'No chord'
+    :!manual?nameFor(state.root)
+    :selPcsNow.length===1?pcName(selPcsNow[0])+' (single note)'
+    :bestExact?bestExact.name
+    :selPcsNow.map(pcName).join(' · ');
+  $('noteList').textContent=selected.length?selected.map(midiName).join(' · '):'–';
+  const badge=$('romanBadge');
+  let badgeRoot=null,badgeQ=null,badgeE=null;
+  if(!manual&&selected.length){badgeRoot=state.root;badgeQ=state.quality;badgeE=state.extension}
+  else if(bestExact){badgeRoot=bestExact.root;badgeQ=bestExact.quality;badgeE=bestExact.extension}
+  let roman=null,allIn=false;
+  if(badgeRoot){
+    roman=romanFor(badgeRoot,badgeQ,badgeE);
+    const qq=QUALITIES.find(x=>x.id===badgeQ),ee=EXTENSIONS.find(x=>x.id===badgeE);
+    const sset=new Set(scalePcs());
+    allIn=intervals(qq,ee).every(iv=>sset.has(mod(pc(badgeRoot)+iv)))}
+  if(!selected.length||(manual&&!bestExact&&selPcsNow.length>1)||(!roman&&allIn)){badge.style.display='none'}
+  else{badge.style.display='';
+    if(roman){badge.textContent=roman+' in '+scaleState.key+' '+curScale().label;badge.classList.remove('chromatic')}
+    else{badge.textContent='outside '+scaleState.key+' '+curScale().label;badge.classList.add('chromatic')}}
+  // builder: blue "active" only reflects a chord YOU built; green outline = top reading of clicked notes
+  document.querySelectorAll('[data-root]').forEach(b=>{b.classList.toggle('active',!manual&&b.dataset.root===state.root);
+    b.classList.toggle('detected',manual&&!!bestExact&&bestExact.root===b.dataset.root)});
+  document.querySelectorAll('[data-quality]').forEach(b=>{b.classList.toggle('active',!manual&&b.dataset.quality===state.quality);
+    b.classList.toggle('detected',manual&&!!bestExact&&bestExact.quality===b.dataset.quality)});
+  document.querySelectorAll('[data-extension]').forEach(b=>{b.classList.toggle('active',!manual&&b.dataset.extension===state.extension);
+    b.classList.toggle('detected',manual&&!!bestExact&&bestExact.extension===b.dataset.extension)});
+  const invHits=detectedInversions(bestExact?[bestExact]:[],selected);
+  document.querySelectorAll('[data-inversion]').forEach(b=>b.classList.toggle('detected',manual&&invHits.has(Number(b.dataset.inversion))));
+  const rootPc=!manual?pc(state.root):bestExact?pc(bestExact.root):null;
+  const scale=new Set(scalePcs()),keyPc=pc(scaleState.key);
+  document.querySelectorAll('.key').forEach(k=>{
+    const m=Number(k.dataset.midi);
+    k.classList.toggle('active',state.selected.has(m));
+    k.classList.toggle('root',rootPc!==null&&state.selected.has(m)&&mod(m)===rootPc);
+    k.classList.toggle('scale-tone',scaleState.enabled&&scale.has(mod(m)));
+    k.classList.toggle('key-center',scaleState.enabled&&mod(m)===keyPc)});
+  const box=$('matches');box.innerHTML='';
+  matches.forEach((m,i)=>{
+    const p=document.createElement('span');
+    p.className='pill '+(m.exact||i===0?'best':'');
+    p.textContent=m.exact?m.name:m.name+' ?';
+    p.onclick=()=>{state.root=m.root;state.quality=m.quality;state.extension=m.extension;state.inversion=0;selectChord(true)};
+    box.appendChild(p)});
+  renderKeyStrip();
+  renderScaleInfo();
+  renderPalette();
+  renderGuitar();
+  renderChordInfo()}
+
+/* ---------------- wiring ---------------- */
+function buildGuitarControls(){
+  TUNINGS.forEach(t=>$('tuningSelect').add(new Option(t.label,t.id)));
+  for(let c=0;c<=7;c++)$('capoSelect').add(new Option(c?`Capo ${c}`:'No capo',c));
+  $('tuningSelect').onchange=ev=>{G.tuningId=ev.target.value;G.specKey='';buildNeck();render()};
+  $('capoSelect').onchange=ev=>{G.capo=+ev.target.value;
+    if(G.userFrets){ // fretted notes below the new capo are unreachable
+      G.userFrets=G.userFrets.map(f=>typeof f==='number'&&f<G.capo?null:f);
+      const sel=new Set();
+      G.userFrets.forEach((fr,ss)=>{if(typeof fr==='number')sel.add(tuning().midis[ss]+fr)});
+      state.selected=sel}
+    G.specKey='';buildNeck();render()};
+  $('leftyToggle').onclick=()=>{G.lefty=!G.lefty;$('leftyToggle').textContent=G.lefty?'Left-handed':'Right-handed';buildNeck();render()};
+  document.querySelectorAll('#fretSeg button').forEach(b=>b.onclick=()=>{
+    G.frets=+b.dataset.fr;
+    document.querySelectorAll('#fretSeg button').forEach(x=>x.classList.toggle('on',x===b));
+    if(G.userFrets)G.userFrets=G.userFrets.map(f=>typeof f==='number'&&f>G.frets?null:f);
+    G.specKey='';buildNeck();render()});
+  document.querySelectorAll('#fingerSeg button').forEach(b=>b.onclick=()=>{
+    G.showFingers=b.dataset.fm==='fingers';
+    document.querySelectorAll('#fingerSeg button').forEach(x=>x.classList.toggle('on',x===b));
+    render()});
+  document.querySelectorAll('#neckSeg button').forEach(b=>b.onclick=()=>{
+    G.neckMode=b.dataset.nm;
+    document.querySelectorAll('#neckSeg button').forEach(x=>x.classList.toggle('on',x===b));
+    render()});
+  $('voicePrev').onclick=()=>{if(!G.voicings.length)return;G.vIndex=(G.vIndex-1+G.voicings.length)%G.voicings.length;
+    strumVoicing(currentVoicing());render()};
+  $('voiceNext').onclick=()=>{if(!G.voicings.length)return;G.vIndex=(G.vIndex+1)%G.voicings.length;
+    strumVoicing(currentVoicing());render()};
+  $('strumBtn').onclick=()=>strumVoicing(currentVoicing()||G.userShape);
+  $('gvToggle').onclick=()=>{G.showInfo=!G.showInfo;
+    $('gvToggle').classList.toggle('active',G.showInfo);
+    $('gvPanel').classList.toggle('hidden',!G.showInfo);
+    render()};
+  $('guitarToggle').onclick=()=>{G.on=!G.on;$('guitarToggle').classList.toggle('active',G.on);
+    $('guitarWrap').classList.toggle('hidden',!G.on);if(G.on){buildNeck();render()}};
+  $('pianoToggle').onclick=()=>{G.pianoOn=!G.pianoOn;$('pianoToggle').classList.toggle('active',G.pianoOn);
+    $('pianoWrap').classList.toggle('hidden',!G.pianoOn)}}
+document.querySelectorAll('#palSeg button').forEach(b=>b.onclick=()=>{
+  if(b.disabled)return;palSize=+b.dataset.size;renderPalette()});
+$('clearBtn').onclick=()=>{[...state.selected].forEach(stopNote);state.selected.clear();G.userFrets=null;state.source='piano';render()};
+$('playBtn').onclick=()=>playSelection();
+document.querySelectorAll('#primarySeg button').forEach(b=>b.onclick=()=>{
+  state.primary=b.dataset.pi;
+  document.querySelectorAll('#primarySeg button').forEach(x=>x.classList.toggle('on',x===b))});
+$('multiToggle').onclick=()=>{state.multi=!state.multi;$('multiToggle').textContent=state.multi?'Multi-press':'Single note';$('multiToggle').classList.toggle('active',state.multi)};
+$('arpToggle').onclick=()=>{state.arpeggio=!state.arpeggio;$('arpToggle').textContent=state.arpeggio?'Arpeggio':'Block chord';$('arpToggle').classList.toggle('active',state.arpeggio)};
+$('sustainToggle').onclick=()=>{state.sustain=!state.sustain;$('sustainToggle').textContent=state.sustain?'Sustain on':'Sustain off';$('sustainToggle').classList.toggle('active',state.sustain);
+  if(!state.sustain)[...active.keys()].forEach(stopNote)};
+$('octaveDown').onclick=()=>{state.octave=Math.max(1,state.octave-1);selectChord()};
+$('octaveUp').onclick=()=>{state.octave=Math.min(5,state.octave+1);selectChord()};
+$('volMaster').oninput=ev=>{state.volMaster=ev.target.value/100;if(masterGain)masterGain.gain.value=state.volMaster};
+$('volKeys').oninput=ev=>{state.volKeys=ev.target.value/100;if(keysBus)keysBus.gain.value=state.volKeys};
+$('volGuitar').oninput=ev=>{state.volGuitar=ev.target.value/100;if(guitarBus)guitarBus.gain.value=state.volGuitar};
+$('helpBtn').onclick=()=>$('helpModal').classList.add('open');
+$('helpClose').onclick=()=>$('helpModal').classList.remove('open');
+$('helpModal').onclick=ev=>{if(ev.target===$('helpModal'))$('helpModal').classList.remove('open')};
+$('numHelpBtn').onclick=()=>$('numModal').classList.add('open');
+$('numClose').onclick=()=>$('numModal').classList.remove('open');
+$('numModal').onclick=ev=>{if(ev.target===$('numModal'))$('numModal').classList.remove('open')};
+$('chordHelpBtn').onclick=()=>$('chordModal').classList.add('open');
+$('chordClose').onclick=()=>$('chordModal').classList.remove('open');
+$('chordModal').onclick=ev=>{if(ev.target===$('chordModal'))$('chordModal').classList.remove('open')};
+$('tetClose').onclick=()=>$('tetModal').classList.remove('open');
+$('tetModal').onclick=ev=>{if(ev.target===$('tetModal'))$('tetModal').classList.remove('open')};
+window.addEventListener('keydown',ev=>{
+  if(ev.key==='Escape')['helpModal','numModal','chordModal','tetModal'].forEach(id=>$(id).classList.remove('open'));
+  if(ev.target.tagName==='SELECT'||ev.target.tagName==='INPUT')return;
+  const map={a:0,w:1,s:2,e:3,d:4,f:5,t:6,g:7,y:8,h:9,u:10,j:11,k:12};
+  const off=map[ev.key.toLowerCase()];
+  if(off===undefined||ev.repeat)return;
+  press(12*(state.octave+1)+off)});
+
+/* ---------------- init ---------------- */
+buildKeyStrip();buildControls();buildKeyboard();buildGuitarControls();buildNeck();
+loadSamples();updateSndStatus();
+selectChord(false);
+window.MTL={state,scaleState,G,SCALES,buildChordSpec,findVoicings,paletteChords,detect,render}; // console access for testing/extension
+</script>
+<script src="../../js/return-home.js" defer></script>
+</body>
+</html>
