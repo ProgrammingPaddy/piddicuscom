@@ -34,7 +34,7 @@
             padding: 0 14px;
             font: 500 13px/1 "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
             color: #fec6d9;
-            background: rgba(22, 16, 21, 0.86);
+            background: rgba(29, 21, 28, 0.86);
             border-bottom: 1px solid rgba(254, 198, 217, 0.16);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);

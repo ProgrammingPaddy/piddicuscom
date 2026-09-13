@@ -9,8 +9,7 @@
         "music",
         "tools"
       ],
-      "href": "projects/chord-vis/",
-      "repo": null
+      "href": "projects/chord-vis/"
     },
     {
       "slug": "noita-slot-machine",
@@ -21,8 +20,18 @@
         "games",
         "tools"
       ],
-      "href": "projects/noita-slot-machine/",
-      "repo": null
+      "href": "projects/noita-slot-machine/"
+    },
+    {
+      "slug": "surf-data",
+      "title": "Surf Survey Results",
+      "description": "Five years of the Counter-Strike surf community survey, charted year by year, with every raw response underneath.",
+      "icon": null,
+      "tags": [
+        "data",
+        "games"
+      ],
+      "href": "projects/surf-data/"
     }
   ]
 }

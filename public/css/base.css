@@ -8,15 +8,15 @@
 
 :root {
     /* Colour */
-    --color-bg: #171015;
-    --color-bg-elevated: #221723;
-    --color-surface: rgba(254, 198, 217, 0.05);
-    --color-surface-hover: rgba(254, 198, 217, 0.09);
-    --color-border: rgba(254, 198, 217, 0.12);
+    --color-bg: #1d151c;
+    --color-bg-elevated: #2a1e2a;
+    --color-surface: rgba(254, 198, 217, 0.07);
+    --color-surface-hover: rgba(254, 198, 217, 0.11);
+    --color-border: rgba(254, 198, 217, 0.15);
     --color-border-strong: rgba(254, 198, 217, 0.3);
     --color-text: #f7edf1;
-    --color-text-muted: #c3aab6;
-    --color-text-faint: #8c7382;
+    --color-text-muted: #cbb3bf;
+    --color-text-faint: #977d8c;
     --color-accent: #fec6d9;
     --color-accent-strong: #ffb0c9;
     --color-accent-soft: rgba(254, 198, 217, 0.16);

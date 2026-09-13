@@ -20,7 +20,8 @@
  *         path.logo-pupil translated to look around
  *
  * The mouth gets the same pink patch behind the letters, the smile on top,
- * and a small "o" that swaps in while a project card is hovered.
+ * and a small "o" that swaps in while a project card is hovered (main.js
+ * puts "is-card-hover" on <body> for that).
  */
 
 const LOGO_URL = "logo.svg";
@@ -420,29 +421,6 @@ function lookAround(svg, eyes) {
     });
 }
 
-/** Open the mouth while any project card is hovered or focused. */
-function reactToCards(svg) {
-    const cardFrom = (node) => (node instanceof Element ? node.closest(".card__link") : null);
-
-    document.addEventListener("pointerover", (event) => {
-        if (cardFrom(event.target)) {
-            svg.classList.add("is-surprised");
-        }
-    });
-
-    document.addEventListener("pointerout", (event) => {
-        const leaving = cardFrom(event.target);
-
-        if (leaving && cardFrom(event.relatedTarget) !== leaving) {
-            svg.classList.remove("is-surprised");
-        }
-    });
-
-    document.addEventListener("focusin", (event) => {
-        svg.classList.toggle("is-surprised", Boolean(cardFrom(event.target)));
-    });
-}
-
 function blinkNowAndThen(svg) {
     function close(duration) {
         svg.classList.add("is-blinking");
@@ -524,7 +502,6 @@ async function init() {
 
     lookAround(svg, eyes);
     blinkNowAndThen(svg);
-    reactToCards(svg);
 }
 
 init();

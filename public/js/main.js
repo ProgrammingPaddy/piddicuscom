@@ -102,7 +102,6 @@ function createCard(project, index) {
     const fragment = cardTemplate.content.cloneNode(true);
     const card = fragment.querySelector(".card");
     const link = fragment.querySelector(".card__link");
-    const source = fragment.querySelector(".card__source");
     const tagList = fragment.querySelector(".card__tags");
 
     card.style.setProperty("--card-index", index);
@@ -118,11 +117,6 @@ function createCard(project, index) {
         item.className = "card__tag";
         item.textContent = tag;
         tagList.append(item);
-    }
-
-    if (project.repo) {
-        source.href = project.repo;
-        source.hidden = false;
     }
 
     return fragment;
@@ -200,6 +194,34 @@ function initSpotlight() {
     });
 }
 
+/* Card hover signal ------------------------------------------------------- */
+
+/**
+ * While any card is hovered or focused, <body> carries "is-card-hover" so
+ * the logo can react.
+ */
+function initCardHoverSignal() {
+    const cardFrom = (node) => (node instanceof Element ? node.closest(".card__link") : null);
+
+    grid.addEventListener("pointerover", (event) => {
+        if (cardFrom(event.target)) {
+            document.body.classList.add("is-card-hover");
+        }
+    });
+
+    grid.addEventListener("pointerout", (event) => {
+        const leaving = cardFrom(event.target);
+
+        if (leaving && cardFrom(event.relatedTarget) !== leaving) {
+            document.body.classList.remove("is-card-hover");
+        }
+    });
+
+    document.addEventListener("focusin", (event) => {
+        document.body.classList.toggle("is-card-hover", Boolean(cardFrom(event.target)));
+    });
+}
+
 /* Scroll reveal ----------------------------------------------------------- */
 
 function initReveal() {
@@ -231,6 +253,7 @@ async function init() {
     document.getElementById("year").textContent = new Date().getFullYear();
     initReveal();
     initSpotlight();
+    initCardHoverSignal();
 
     filterBar.addEventListener("click", (event) => {
         const chip = event.target.closest(".chip");

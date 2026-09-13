@@ -77,6 +77,12 @@ repo-backed project (`npm run sync -- snake` for one, `--force` to re-copy
 regardless). Your `project.json` is never overwritten. Files are copied,
 not submoduled, so a deploy never depends on another repository.
 
+Two optional keys in that `project.json`: `"branch"` tracks a branch other
+than the default, and `"root": "some/folder"` copies only that subfolder of
+the repo (for repos where the page is not at the top level). If the copied
+folder has its own `project.json`, sync saves it as `project.repo.json` and
+the build uses it for any field yours does not set.
+
 ## Deployment
 
 Pushing `main` triggers Workers Builds, which runs `npm install` and

@@ -11,9 +11,11 @@
  *
  * Metadata comes from project.json in the folder when there is one, and
  * otherwise from the entry page itself: <title>, <meta name="description">
- * and <meta name="keywords"> (used as tags). An "icon" in project.json is an
- * image inside the folder (or a URL); without one the homepage draws a mark
- * from the project's initials.
+ * and <meta name="keywords"> (used as tags). A repo-backed project may also
+ * have project.repo.json (saved by sync from the repo's own project.json);
+ * the site's project.json overrides it field by field. An "icon" is an image
+ * inside the folder (or a URL); without one the homepage draws a mark from
+ * the project's initials.
  *
  * Usage: node scripts/build.mjs [--quiet]
  */
@@ -28,6 +30,7 @@ import {
     projectsDir,
     readJson,
     relative,
+    repoConfigName,
 } from "./lib.mjs";
 
 /** Only this much of an entry page is scanned for <title> and <meta> tags. */
@@ -63,7 +66,10 @@ export function discoverProjects(warn = () => {}) {
 
 function readFolderProject(slug, warn) {
     const folder = path.join(projectsDir, slug);
-    const config = readJson(path.join(folder, projectConfigName), {});
+    const config = {
+        ...readJson(path.join(folder, repoConfigName), {}),
+        ...readJson(path.join(folder, projectConfigName), {}),
+    };
 
     if (config.hidden === true) {
         return null;
@@ -138,7 +144,6 @@ function buildEntry(slug, href, config, page, icon) {
         icon,
         tags: normaliseTags(tags),
         href,
-        repo: config.repo ?? null,
         order: typeof config.order === "number" ? config.order : null,
     };
 }

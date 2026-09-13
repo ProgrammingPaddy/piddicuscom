@@ -14,6 +14,9 @@ export const manifestPath = path.join(projectsDir, "projects.json");
 /** Optional per-project metadata file, kept next to the project's entry page. */
 export const projectConfigName = "project.json";
 
+/** A repo's own project.json, saved by sync; the site's file overrides it. */
+export const repoConfigName = "project.repo.json";
+
 /** Folders and files whose name starts with one of these are never projects. */
 const IGNORED_PREFIXES = ["_", "."];
 

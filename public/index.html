@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Piddicus: a menu of small browser projects.">
-    <meta name="theme-color" content="#171015">
+    <meta name="theme-color" content="#1d151c">
     <title>Piddicus</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
 
@@ -19,9 +19,13 @@
 </head>
 <body>
     <div class="backdrop" aria-hidden="true">
-        <div class="backdrop__orb backdrop__orb--one"></div>
-        <div class="backdrop__orb backdrop__orb--two"></div>
-        <div class="backdrop__dots"></div>
+        <canvas class="backdrop__lava"></canvas>
+        <div class="backdrop__petals"></div>
+        <div class="backdrop__sparkle backdrop__sparkle--a"></div>
+        <div class="backdrop__sparkle backdrop__sparkle--b"></div>
+        <div class="backdrop__sparkle backdrop__sparkle--c"></div>
+        <div class="backdrop__sparkle backdrop__sparkle--d"></div>
+        <div class="backdrop__sparkle backdrop__sparkle--e"></div>
     </div>
 
     <header class="site-header">
@@ -40,7 +44,7 @@
             </h1>
             <p class="hero__tagline reveal">
                 <span class="hero__phrase" data-effect="enchant">Fun projects</span>
-                <span class="hero__tagline-soft">and <span class="hero__phrase" data-effect="hammer">helpful tools.</span></span>
+                <span class="hero__tagline-soft">and <span class="hero__phrase" data-effect="gears">helpful tools.</span></span>
             </p>
         </section>
 
@@ -81,14 +85,12 @@
                 <p class="card__description"></p>
                 <ul class="card__tags"></ul>
             </a>
-            <a class="card__source" href="#" target="_blank" rel="noopener" hidden>
-                Source <span aria-hidden="true">&nearr;</span>
-            </a>
         </li>
     </template>
 
-    <script src="js/main.js" defer></script>
-    <script src="js/logo.js" defer></script>
-    <script src="js/tagline.js" defer></script>
+    <script src="js/main.js" type="module"></script>
+    <script src="js/logo.js" type="module"></script>
+    <script src="js/tagline.js" type="module"></script>
+    <script src="js/backdrop.js" type="module"></script>
 </body>
 </html>

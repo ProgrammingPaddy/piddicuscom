@@ -7,6 +7,14 @@
  * folder's files with the latest commit (leaving project.json alone), records
  * the commit in project.json, and regenerates the manifest.
  *
+ * Optional keys in project.json:
+ *   "branch"  track a branch other than the repo's default
+ *   "root"    copy only this subfolder of the repo (where the page lives)
+ *
+ * If the copied root contains its own project.json, it is saved next to the
+ * page as project.repo.json and the build uses it for any field the site's
+ * project.json does not set.
+ *
  * Usage:
  *   npm run sync                    refresh every repo-backed project
  *   npm run sync -- snake           refresh one project by folder name
@@ -28,6 +36,7 @@ import {
     projectsDir,
     readJson,
     relative,
+    repoConfigName,
     writeJson,
 } from "./lib.mjs";
 
@@ -126,18 +135,32 @@ function addRepoProject(url) {
     return { slug, folder, config: readJson(configPath) };
 }
 
-function replaceProjectFiles(folder, cloneDir) {
+function resolveRoot(cloneDir, root) {
+    if (!root) {
+        return cloneDir;
+    }
+
+    const resolved = path.resolve(cloneDir, root);
+
+    if (!resolved.startsWith(cloneDir + path.sep) || !fs.existsSync(resolved)) {
+        throw new Error(`root "${root}" does not exist in the repo`);
+    }
+
+    return resolved;
+}
+
+function replaceProjectFiles(folder, sourceDir) {
     for (const name of fs.readdirSync(folder)) {
         if (name !== projectConfigName) {
             fs.rmSync(path.join(folder, name), { recursive: true, force: true });
         }
     }
 
-    fs.cpSync(cloneDir, folder, {
+    fs.cpSync(sourceDir, folder, {
         recursive: true,
         filter: (source) => {
             const name = path.basename(source);
-            const isTopLevel = path.dirname(source) === cloneDir;
+            const isTopLevel = path.dirname(source) === sourceDir;
 
             if (name === ".git") {
                 return false;
@@ -146,6 +169,14 @@ function replaceProjectFiles(folder, cloneDir) {
             return !(isTopLevel && EXCLUDED_FROM_COPY.has(name));
         },
     });
+
+    /* Keep the repo's own metadata under a separate name so the site's
+       project.json stays untouched and the build can merge the two. */
+    const repoConfig = path.join(sourceDir, projectConfigName);
+
+    if (fs.existsSync(repoConfig)) {
+        fs.copyFileSync(repoConfig, path.join(folder, repoConfigName));
+    }
 }
 
 function syncProject(project, { force }) {
@@ -165,7 +196,7 @@ function syncProject(project, { force }) {
             return false;
         }
 
-        replaceProjectFiles(folder, clone.dir);
+        replaceProjectFiles(folder, resolveRoot(clone.dir, config.root));
         writeJson(path.join(folder, projectConfigName), { ...config, commit: clone.commit });
         console.log(`  ${before} -> ${after} (${clone.branch})`);
         return true;
