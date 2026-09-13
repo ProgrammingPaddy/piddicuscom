@@ -1,0 +1,6 @@
+#!/bin/sh
+# Regenerate the project manifest so a commit never ships a stale menu.
+# Installed by `npm install` (see scripts/install-hooks.mjs).
+
+node scripts/build.mjs --quiet || exit 1
+git add -- public/projects/projects.json

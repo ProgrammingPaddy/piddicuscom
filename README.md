@@ -1,15 +1,14 @@
 # Piddicus
 
 Personal site and project shelf. Static HTML, CSS and vanilla JS with no
-build step, no backend and no database. The homepage is a menu of
-self-contained HTML projects. Hosted on Cloudflare Workers as static assets.
+framework and no backend. The homepage is a menu of self-contained HTML
+projects. Hosted on Cloudflare Workers as static assets.
 
 ## Layout
 
 ```
-wrangler.jsonc            Cloudflare config (assets-only, no Worker script)
-README.md
 public/                   Everything in here is served; nothing outside is
+  .assetsignore           Paths under public/ that are NOT uploaded (_template)
   index.html              Homepage (the menu)
   css/
     base.css              Design tokens, reset, typography
@@ -19,119 +18,162 @@ public/                   Everything in here is served; nothing outside is
   js/
     main.js               Loads the manifest and renders the menu
   projects/
-    projects.json         Manifest: one entry per project
-    <slug>/               One folder per project, fully self-contained
+    <name>/               A project. Drop a folder here and it is on the site.
+    <name>.html           A single-file project works too.
+    _template/            Starter to copy for a new project (never listed)
+    projects.json         Generated menu manifest. Do not edit by hand.
 scripts/
-  add-project.ps1         Add a project (from a repo, a local folder, or empty)
-  update-projects.ps1     Pull the latest commit for repo-backed projects
-  remove-project.ps1      Remove a project
-  Manifest.psm1           Shared helpers used by the scripts above
+  build.mjs               Scans public/projects and writes projects.json
+  sync.mjs                Refreshes projects that live in their own git repo
+  install-hooks.mjs       Runs on npm install; points git at .githooks
+  lib.mjs                 Paths and helpers shared by the scripts
+.githooks/pre-commit      Regenerates the manifest on every commit
+wrangler.jsonc            Cloudflare config (assets-only, no Worker script)
+package.json              npm scripts; wrangler is the only dependency
 ```
+
+## Setup
+
+Once per clone:
+
+```bash
+npm install
+```
+
+That installs wrangler for local preview and points git at `.githooks`, so
+the menu manifest is regenerated automatically whenever you commit.
 
 ## Running locally
 
-The homepage fetches `projects/projects.json`, so it needs to be served over
-HTTP rather than opened from disk:
-
 ```bash
-python -m http.server 8080 --directory public
+npm run dev
 ```
 
-Then open http://localhost:8080.
+Serves the site at http://localhost:8787 with the same static-asset rules as
+production. The manifest is generated when the server starts, so after
+dropping in a new project either restart it or run `npm run build` in
+another terminal.
 
 ## Adding a project
 
-Every project is a plain folder under `public/projects/<slug>` with its own
-entry page. The add script fills the folder and writes the manifest entry.
-Choose where the files come from:
+Drop it into `public/projects`. That is the whole process.
 
-**From the project's own git repo.** The files are copied in and pinned to
-the latest commit. The repo URL, branch and commit are recorded in the
-manifest so `update-projects.ps1` can refresh it later.
+- **A folder** containing an `index.html`. If there is no `index.html`, the
+  first `.html` file alphabetically becomes the entry page.
+- **A single `.html` file** placed directly in `public/projects`.
 
-```powershell
-.\scripts\add-project.ps1 `
-    -Title "Snake" `
-    -Url https://github.com/ProgrammingPaddy/snake.git `
-    -Description "Classic snake on a canvas." `
-    -Icon "🐍" `
-    -Tags game,canvas
-```
+Names starting with `_` or `.` are ignored, so `_template` never shows up.
+Copy `_template` when starting a project from scratch.
 
-**From a local folder.** For projects that do not have a repo.
+Then commit. The pre-commit hook regenerates `projects.json`, so the menu
+always matches what is in the folder. Delete a folder and commit to remove
+a project.
 
-```powershell
-.\scripts\add-project.ps1 -Title "Colour Mixer" -Path ..\colour-mixer -Tags tool
-```
+### Card metadata
 
-**Empty.** Creates a starter `index.html` to build on directly in this repo.
+With no extra files, the card uses the entry page's `<title>`,
+`<meta name="description">` and `<meta name="keywords">` (comma-separated,
+shown as tags). Single-file projects can only be described this way.
 
-```powershell
-.\scripts\add-project.ps1 -Title "Scratch Pad"
-```
-
-Optional flags for all three: `-Slug` (folder name, defaults to a slugified
-title), `-Entry` (page to open, defaults to `index.html`), and `-Branch`
-(with `-Url` only, defaults to the repo's default branch).
-
-The script stages the changes but does not commit. Commit and push to deploy:
-
-```bash
-git commit -m "Add snake project"
-```
-
-Projects are copied rather than mounted as git submodules. That keeps every
-deploy self-contained: the host never has to reach a second repository, a
-project can exist without one, and a project repo going private or missing
-cannot break the site.
-
-## Updating projects
-
-After pushing new commits to a project's own repo, pull them into the site:
-
-```powershell
-.\scripts\update-projects.ps1           # all repo-backed projects
-.\scripts\update-projects.ps1 -Slug snake
-```
-
-Projects without a repo are skipped. Edit those directly in
-`public/projects/<slug>`.
-
-## Removing a project
-
-```powershell
-.\scripts\remove-project.ps1 -Slug snake
-```
-
-## Manifest format
+For more control, add `project.json` next to the entry page. Every field is
+optional:
 
 ```json
 {
-  "projects": [
-    {
-      "slug": "snake",
-      "title": "Snake",
-      "description": "Classic snake on a canvas.",
-      "icon": "🐍",
-      "tags": ["game", "canvas"],
-      "entry": "index.html",
-      "repo": "https://github.com/ProgrammingPaddy/snake.git",
-      "branch": "main",
-      "commit": "c37e1c0096328bae0fc8b80c099a7eef17db81d4"
-    }
-  ]
+  "title": "Snake",
+  "description": "Classic snake on a canvas.",
+  "icon": "🐍",
+  "tags": ["game", "canvas"],
+  "entry": "play.html",
+  "order": 1,
+  "hidden": false
 }
 ```
 
-`repo`, `branch` and `commit` are `null` for projects without a repo. Cards
-render in manifest order. Edit the file by hand to reorder, retitle, or
-change tags; the scripts only add, update and remove entries.
+- `icon` is an emoji or short string. Without one the card shows the title's
+  initial on a tinted tile.
+- `entry` is the page to open, relative to the folder. Defaults to
+  `index.html`.
+- `order` sorts lower numbers first. Projects without an order follow,
+  alphabetically by title.
+- `hidden: true` keeps the folder deployed (and reachable by URL) but off the
+  menu. Useful for work in progress.
+
+### Projects that live in their own repo
+
+Give the sync script the clone URL:
+
+```bash
+npm run sync -- https://github.com/ProgrammingPaddy/snake
+```
+
+It creates `public/projects/snake/`, writes a `project.json` holding the
+`repo` URL, and copies in the repo's files at its latest commit. The commit
+hash is recorded in `project.json` so later runs can tell whether anything
+changed.
+
+Add `title`, `icon`, `tags` and so on to that `project.json` like any other
+project. Sync replaces every other file in the folder but never touches
+`project.json` (beyond updating `commit`), and ignores any `project.json`
+inside the repo itself. Set `"branch"` to track something other than the
+repo's default branch.
+
+Files are copied rather than mounted as git submodules. Every deploy is
+self-contained, and a project repo going private or missing cannot break the
+site.
+
+## Updating projects
+
+Projects you edit in place: edit, commit, push.
+
+Repo-backed projects, after pushing to the project's own repo:
+
+```bash
+npm run sync
+```
+
+That refreshes every repo-backed project. To refresh one:
+
+```bash
+npm run sync -- snake
+```
+
+Review with `git status`, then commit. Add `--force` to re-copy even when
+the commit has not changed. Nothing is ever committed by the scripts.
+
+## Manifest format
+
+`public/projects/projects.json` is generated by `scripts/build.mjs` and read
+by `public/js/main.js`. Each entry looks like:
+
+```json
+{
+  "slug": "snake",
+  "title": "Snake",
+  "description": "Classic snake on a canvas.",
+  "icon": "🐍",
+  "tags": ["game", "canvas"],
+  "href": "projects/snake/",
+  "repo": "https://github.com/ProgrammingPaddy/snake"
+}
+```
+
+`repo` is `null` for projects that are not repo-backed. Do not edit this file;
+change the project's folder or `project.json` and rebuild.
 
 ## Deployment
 
 The GitHub repo is connected to a Cloudflare Worker through Workers Builds.
-Every push runs `npx wrangler deploy`, which uploads `public/` as static
-assets. There is no build command and no manual deploy step.
+Every push to `main` runs `npm install` and `npx wrangler deploy`, which
+uploads `public/` as static assets. No build command is needed because the
+generated manifest is committed.
+
+Optional safety net: set the build command in the Cloudflare dashboard to
+`npm run build`, so the manifest is regenerated on deploy even if a commit
+was made with hooks disabled.
+
+`npm run deploy` does the same thing from this machine, after a one-time
+`npx wrangler login`.
 
 `wrangler.jsonc` deliberately has no `main` key. That makes it an
 assets-only Worker with no script. Leave `compatibility_date` alone; it is

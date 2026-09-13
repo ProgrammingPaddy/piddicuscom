@@ -1,0 +1,3 @@
+# Files under public/ that must not be uploaded as site assets.
+# Same syntax as .gitignore, relative to this folder.
+_template/

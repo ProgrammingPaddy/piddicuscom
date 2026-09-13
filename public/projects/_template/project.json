@@ -1,0 +1,10 @@
+{
+  "title": "New Project",
+  "description": "One sentence about what this project does.",
+  "icon": "✨",
+  "tags": ["demo", "canvas"],
+  "entry": "index.html",
+  "order": 10,
+  "hidden": false,
+  "repo": null
+}

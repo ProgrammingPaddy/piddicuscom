@@ -1,6 +1,6 @@
 /**
- * Homepage behaviour: load the project manifest, render the menu,
- * wire up tag filtering and scroll-reveal animations.
+ * Homepage behaviour: load the generated project manifest, render the menu,
+ * wire up tag filtering, card hover spotlight and scroll-reveal animations.
  */
 
 const MANIFEST_URL = "projects/projects.json";
@@ -27,9 +27,26 @@ async function loadManifest() {
     return Array.isArray(data.projects) ? data.projects : [];
 }
 
-function projectHref(project) {
-    const entry = project.entry || "index.html";
-    return `projects/${project.slug}/${entry}`;
+/* Helpers ----------------------------------------------------------------- */
+
+/** Stable 0-359 hue from a string, so a project keeps its colour between visits. */
+function hueFromString(text) {
+    let hash = 0;
+
+    for (const char of text) {
+        hash = (hash * 31 + char.codePointAt(0)) % 360;
+    }
+
+    return hash;
+}
+
+function firstGrapheme(text) {
+    const [first] = Array.from(text.trim());
+    return first ? first.toUpperCase() : "?";
+}
+
+function formatIndex(index) {
+    return String(index + 1).padStart(2, "0");
 }
 
 /* Rendering --------------------------------------------------------------- */
@@ -38,19 +55,35 @@ function createCard(project, index) {
     const fragment = cardTemplate.content.cloneNode(true);
     const card = fragment.querySelector(".card");
     const link = fragment.querySelector(".card__link");
+    const icon = fragment.querySelector(".card__icon");
+    const source = fragment.querySelector(".card__source");
     const tagList = fragment.querySelector(".card__tags");
 
     card.style.setProperty("--card-index", index);
-    link.href = projectHref(project);
-    fragment.querySelector(".card__icon").textContent = project.icon || "◆";
+    card.style.setProperty("--card-hue", hueFromString(project.slug));
+
+    link.href = project.href;
     fragment.querySelector(".card__title").textContent = project.title;
     fragment.querySelector(".card__description").textContent = project.description || "";
+    fragment.querySelector(".card__index").textContent = formatIndex(index);
+
+    if (project.icon) {
+        icon.textContent = project.icon;
+    } else {
+        icon.textContent = firstGrapheme(project.title);
+        icon.classList.add("card__icon--letter");
+    }
 
     for (const tag of project.tags || []) {
         const item = document.createElement("li");
         item.className = "card__tag";
         item.textContent = tag;
         tagList.append(item);
+    }
+
+    if (project.repo) {
+        source.href = project.repo;
+        source.hidden = false;
     }
 
     return fragment;
@@ -65,9 +98,14 @@ function renderGrid() {
     grid.setAttribute("aria-busy", "false");
 
     emptyState.hidden = projects.length > 0;
-    countLabel.textContent = visible.length
-        ? `${visible.length} of ${projects.length}`
-        : "";
+
+    if (projects.length === 0) {
+        countLabel.textContent = "";
+    } else if (activeTag) {
+        countLabel.textContent = `${visible.length} of ${projects.length}`;
+    } else {
+        countLabel.textContent = `${projects.length} ${projects.length === 1 ? "project" : "projects"}`;
+    }
 }
 
 function renderFilter() {
@@ -103,6 +141,26 @@ function setActiveTag(tag) {
     renderGrid();
 }
 
+/* Hover spotlight --------------------------------------------------------- */
+
+function initSpotlight() {
+    if (!window.matchMedia("(hover: hover)").matches) {
+        return;
+    }
+
+    grid.addEventListener("pointermove", (event) => {
+        const link = event.target.closest(".card__link");
+
+        if (!link) {
+            return;
+        }
+
+        const bounds = link.getBoundingClientRect();
+        link.style.setProperty("--spot-x", `${event.clientX - bounds.left}px`);
+        link.style.setProperty("--spot-y", `${event.clientY - bounds.top}px`);
+    });
+}
+
 /* Scroll reveal ----------------------------------------------------------- */
 
 function initReveal() {
@@ -133,6 +191,7 @@ function initReveal() {
 async function init() {
     document.getElementById("year").textContent = new Date().getFullYear();
     initReveal();
+    initSpotlight();
 
     filterBar.addEventListener("click", (event) => {
         const chip = event.target.closest(".chip");

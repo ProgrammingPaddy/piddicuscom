@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Piddicus — a home for small web projects and experiments.">
     <title>Piddicus</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -62,8 +63,8 @@
             <ul class="card-grid" id="project-grid" aria-busy="true"></ul>
 
             <p class="empty-state" id="empty-state" hidden>
-                Nothing on the shelf yet. Add a project with
-                <code>scripts/add-project.ps1</code>.
+                Nothing on the shelf yet. Drop a folder into
+                <code>public/projects</code> to add one.
             </p>
         </section>
 
@@ -73,16 +74,15 @@
             </div>
             <div class="prose reveal">
                 <p>
-                    Each project is a self-contained folder under
+                    Every entry on the menu is a folder dropped into
                     <code>projects/</code>. Some are written here directly;
                     others live in their own repository and are copied in at a
-                    pinned commit. A small manifest tells the homepage what to
-                    show on each card.
+                    pinned commit. A small script scans that folder and writes
+                    the menu you see above.
                 </p>
                 <p>
-                    Updating a project means pulling its latest commit and
-                    pushing this repo. No build step, no framework, just files
-                    served as they are.
+                    No framework, no bundler. Each project is plain HTML served
+                    exactly as it was written.
                 </p>
             </div>
         </section>
@@ -98,11 +98,17 @@
             <a class="card__link" href="#">
                 <div class="card__top">
                     <span class="card__icon" aria-hidden="true"></span>
-                    <span class="card__arrow" aria-hidden="true">&rarr;</span>
+                    <span class="card__meta" aria-hidden="true">
+                        <span class="card__index"></span>
+                        <span class="card__arrow">&rarr;</span>
+                    </span>
                 </div>
                 <h3 class="card__title"></h3>
                 <p class="card__description"></p>
                 <ul class="card__tags"></ul>
+            </a>
+            <a class="card__source" href="#" target="_blank" rel="noopener" hidden>
+                Source <span aria-hidden="true">&nearr;</span>
             </a>
         </li>
     </template>

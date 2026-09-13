@@ -96,11 +96,13 @@
 }
 
 .card__link {
+    position: relative;
     display: flex;
     flex-direction: column;
     gap: var(--space-3);
     height: 100%;
     padding: var(--space-6);
+    overflow: hidden;
     background: var(--color-surface);
     border: 1px solid var(--color-border);
     border-radius: inherit;
@@ -111,11 +113,30 @@
         box-shadow var(--duration-base) var(--ease-out);
 }
 
+/* Spotlight that follows the pointer; --spot-x/--spot-y are set in JS. */
+.card__link::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+        280px circle at var(--spot-x, 50%) var(--spot-y, 50%),
+        hsl(var(--card-hue, 160) 90% 70% / 0.14),
+        transparent 70%
+    );
+    opacity: 0;
+    transition: opacity var(--duration-base) var(--ease-out);
+    pointer-events: none;
+}
+
 .card__link:hover {
     background: var(--color-surface-hover);
     border-color: var(--color-border-strong);
     transform: translateY(-4px);
     box-shadow: 0 20px 40px -20px rgba(0, 0, 0, 0.6);
+}
+
+.card__link:hover::before {
+    opacity: 1;
 }
 
 .card__top {
@@ -135,9 +156,26 @@
     border-radius: var(--radius-md);
 }
 
+/* Fallback when a project has no icon: its initial on a tinted tile. */
+.card__icon--letter {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    color: hsl(var(--card-hue, 160) 90% 78%);
+    background: hsl(var(--card-hue, 160) 60% 50% / 0.16);
+    border-color: hsl(var(--card-hue, 160) 60% 60% / 0.35);
+}
+
+.card__meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--color-text-faint);
+}
+
 .card__arrow {
     font-size: var(--text-lg);
-    color: var(--color-text-faint);
     transition:
         transform var(--duration-base) var(--ease-out),
         color var(--duration-base) var(--ease-out);
@@ -163,6 +201,8 @@
     flex-wrap: wrap;
     gap: var(--space-2);
     margin-top: var(--space-2);
+    /* Leave room for the source link that sits in the bottom-right corner. */
+    padding-right: 5rem;
 }
 
 .card__tag {
@@ -174,6 +214,22 @@
 .card__tag::before {
     content: "#";
     opacity: 0.6;
+}
+
+/* Link to the project's own repository. A sibling of the card link because
+   anchors cannot nest; positioned over the card's bottom-right corner. */
+.card__source {
+    position: absolute;
+    right: var(--space-6);
+    bottom: var(--space-6);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-text-faint);
+    transition: color var(--duration-fast) var(--ease-out);
+}
+
+.card__source:hover {
+    color: var(--color-accent);
 }
 
 /* Empty state ------------------------------------------------------------ */

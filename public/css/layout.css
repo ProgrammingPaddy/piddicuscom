@@ -12,27 +12,29 @@
     pointer-events: none;
 }
 
+/* Soft colour washes. Radial gradients fade on their own, so no blur filter
+   is needed; a filtered, animated layer this large is costly to composite. */
 .backdrop__orb {
     position: absolute;
     border-radius: 50%;
-    filter: blur(90px);
-    opacity: 0.35;
+    opacity: 0.3;
+    will-change: transform;
 }
 
 .backdrop__orb--one {
-    top: -20vh;
-    left: -10vw;
-    width: 55vw;
-    height: 55vw;
-    background: radial-gradient(circle, var(--color-accent) 0%, transparent 65%);
+    top: -25vh;
+    left: -15vw;
+    width: 65vw;
+    height: 65vw;
+    background: radial-gradient(circle, var(--color-accent) 0%, transparent 60%);
 }
 
 .backdrop__orb--two {
-    right: -15vw;
-    bottom: -25vh;
-    width: 60vw;
-    height: 60vw;
-    background: radial-gradient(circle, var(--color-accent-secondary) 0%, transparent 65%);
+    right: -20vw;
+    bottom: -30vh;
+    width: 70vw;
+    height: 70vw;
+    background: radial-gradient(circle, var(--color-accent-secondary) 0%, transparent 60%);
 }
 
 .backdrop__grid {
