@@ -129,6 +129,45 @@
     transform: scale(1);
 }
 
+/* Tagline letter effects (split into spans by js/tagline.js) ------------ */
+
+.letters__word {
+    display: inline-block;
+    white-space: nowrap;
+}
+
+.letters__letter {
+    display: inline-block;
+    transform-origin: 50% 100%;
+}
+
+@keyframes hammer {
+    0% {
+        transform: none;
+    }
+
+    18% {
+        transform: translateY(4px) scale(1.25, 0.7);
+    }
+
+    55% {
+        transform: translateY(-7px) scale(0.92, 1.12);
+    }
+
+    100% {
+        transform: none;
+    }
+}
+
+.hero__phrase[data-effect="hammer"].is-active .letters__letter {
+    animation: hammer 720ms var(--ease-bounce) infinite;
+    animation-delay: calc(var(--i, 0) * 55ms);
+}
+
+.hero__phrase[data-effect="hammer"].is-active .letters__letter.is-done {
+    animation: none;
+}
+
 /* Card entrance, staggered by index set in JS ---------------------------- */
 
 .card {

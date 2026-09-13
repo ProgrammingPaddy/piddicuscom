@@ -1,99 +1,50 @@
 # Piddicus
 
-Personal site and project shelf. Static HTML, CSS and vanilla JS with no
-framework and no backend. The homepage is a menu of self-contained HTML
-projects. Hosted on Cloudflare Workers as static assets.
-
-## Layout
+Personal site: a menu of self-contained browser projects. Plain HTML, CSS
+and JavaScript, served as static assets by Cloudflare Workers.
 
 ```
-public/                   Everything in here is served; nothing outside is
-  .assetsignore           Paths under public/ that are NOT uploaded (_template)
-  index.html              Homepage (the menu)
-  css/
-    base.css              Design tokens, reset, typography
-    layout.css            Header, hero, sections, footer, backdrop
-    components.css        Buttons, filter chips, project cards
-    animations.css        Keyframes, scroll reveal, reduced-motion overrides
-  logo.svg                The wordmark, used in the hero, footer and project bars
-  js/
-    main.js               Loads the manifest and renders the menu
-    logo.js               Inlines the wordmark so its eyes follow the pointer and blink
-    return-home.js        One-line include that adds a "back to the menu" bar to a project
+public/               Everything served
+  index.html          The menu
+  logo.svg            Wordmark (header, hero, footer, project bars)
+  css/  js/           Site styles and scripts
   projects/
-    <name>/               A project. Drop a folder here and it is on the site.
-    <name>.html           A single-file project works too.
-    _template/            Starter to copy for a new project (never listed)
-    projects.json         Generated menu manifest. Do not edit by hand.
-scripts/
-  build.mjs               Scans public/projects and writes projects.json
-  sync.mjs                Refreshes projects that live in their own git repo
-  install-hooks.mjs       Runs on npm install; points git at .githooks
-  lib.mjs                 Paths and helpers shared by the scripts
-.githooks/pre-commit      Regenerates the manifest on every commit
-wrangler.jsonc            Cloudflare config (assets-only, no Worker script)
-package.json              npm scripts; wrangler is the only dependency
+    <name>/           A project. Drop a folder here and it is on the site.
+    <name>.html       A single-file project works too.
+    _template/        Starter to copy (never listed, never deployed)
+    projects.json     Generated menu manifest. Do not edit.
+scripts/              build.mjs (manifest), sync.mjs (repo-backed projects)
+.githooks/pre-commit  Regenerates the manifest on every commit
+wrangler.jsonc        Cloudflare config (assets-only, no Worker script)
 ```
 
-## Setup
-
-Once per clone:
+## Setup and local preview
 
 ```bash
 npm install
-```
-
-That installs wrangler for local preview and points git at `.githooks`, so
-the menu manifest is regenerated automatically whenever you commit.
-
-## Running locally
-
-```bash
 npm run dev
 ```
 
-Serves the site at http://localhost:8787 with the same static-asset rules as
-production. The manifest is generated when the server starts, so after
-dropping in a new project either restart it or run `npm run build` in
-another terminal.
+Install once per clone: it fetches wrangler and wires up the pre-commit
+hook. Dev serves http://localhost:8787 with production's asset rules and
+regenerates the manifest on start (`npm run build` does it on demand).
 
 ## Adding a project
 
-Drop it into `public/projects`. That is the whole process.
+Drop a folder with an `index.html` (or a lone `.html` file) into
+`public/projects`, commit, push. The hook keeps `projects.json` in sync.
+Delete the folder to remove the project. Names starting with `_` or `.`
+are ignored.
 
-- **A folder** containing an `index.html`. If there is no `index.html`, the
-  first `.html` file alphabetically becomes the entry page.
-- **A single `.html` file** placed directly in `public/projects`.
-
-Names starting with `_` or `.` are ignored, so `_template` never shows up.
-Copy `_template` when starting a project from scratch.
-
-Then commit. The pre-commit hook regenerates `projects.json`, so the menu
-always matches what is in the folder. Delete a folder and commit to remove
-a project.
-
-### The "back to the menu" bar
-
-Projects are self-contained, so nothing links back to the site unless the
-project says so. Add one line anywhere in a project's HTML:
+**Back-to-menu bar.** Add one line anywhere in the project's HTML:
 
 ```html
 <script src="../../js/return-home.js" defer></script>
 ```
 
-It inserts a slim bar at the top of the page with the logo and a link home.
-The bar sits in normal flow, so it pushes the project down instead of
-covering it. `_template` already includes the line. Adjust the `../` depth
-if the page is nested deeper than `public/projects/<name>/`.
-
-### Card metadata
-
-With no extra files, the card uses the entry page's `<title>`,
-`<meta name="description">` and `<meta name="keywords">` (comma-separated,
-shown as tags). Single-file projects can only be described this way.
-
-For more control, add `project.json` next to the entry page. Every field is
-optional:
+**Card details.** With nothing else, the card uses the page's `<title>`,
+`<meta name="description">` and `<meta name="keywords">` (as tags). For more
+control add `project.json` next to the entry page. All fields optional:
 
 ```json
 {
@@ -107,116 +58,35 @@ optional:
 }
 ```
 
-- `tags` are the menu's categories, so keep them plural and reuse the
-  existing ones (`games`, `music`, `tools`) before inventing new ones.
-- `icon` is an image inside the project folder (or a full URL), clipped to
-  the card's blob shape. Leave it out and the card draws a pink blob with the
-  project's initials instead; the blob's shape is seeded from the folder name.
-- `entry` is the page to open, relative to the folder. Defaults to
-  `index.html`.
-- `order` sorts lower numbers first. Projects without an order follow,
-  alphabetically by title.
-- `hidden: true` keeps the folder deployed (and reachable by URL) but off the
-  menu. Useful for work in progress.
+- `tags` are the menu's categories: keep them plural and reuse `games`,
+  `music`, `tools` before adding new ones.
+- `icon` is an image in the folder (or a URL). Without one the card draws a
+  pink blob with the project's initials.
+- `order` sorts lower first; unordered projects follow alphabetically.
+- `hidden: true` deploys the folder but keeps it off the menu.
 
-### Projects that live in their own repo
-
-Give the sync script the clone URL:
+**Projects with their own repo.** Give sync the clone URL once:
 
 ```bash
 npm run sync -- https://github.com/ProgrammingPaddy/snake
 ```
 
-It creates `public/projects/snake/`, writes a `project.json` holding the
-`repo` URL, and copies in the repo's files at its latest commit. The commit
-hash is recorded in `project.json` so later runs can tell whether anything
-changed.
-
-Add `title`, `icon`, `tags` and so on to that `project.json` like any other
-project. Sync replaces every other file in the folder but never touches
-`project.json` (beyond updating `commit`), and ignores any `project.json`
-inside the repo itself. Set `"branch"` to track something other than the
-repo's default branch.
-
-Files are copied rather than mounted as git submodules. Every deploy is
-self-contained, and a project repo going private or missing cannot break the
-site.
-
-## Updating projects
-
-Projects you edit in place: edit, commit, push.
-
-Repo-backed projects, after pushing to the project's own repo:
-
-```bash
-npm run sync
-```
-
-That refreshes every repo-backed project. To refresh one:
-
-```bash
-npm run sync -- snake
-```
-
-Review with `git status`, then commit. Add `--force` to re-copy even when
-the commit has not changed. Nothing is ever committed by the scripts.
-
-## Manifest format
-
-`public/projects/projects.json` is generated by `scripts/build.mjs` and read
-by `public/js/main.js`. Each entry looks like:
-
-```json
-{
-  "slug": "snake",
-  "title": "Snake",
-  "description": "Classic snake on a canvas.",
-  "icon": "projects/snake/icon.png",
-  "tags": ["games"],
-  "href": "projects/snake/",
-  "repo": "https://github.com/ProgrammingPaddy/snake"
-}
-```
-
-`icon` is `null` when the project has none, and `repo` is `null` for
-projects that are not repo-backed. Do not edit this file;
-change the project's folder or `project.json` and rebuild.
+It creates the folder, records the repo in its `project.json`, and copies
+the files in at the latest commit. Later, `npm run sync` refreshes every
+repo-backed project (`npm run sync -- snake` for one, `--force` to re-copy
+regardless). Your `project.json` is never overwritten. Files are copied,
+not submoduled, so a deploy never depends on another repository.
 
 ## Deployment
 
-The GitHub repo is connected to a Cloudflare Worker through Workers Builds.
-Every push to `main` runs `npm install` and `npx wrangler deploy`, which
-uploads `public/` as static assets. No build command is needed because the
-generated manifest is committed.
-
-Optional safety net: set the build command in the Cloudflare dashboard to
-`npm run build`, so the manifest is regenerated on deploy even if a commit
-was made with hooks disabled.
-
-`npm run deploy` does the same thing from this machine, after a one-time
+Pushing `main` triggers Workers Builds, which runs `npm install` and
+`npx wrangler deploy`. No build command is needed because the manifest is
+committed. `npm run deploy` does the same from this machine after
 `npx wrangler login`.
 
-`wrangler.jsonc` deliberately has no `main` key. That makes it an
-assets-only Worker with no script. Leave `compatibility_date` alone; it is
-pinned to the project start date and changing it alters runtime behaviour.
-
-### First deploy checklist
-
-1. Push to `main` and watch the build in the Cloudflare dashboard.
-2. Open the generated `*.workers.dev` URL and confirm the homepage loads.
-3. In the Worker's **Settings → Domains & Routes**, choose **Add custom
-   domain** and enter the domain. Cloudflare creates the DNS record and
-   certificate itself. Do not hand-create DNS records for this.
-4. If the domain hosted email through Squarespace, confirm the MX records
-   exist in Cloudflare DNS. They had to be recreated after the nameserver
-   switch and are not part of this repo.
-
-If a deploy fails immediately, check that `wrangler.jsonc` exists at the
-repo root and that `assets.directory` matches the `public/` folder.
-
-### Future expansion
-
-When one project eventually needs a server-side endpoint, add `src/index.js`
-and point `main` at it in `wrangler.jsonc`. Static assets keep being served
-exactly as before; the Worker only handles requests that do not match a
-file. Nothing else needs to move.
+Leave `compatibility_date` alone. Do not add `main` to `wrangler.jsonc`
+unless a project needs a server-side endpoint; when one does, add
+`src/index.js` and point `main` at it, and static files keep serving as
+before. The custom domain is attached in the Worker's dashboard settings,
+not through DNS records in this repo. Squarespace email on the domain
+depends on MX records that live in Cloudflare DNS.

@@ -12,5 +12,5 @@ Thumbs.db
 node_modules/
 .dev.vars
 
-# Local tooling
-.claude/settings.local.json
+# Local tooling (Claude Code session config)
+.claude/
