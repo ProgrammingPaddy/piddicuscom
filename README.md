@@ -60,8 +60,8 @@ control add `project.json` next to the entry page. All fields optional:
 
 - `tags` are the menu's categories: keep them plural and reuse `games`,
   `music`, `tools` before adding new ones.
-- `icon` is an image in the folder (or a URL). Without one the card draws a
-  pink blob with the project's initials.
+- `icon` is an optional image in the folder (or a URL), shown inside the
+  card's title blob.
 - `order` sorts lower first; unordered projects follow alphabetically.
 - `hidden: true` deploys the folder but keeps it off the menu.
 

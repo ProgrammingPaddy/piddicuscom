@@ -33,10 +33,10 @@ const FILL = {
 };
 
 /** Furthest a pupil may travel in any direction, in the SVG's own units. */
-const PUPIL_TRAVEL = 14;
+const PUPIL_TRAVEL = 24;
 
 /** Fraction of the room between pupil and socket edge that may be used. */
-const ROOM_USE = 0.8;
+const ROOM_USE = 0.85;
 
 /** Extra units the pupil may slide under the socket edge. */
 const PEEK = 1.5;

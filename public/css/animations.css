@@ -265,7 +265,7 @@
 
     .chip:hover,
     .card__link:hover,
-    .card__link:hover .card__mark,
+    .card__link:hover .card__title,
     .site-header__brand:hover .site-header__logo {
         transform: none;
     }

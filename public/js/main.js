@@ -27,12 +27,12 @@ async function loadManifest() {
     return Array.isArray(data.projects) ? data.projects : [];
 }
 
-/* Marks ------------------------------------------------------------------- */
+/* Title blobs ------------------------------------------------------------- */
 
 /**
- * Projects without an icon get a pink blob with their initials. The blob's
- * shape is seeded from the slug so it is different for every project but
- * the same on every visit.
+ * Each card's title sits in a pink blob. The blob's shape is seeded from the
+ * slug so it is different for every project but the same on every visit,
+ * and it morphs to a second seeded shape on hover.
  */
 
 function hashString(text) {
@@ -67,29 +67,22 @@ function blobRadius(random) {
     return `${a}% ${100 - a}% ${100 - b}% ${b}% / ${c}% ${d}% ${100 - d}% ${100 - c}%`;
 }
 
-function initials(title) {
-    const words = title.trim().split(/\s+/).filter(Boolean);
-    const letters = words.slice(0, 2).map((word) => Array.from(word)[0].toUpperCase());
-
-    return letters.join("") || "?";
-}
-
-function fillMark(mark, project) {
+function fillTitle(title, project) {
     const random = createRandom(hashString(project.slug));
 
-    mark.style.setProperty("--blob-rest", blobRadius(random));
-    mark.style.setProperty("--blob-hover", blobRadius(random));
+    title.style.setProperty("--blob-rest", blobRadius(random));
+    title.style.setProperty("--blob-hover", blobRadius(random));
 
     if (project.icon) {
         const image = document.createElement("img");
+        image.className = "card__title-icon";
         image.src = project.icon;
         image.alt = "";
         image.loading = "lazy";
-        mark.append(image);
-        mark.classList.add("card__mark--image");
-    } else {
-        mark.textContent = initials(project.title);
+        title.append(image);
     }
+
+    title.append(document.createTextNode(project.title));
 }
 
 /* Rendering --------------------------------------------------------------- */
@@ -107,10 +100,9 @@ function createCard(project, index) {
     card.style.setProperty("--card-index", index);
 
     link.href = project.href;
-    fragment.querySelector(".card__title").textContent = project.title;
+    fillTitle(fragment.querySelector(".card__title"), project);
     fragment.querySelector(".card__description").textContent = project.description || "";
     fragment.querySelector(".card__index").textContent = formatIndex(index);
-    fillMark(fragment.querySelector(".card__mark"), project);
 
     for (const tag of project.tags || []) {
         const item = document.createElement("li");
