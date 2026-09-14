@@ -14,6 +14,38 @@
     }
 }
 
+@keyframes pop-in {
+    from {
+        opacity: 0;
+        transform: translateY(16px) scale(0.92);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Squash and settle. Uses the `scale` property so it can run on top of the
+   hover lift, which lives in `transform`. */
+@keyframes jelly {
+    0% {
+        scale: 1 1;
+    }
+
+    30% {
+        scale: 1.035 0.965;
+    }
+
+    60% {
+        scale: 0.985 1.02;
+    }
+
+    100% {
+        scale: 1 1;
+    }
+}
+
 @keyframes float {
     0%,
     100% {
@@ -93,9 +125,9 @@
 }
 
 /* The wordmark bobs gently once it has arrived. The reveal transition owns
-   the transform until then, so the float runs on the artwork inside. */
-.hero__logo img,
-.hero__logo svg {
+   the heading's transform and the drag owns the artwork's, so the float
+   runs on the wrapper between them. */
+.hero__logo-float {
     animation: float 6s var(--ease-in-out) infinite;
 }
 
@@ -180,8 +212,8 @@
 
 .card {
     opacity: 0;
-    animation: fade-up var(--duration-slow) var(--ease-out) forwards;
-    animation-delay: calc(var(--card-index, 0) * 60ms);
+    animation: pop-in var(--duration-slow) var(--ease-bounce) forwards;
+    animation-delay: calc(var(--card-index, 0) * 70ms);
 }
 
 /* Ambient backdrop ------------------------------------------------------- */
@@ -245,8 +277,11 @@
         animation: none;
     }
 
-    .hero__logo img,
-    .hero__logo svg,
+    .card__link:hover {
+        animation: none;
+    }
+
+    .hero__logo-float,
     .backdrop__sparkle,
     .petal,
     .petal::before {

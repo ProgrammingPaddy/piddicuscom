@@ -66,10 +66,11 @@ function initLava(canvas, animate) {
     let image = null;
     let pixels = null;
     let lastDraw = 0;
+    let lastTime = 0;
 
     function resize() {
-        width = Math.max(1, Math.round(window.innerWidth * LAVA.scale));
-        height = Math.max(1, Math.round(window.innerHeight * LAVA.scale));
+        width = Math.max(16, Math.round(window.innerWidth * LAVA.scale));
+        height = Math.max(16, Math.round(window.innerHeight * LAVA.scale));
         canvas.width = width;
         canvas.height = height;
         image = context.createImageData(width, height);
@@ -92,6 +93,7 @@ function initLava(canvas, animate) {
     }
 
     function draw(time) {
+        lastTime = time;
         const masses = positions(time);
         const count = masses.length;
         const low = LAVA.threshold * (1 - LAVA.edge);
@@ -165,10 +167,14 @@ function initLava(canvas, animate) {
     }
 
     resize();
-    window.addEventListener("resize", resize, { passive: true });
-
-    /* Paint once right away so there is no blank first frame. */
     draw(0);
+
+    /* Resizing clears the canvas, so repaint at once rather than showing a
+       stretched stale frame until the next animation frame. */
+    window.addEventListener("resize", () => {
+        resize();
+        draw(lastTime);
+    }, { passive: true });
 
     if (animate) {
         requestAnimationFrame(frame);

@@ -1,7 +1,9 @@
 /**
  * Homepage behaviour: load the generated project manifest, render the menu,
- * wire up category filtering, card hover spotlight and scroll-reveal.
+ * wire up category filtering and scroll-reveal.
  */
+
+import { shapeCardLink } from "./cards.js";
 
 const MANIFEST_URL = "projects/projects.json";
 
@@ -30,9 +32,9 @@ async function loadManifest() {
 /* Title blobs ------------------------------------------------------------- */
 
 /**
- * Each card's title sits in a pink blob. The blob's shape is seeded from the
- * slug so it is different for every project but the same on every visit,
- * and it morphs to a second seeded shape on hover.
+ * Each card's title sits in a pink blob whose shape is seeded from the slug,
+ * so it differs per project but never changes between visits, and morphs to
+ * a second seeded shape on hover. The card's own outline is cards.js's job.
  */
 
 function hashString(text) {
@@ -100,6 +102,7 @@ function createCard(project, index) {
     card.style.setProperty("--card-index", index);
 
     link.href = project.href;
+    link.dataset.seed = project.slug;
     fillTitle(fragment.querySelector(".card__title"), project);
     fragment.querySelector(".card__description").textContent = project.description || "";
     fragment.querySelector(".card__index").textContent = formatIndex(index);
@@ -121,6 +124,10 @@ function renderGrid() {
 
     grid.replaceChildren(...visible.map(createCard));
     grid.setAttribute("aria-busy", "false");
+
+    for (const link of grid.querySelectorAll(".card__link")) {
+        shapeCardLink(link, link.dataset.seed);
+    }
 
     emptyState.hidden = projects.length > 0;
 
@@ -164,26 +171,6 @@ function setActiveTag(tag) {
     }
 
     renderGrid();
-}
-
-/* Hover spotlight --------------------------------------------------------- */
-
-function initSpotlight() {
-    if (!window.matchMedia("(hover: hover)").matches) {
-        return;
-    }
-
-    grid.addEventListener("pointermove", (event) => {
-        const link = event.target.closest(".card__link");
-
-        if (!link) {
-            return;
-        }
-
-        const bounds = link.getBoundingClientRect();
-        link.style.setProperty("--spot-x", `${event.clientX - bounds.left}px`);
-        link.style.setProperty("--spot-y", `${event.clientY - bounds.top}px`);
-    });
 }
 
 /* Card hover signal ------------------------------------------------------- */
@@ -244,7 +231,6 @@ function initReveal() {
 async function init() {
     document.getElementById("year").textContent = new Date().getFullYear();
     initReveal();
-    initSpotlight();
     initCardHoverSignal();
 
     filterBar.addEventListener("click", (event) => {

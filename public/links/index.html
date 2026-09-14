@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Where else to find Piddicus.">
+    <meta name="theme-color" content="#1d151c">
+    <title>Links · Piddicus</title>
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/animations.css">
+</head>
+<body>
+    <div class="backdrop" aria-hidden="true">
+        <canvas class="backdrop__lava"></canvas>
+        <div class="backdrop__petals"></div>
+        <div class="backdrop__sparkle backdrop__sparkle--a"></div>
+        <div class="backdrop__sparkle backdrop__sparkle--b"></div>
+        <div class="backdrop__sparkle backdrop__sparkle--c"></div>
+        <div class="backdrop__sparkle backdrop__sparkle--d"></div>
+        <div class="backdrop__sparkle backdrop__sparkle--e"></div>
+    </div>
+
+    <header class="site-header">
+        <a class="site-header__brand" href="../" aria-label="Piddicus home">
+            <img class="site-header__logo" src="../logo.svg" alt="Piddicus" width="968" height="348">
+        </a>
+        <nav class="site-header__nav" aria-label="Links">
+            <a href="./" aria-current="page">Links</a>
+            <a href="https://github.com/ProgrammingPaddy" target="_blank" rel="noopener">GitHub</a>
+        </nav>
+    </header>
+
+    <main class="page">
+        <section class="menu" aria-label="Links">
+            <div class="menu__bar">
+                <h1 class="menu__title">Links</h1>
+            </div>
+
+            <!-- One list item per link. --blob-* shape the title and
+                 --card-index staggers the entrance; the outline is seeded
+                 from the href by js/cards.js. -->
+            <ul class="card-grid">
+                <li class="card" style="--card-index: 0">
+                    <a class="card__link" href="https://www.youtube.com/channel/UC5nydgG1o87kR-M8Mak1ucg" target="_blank" rel="noopener">
+                        <div class="card__top">
+                            <h2 class="card__title" style="--blob-rest: 62% 38% 41% 59% / 58% 44% 56% 42%; --blob-hover: 37% 63% 58% 42% / 42% 60% 40% 58%">YouTube</h2>
+                            <span class="card__meta" aria-hidden="true">
+                                <span class="card__arrow">&nearr;</span>
+                            </span>
+                        </div>
+                        <p class="card__description">Videos.</p>
+                    </a>
+                </li>
+                <li class="card" style="--card-index: 1">
+                    <a class="card__link" href="https://github.com/ProgrammingPaddy" target="_blank" rel="noopener">
+                        <div class="card__top">
+                            <h2 class="card__title" style="--blob-rest: 34% 66% 55% 45% / 63% 36% 64% 37%; --blob-hover: 60% 40% 38% 62% / 39% 62% 38% 61%">GitHub</h2>
+                            <span class="card__meta" aria-hidden="true">
+                                <span class="card__arrow">&nearr;</span>
+                            </span>
+                        </div>
+                        <p class="card__description">Code, including this site.</p>
+                    </a>
+                </li>
+            </ul>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <p class="site-footer__brand">
+            <img class="site-footer__logo" src="../logo.svg" alt="" width="968" height="348">
+            <span>&copy; <span id="year"></span></span>
+        </p>
+        <p><a href="https://github.com/ProgrammingPaddy/piddicuscom" target="_blank" rel="noopener">Source</a></p>
+    </footer>
+
+    <script src="../js/backdrop.js" type="module"></script>
+    <script type="module">
+        import { shapeCardLink } from "../js/cards.js";
+
+        document.getElementById("year").textContent = new Date().getFullYear();
+
+        for (const link of document.querySelectorAll(".card__link")) {
+            shapeCardLink(link, link.href);
+        }
+    </script>
+</body>
+</html>

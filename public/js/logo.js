@@ -2,7 +2,8 @@
  * Brings the wordmark to life on the homepage.
  *
  * Swaps the hero's <img> for the inline SVG, rebuilds the eyes from the
- * artwork, makes the pupils follow the pointer, and blinks now and then.
+ * artwork, makes the pupils follow the pointer, blinks now and then, and
+ * lets the whole wordmark be grabbed and dragged (it springs back).
  *
  * The SVG is treated as data. Nothing here depends on element ids, only on
  * the fill colours of its three paths (pink letters, white eyes, mauve pupils
@@ -59,6 +60,18 @@ const OPEN_MOUTH_RADIUS = 0.36;
 const BLINK_DURATION = 150;
 const BLINK_GAP_MIN = 2500;
 const BLINK_GAP_RANGE = 4500;
+
+/**
+ * Spring settings for dragging. While held, the wordmark chases the pointer
+ * on a stiff spring so it lags and wobbles; once released, a softer,
+ * underdamped spring carries it home with a few overshoots.
+ */
+const SPRING = {
+    held: { stiffness: 220, damping: 22 },
+    free: { stiffness: 70, damping: 6.5 },
+    tiltPerVelocity: 0.018, // degrees per px/s of horizontal speed
+    maxTilt: 14,
+};
 
 /* Path data ------------------------------------------------------------- */
 
@@ -421,6 +434,92 @@ function lookAround(svg, eyes) {
     });
 }
 
+/** Let the wordmark be picked up, dragged about, and spring back home. */
+function makeGrabbable(svg) {
+    const position = { x: 0, y: 0 };
+    const velocity = { x: 0, y: 0 };
+    const target = { x: 0, y: 0 };
+    let grab = null;
+    let running = false;
+    let lastFrame = 0;
+
+    function apply(tilt) {
+        svg.style.transform = `translate(${position.x.toFixed(1)}px, ${position.y.toFixed(1)}px) rotate(${tilt.toFixed(2)}deg)`;
+    }
+
+    function frame(now) {
+        const dt = Math.min((now - (lastFrame || now)) / 1000, 1 / 30);
+        lastFrame = now;
+
+        const spring = grab ? SPRING.held : SPRING.free;
+
+        for (const axis of ["x", "y"]) {
+            const force = spring.stiffness * (target[axis] - position[axis]) - spring.damping * velocity[axis];
+            velocity[axis] += force * dt;
+            position[axis] += velocity[axis] * dt;
+        }
+
+        const tilt = Math.max(-SPRING.maxTilt, Math.min(SPRING.maxTilt, velocity.x * SPRING.tiltPerVelocity));
+        apply(tilt);
+
+        const settled = !grab
+            && Math.abs(position.x) < 0.2 && Math.abs(position.y) < 0.2
+            && Math.abs(velocity.x) < 2 && Math.abs(velocity.y) < 2;
+
+        if (settled) {
+            position.x = 0;
+            position.y = 0;
+            velocity.x = 0;
+            velocity.y = 0;
+            svg.style.transform = "";
+            running = false;
+            lastFrame = 0;
+            return;
+        }
+
+        requestAnimationFrame(frame);
+    }
+
+    function wake() {
+        if (!running) {
+            running = true;
+            requestAnimationFrame(frame);
+        }
+    }
+
+    svg.addEventListener("pointerdown", (event) => {
+        if (event.button !== 0) {
+            return;
+        }
+
+        event.preventDefault();
+        svg.setPointerCapture(event.pointerId);
+        grab = { id: event.pointerId, startX: event.clientX - position.x, startY: event.clientY - position.y };
+        svg.classList.add("is-held");
+        wake();
+    });
+
+    svg.addEventListener("pointermove", (event) => {
+        if (grab && event.pointerId === grab.id) {
+            target.x = event.clientX - grab.startX;
+            target.y = event.clientY - grab.startY;
+        }
+    });
+
+    function release(event) {
+        if (grab && event.pointerId === grab.id) {
+            grab = null;
+            target.x = 0;
+            target.y = 0;
+            svg.classList.remove("is-held");
+            wake();
+        }
+    }
+
+    svg.addEventListener("pointerup", release);
+    svg.addEventListener("pointercancel", release);
+}
+
 function blinkNowAndThen(svg) {
     function close(duration) {
         svg.classList.add("is-blinking");
@@ -488,6 +587,7 @@ async function init() {
     svg.removeAttribute("height");
 
     image.replaceWith(svg);
+    makeGrabbable(svg);
 
     const eyes = buildFace(svg);
 

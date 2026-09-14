@@ -6,6 +6,7 @@ and JavaScript, served as static assets by Cloudflare Workers.
 ```
 public/               Everything served
   index.html          The menu
+  links/index.html    The links page; add a link by copying a list item
   logo.svg            Wordmark (header, hero, footer, project bars)
   css/  js/           Site styles and scripts
   projects/
