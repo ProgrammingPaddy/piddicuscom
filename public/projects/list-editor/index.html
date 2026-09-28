@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Paste a list, tidy it in a table, export it as text, JSON or CSV.">
+    <meta name="description" content="Paste, rate, export.">
     <meta name="theme-color" content="#1d151c">
     <title>List Editor</title>
     <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
@@ -285,20 +285,12 @@
 <body>
     <main class="page">
         <h1 class="title">List Editor</h1>
-        <p class="lead">
-            Paste a list, tidy it up in a table, export it as text, JSON or CSV.
-            Rate things out of ten, in halves, with notes if you like. Nothing
-            here leaves your browser.
-        </p>
+        <p class="lead">Paste, rate, export. Nothing leaves your browser.</p>
 
         <section class="panel" aria-labelledby="paste-title">
             <h2 class="panel__title" id="paste-title">Paste</h2>
-            <p class="panel__hint">
-                One title per line. <code>Title | rating | notes</code> works, so does
-                just the title, so do tab-separated columns from a spreadsheet.
-                To pick up where you left off, paste a whole exported list and load it.
-            </p>
-            <textarea class="field paste" id="paste" placeholder="Frieren: Beyond Journey's End | 9.5 | Quiet and devastating.&#10;Cowboy Bebop | 9&#10;Mob Psycho 100" aria-label="Pasted list"></textarea>
+            <p class="panel__hint">One title per line. <code>Title | rating | notes</code>, or just the title.</p>
+            <textarea class="field paste" id="paste" aria-label="Pasted list"></textarea>
             <div class="controls">
                 <label>Type
                     <select class="select" id="paste-type">
@@ -319,7 +311,7 @@
 
         <section class="panel" aria-labelledby="rows-title">
             <h2 class="panel__title" id="rows-title">List</h2>
-            <p class="panel__hint">Drag a slider all the way left to leave something unrated.</p>
+            <p class="panel__hint">Slider fully left is unrated.</p>
             <div class="controls">
                 <button class="button" id="load-log" type="button">Load the Watch Log</button>
                 <input class="file-input" id="import-file" type="file" accept=".txt,.json,.csv,text/plain,application/json,text/csv">
@@ -341,16 +333,12 @@
                 </thead>
                 <tbody id="rows"></tbody>
             </table>
-            <p class="empty" id="empty">Nothing yet. Paste some titles above or import a file.</p>
+            <p class="empty" id="empty">Empty.</p>
         </section>
 
         <section class="panel" aria-labelledby="export-title">
             <h2 class="panel__title" id="export-title">Export</h2>
-            <p class="panel__hint">
-                Text keeps the list readable and re-loadable here; JSON and CSV
-                are for other tools. Viewing in the Watch Log shows your list
-                there, on this device only.
-            </p>
+            <p class="panel__hint">Text reloads here. Viewing in the Watch Log is local to this device.</p>
             <div class="controls">
                 <button class="button button--primary" id="copy" type="button">Copy text</button>
                 <button class="button" id="download" type="button">Download text</button>

@@ -50,7 +50,7 @@
     {
       "slug": "list-editor",
       "title": "List Editor",
-      "description": "Paste a list, tidy it in a table, export it as the Watch Log file, JSON or CSV.",
+      "description": "Paste a list, rate it, export it.",
       "icon": null,
       "preview": "previews/list-editor.svg",
       "tags": [

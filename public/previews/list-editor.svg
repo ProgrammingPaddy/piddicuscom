@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" width="320" height="200" role="img" aria-label="Pasted lines turning into a tidy table, with an export button">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" width="320" height="200" role="img" aria-label="Pasted lines turning into a table">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="var(--preview-bg-top, #2f2130)"/>
@@ -8,63 +8,48 @@
 
   <rect width="320" height="200" fill="url(#bg)"/>
 
-  <!-- Pasted text box -->
-  <rect x="20" y="22" width="120" height="118" rx="10" fill="var(--preview-panel, #3b2a3b)"/>
-  <g font-family="ui-monospace, Consolas, monospace" font-size="8.5" fill="var(--preview-line, #cbb3bf)">
-    <text x="30" y="42">Frieren | 9.5</text>
-    <text x="30" y="58">Breaking Bad | 9.5</text>
-    <text x="30" y="74">Cowboy Bebop | 9</text>
-    <text x="30" y="90">Severance | 8.5</text>
-    <text x="30" y="106">The Bear | 8</text>
-    <text x="30" y="122">Mob Psycho 100</text>
+  <!-- Pasted text box: lines as bars, one per row -->
+  <rect x="20" y="36" width="122" height="128" rx="10" fill="var(--preview-panel, #3b2a3b)"/>
+  <g fill="var(--preview-line, #cbb3bf)" opacity="0.8">
+    <rect x="32" y="50" width="74" height="6" rx="3"/>
+    <rect x="32" y="66" width="52" height="6" rx="3"/>
+    <rect x="32" y="82" width="88" height="6" rx="3"/>
+    <rect x="32" y="98" width="64" height="6" rx="3"/>
+    <rect x="32" y="114" width="80" height="6" rx="3"/>
+    <rect x="32" y="130" width="46" height="6" rx="3"/>
+    <rect x="32" y="146" width="60" height="6" rx="3"/>
   </g>
   <!-- Text cursor -->
-  <rect x="99" y="115" width="1.5" height="10" fill="var(--preview-accent, #fec6d9)"/>
+  <rect x="96" y="143" width="1.5" height="12" fill="var(--preview-accent, #fec6d9)"/>
 
   <!-- Arrow across -->
-  <path d="M150 80 h22" stroke="var(--preview-accent, #fec6d9)" stroke-width="2.5" stroke-linecap="round"/>
-  <path d="M167 73 l8 7 l-8 7" fill="none" stroke="var(--preview-accent, #fec6d9)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M152 100 h22" stroke="var(--preview-accent, #fec6d9)" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M169 93 l8 7 l-8 7" fill="none" stroke="var(--preview-accent, #fec6d9)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
 
-  <!-- Table -->
-  <rect x="184" y="22" width="116" height="118" rx="10" fill="var(--preview-panel, #3b2a3b)"/>
+  <!-- Table: title bar and rating bars per row -->
+  <rect x="184" y="36" width="116" height="128" rx="10" fill="var(--preview-panel, #3b2a3b)"/>
   <g stroke="var(--preview-bg-bottom, #241a26)" stroke-width="1">
-    <line x1="184" y1="44" x2="300" y2="44"/>
-    <line x1="184" y1="64" x2="300" y2="64"/>
-    <line x1="184" y1="84" x2="300" y2="84"/>
-    <line x1="184" y1="104" x2="300" y2="104"/>
+    <line x1="184" y1="58" x2="300" y2="58"/>
+    <line x1="184" y1="80" x2="300" y2="80"/>
+    <line x1="184" y1="102" x2="300" y2="102"/>
     <line x1="184" y1="124" x2="300" y2="124"/>
+    <line x1="184" y1="146" x2="300" y2="146"/>
   </g>
-  <!-- Rows: title bar, type pill, rating -->
-  <g>
-    <rect x="192" y="50" width="40" height="7" rx="3.5" fill="var(--preview-cream, #f7edf1)" opacity="0.85"/>
-    <rect x="240" y="49" width="24" height="9" rx="4.5" fill="var(--preview-accent, #fec6d9)" opacity="0.25"/>
-    <text x="292" y="57" text-anchor="end" font-family="Fredoka, Nunito, system-ui, sans-serif" font-size="8" font-weight="500" fill="var(--preview-cream, #f7edf1)">9.5</text>
-
-    <rect x="192" y="70" width="52" height="7" rx="3.5" fill="var(--preview-cream, #f7edf1)" opacity="0.85"/>
-    <rect x="250" y="69" width="20" height="9" rx="4.5" fill="var(--preview-accent, #fec6d9)" opacity="0.25"/>
-    <text x="292" y="77" text-anchor="end" font-family="Fredoka, Nunito, system-ui, sans-serif" font-size="8" font-weight="500" fill="var(--preview-cream, #f7edf1)">9.5</text>
-
-    <rect x="192" y="90" width="46" height="7" rx="3.5" fill="var(--preview-cream, #f7edf1)" opacity="0.85"/>
-    <rect x="244" y="89" width="24" height="9" rx="4.5" fill="var(--preview-accent, #fec6d9)" opacity="0.25"/>
-    <text x="292" y="97" text-anchor="end" font-family="Fredoka, Nunito, system-ui, sans-serif" font-size="8" font-weight="500" fill="var(--preview-cream, #f7edf1)">9</text>
-
-    <rect x="192" y="110" width="36" height="7" rx="3.5" fill="var(--preview-cream, #f7edf1)" opacity="0.85"/>
-    <rect x="234" y="109" width="20" height="9" rx="4.5" fill="var(--preview-accent, #fec6d9)" opacity="0.25"/>
-    <text x="292" y="117" text-anchor="end" font-family="Fredoka, Nunito, system-ui, sans-serif" font-size="8" font-weight="500" fill="var(--preview-cream, #f7edf1)">8.5</text>
-
-    <rect x="192" y="130" width="30" height="7" rx="3.5" fill="var(--preview-cream, #f7edf1)" opacity="0.85"/>
-    <rect x="228" y="129" width="20" height="9" rx="4.5" fill="var(--preview-accent, #fec6d9)" opacity="0.25"/>
-    <text x="292" y="137" text-anchor="end" font-family="Fredoka, Nunito, system-ui, sans-serif" font-size="8" font-weight="500" fill="var(--preview-cream, #f7edf1)">8</text>
+  <g fill="var(--preview-cream, #f7edf1)" opacity="0.85">
+    <rect x="192" y="44" width="42" height="6" rx="3"/>
+    <rect x="192" y="66" width="30" height="6" rx="3"/>
+    <rect x="192" y="88" width="50" height="6" rx="3"/>
+    <rect x="192" y="110" width="36" height="6" rx="3"/>
+    <rect x="192" y="132" width="46" height="6" rx="3"/>
+    <rect x="192" y="154" width="26" height="6" rx="3"/>
   </g>
-  <!-- Header row -->
-  <g font-family="Fredoka, Nunito, system-ui, sans-serif" font-size="7" font-weight="500" fill="var(--preview-muted, #977d8c)" letter-spacing="0.8">
-    <text x="192" y="37">TITLE</text>
-    <text x="292" y="37" text-anchor="end">RATING</text>
+  <!-- Rating bars, three per row to fit -->
+  <g fill="var(--preview-accent, #fec6d9)">
+    <g><rect x="256" y="44" width="10" height="6" rx="3"/><rect x="269" y="44" width="10" height="6" rx="3"/><rect x="282" y="44" width="10" height="6" rx="3"/></g>
+    <g><rect x="256" y="66" width="10" height="6" rx="3"/><rect x="269" y="66" width="10" height="6" rx="3"/><rect x="282" y="66" width="10" height="6" rx="3"/></g>
+    <g><rect x="256" y="88" width="10" height="6" rx="3"/><rect x="269" y="88" width="10" height="6" rx="3"/><rect x="282" y="88" width="10" height="6" rx="3" fill="var(--preview-bg-bottom, #241a26)"/><rect x="282" y="88" width="7" height="6" rx="3"/></g>
+    <g><rect x="256" y="110" width="10" height="6" rx="3"/><rect x="269" y="110" width="10" height="6" rx="3"/><rect x="282" y="110" width="10" height="6" rx="3" fill="var(--preview-bg-bottom, #241a26)"/><rect x="282" y="110" width="5" height="6" rx="3"/></g>
+    <g><rect x="256" y="132" width="10" height="6" rx="3"/><rect x="269" y="132" width="10" height="6" rx="3"/><rect x="282" y="132" width="10" height="6" rx="3" fill="var(--preview-bg-bottom, #241a26)"/></g>
+    <g><rect x="256" y="154" width="10" height="6" rx="3"/><rect x="269" y="154" width="10" height="6" rx="3" fill="var(--preview-bg-bottom, #241a26)"/><rect x="269" y="154" width="5" height="6" rx="3"/><rect x="282" y="154" width="10" height="6" rx="3" fill="var(--preview-bg-bottom, #241a26)"/></g>
   </g>
-
-  <!-- Export button -->
-  <rect x="104" y="156" width="112" height="28" rx="14" fill="var(--preview-accent, #fec6d9)"/>
-  <text x="160" y="174.5" text-anchor="middle" font-family="Fredoka, Nunito, system-ui, sans-serif" font-size="11" font-weight="700" fill="var(--preview-on-accent, #2a1220)">Export</text>
-  <path d="M234 164 v12 M228 170 l6 6 l6 -6" fill="none" stroke="var(--preview-tertiary, #cdb4ff)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M224 182 h20" stroke="var(--preview-tertiary, #cdb4ff)" stroke-width="2.5" stroke-linecap="round"/>
 </svg>
