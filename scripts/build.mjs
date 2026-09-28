@@ -16,7 +16,8 @@
  * the site's project.json overrides it field by field. An "icon" is an image
  * inside the folder (or a URL); without one the homepage draws a mark from
  * the project's initials. A preview illustration at public/previews/<slug>.svg
- * (or .webp/.png) is linked when present.
+ * (or .webp/.png) is linked when present, and a theme's own version at
+ * public/previews/<theme>/<slug>.svg is listed under "previews".
  *
  * Usage: node scripts/build.mjs [--quiet]
  */
@@ -140,9 +141,29 @@ function findEntryPage(folder) {
 
 /* Metadata ----------------------------------------------------------------- */
 
-function findPreview(slug) {
-    const type = PREVIEW_TYPES.find((extension) => fs.existsSync(path.join(previewsDir, slug + extension)));
-    return type ? `previews/${encodeURIComponent(slug)}${type}` : null;
+function findPreview(slug, dir = previewsDir) {
+    const type = PREVIEW_TYPES.find((extension) => fs.existsSync(path.join(dir, slug + extension)));
+    const folder = path.relative(publicDir, dir).split(path.sep).join("/");
+    return type ? `${folder}/${encodeURIComponent(slug)}${type}` : null;
+}
+
+/** Theme-specific illustrations, keyed by the subfolder (theme) name. */
+function findThemedPreviews(slug) {
+    const previews = {};
+
+    for (const entry of fs.readdirSync(previewsDir, { withFileTypes: true })) {
+        if (!entry.isDirectory() || !isProjectName(entry.name)) {
+            continue;
+        }
+
+        const preview = findPreview(slug, path.join(previewsDir, entry.name));
+
+        if (preview) {
+            previews[entry.name] = preview;
+        }
+    }
+
+    return Object.keys(previews).length > 0 ? previews : undefined;
 }
 
 function buildEntry(slug, href, config, page, icon) {
@@ -154,6 +175,7 @@ function buildEntry(slug, href, config, page, icon) {
         description: config.description ?? page.description ?? "",
         icon,
         preview: findPreview(slug),
+        previews: findThemedPreviews(slug),
         tags: normaliseTags(tags),
         href,
         order: typeof config.order === "number" ? config.order : null,

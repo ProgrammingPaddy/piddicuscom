@@ -8,7 +8,9 @@ public/               Everything served
   index.html          The menu
   links/index.html    The links page; add a link by copying a list item
   logo.svg            Wordmark (header, hero, footer, project bars)
-  css/  js/           Site styles and scripts
+  logo-medieval.webp  Wordmark for the medieval theme
+  logo-water.webp     Wordmark for the water theme
+  css/  js/           Site styles and scripts (themes.css, theme.js: themes)
   projects/
     <name>/           A project. Drop a folder here and it is on the site.
     <name>.html       A single-file project works too.
@@ -43,7 +45,9 @@ are ignored.
 at 320x200. SVGs are inlined into the page, so colour them with the
 `--preview-*` tokens from `css/base.css` (with a fallback, e.g.
 `fill="var(--preview-accent, #fec6d9)"`) and any future theme recolours
-them for free. The build links previews automatically.
+them for free. The build links previews automatically. A theme can have
+its own version at `public/previews/<theme>/<name>.svg`; the card shows
+it while that theme is on and the default otherwise.
 
 **Watch List.** The ratings page reads `public/projects/watch-list/watched.txt`,
 one title per line as `Title | rating | notes` (rating out of 10 in halves,
@@ -98,6 +102,18 @@ than the default, and `"root": "some/folder"` copies only that subfolder of
 the repo (for repos where the page is not at the top level). If the copied
 folder has its own `project.json`, sync saves it as `project.repo.json` and
 the build uses it for any field yours does not set.
+
+## Themes
+
+The look is a set of tokens in `public/css/base.css`; a theme is a block in
+`public/css/themes.css` that redefines them under `html[data-theme="name"]`,
+plus an entry in `public/js/theme.js` (name, label, favicon). The header's
+Theme menu lists the entries and the choice is kept in localStorage. The
+background scene is a token too (`--backdrop-scene`: `lava`, `forge` or
+`wave`).
+Keep new work token-driven (no literal colours, fonts or radii outside
+`base.css`) and every theme gets it for free. Theme artwork such as `logo-medieval.webp` is
+stored with its metadata stripped.
 
 ## Deployment
 

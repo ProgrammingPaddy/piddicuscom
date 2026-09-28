@@ -1,9 +1,11 @@
 /**
  * Brings the wordmark to life on the homepage.
  *
- * Swaps the hero's <img> for the inline SVG, rebuilds the eyes from the
- * artwork, makes the pupils follow the pointer, blinks now and then, and
- * lets the whole wordmark be grabbed and dragged (it springs back).
+ * Puts the inline SVG beside the hero's wordmark image, rebuilds the eyes
+ * from the artwork, makes the pupils follow the pointer, blinks now and
+ * then, and lets the wordmark be grabbed and dragged (it springs back).
+ * Only the theme whose wordmark has the face shows the SVG; any other
+ * theme shows its own image, which can still be dragged.
  *
  * The SVG is treated as data. Nothing here depends on element ids, only on
  * the fill colours of its three paths (pink letters, white eyes, mauve pupils
@@ -364,6 +366,11 @@ function buildFace(svg) {
 
 /* Behaviour ------------------------------------------------------------- */
 
+/** A theme may opt out of the toy behaviour (js/theme.js sets `playful`). */
+function isPlayful() {
+    return !window.piddicusTheme || Boolean(window.piddicusTheme.get().playful);
+}
+
 function clamp(value, min, max) {
     return Math.min(max, Math.max(min, value));
 }
@@ -390,7 +397,7 @@ function lookAround(svg, eyes) {
     }
 
     function frame(now) {
-        const awake = pointer && now - lastMove < LOOK_TIMEOUT;
+        const awake = !svg.hasAttribute("hidden") && pointer && now - lastMove < LOOK_TIMEOUT;
         let settled = true;
 
         for (const eye of state) {
@@ -488,7 +495,7 @@ function makeGrabbable(svg) {
     }
 
     svg.addEventListener("pointerdown", (event) => {
-        if (event.button !== 0) {
+        if (event.button !== 0 || !isPlayful()) {
             return;
         }
 
@@ -565,7 +572,7 @@ async function fetchInlineSvg(url) {
 
 async function init() {
     const host = document.querySelector(".hero__logo");
-    const image = host && host.querySelector("img");
+    const image = host && host.querySelector(".logo-image");
 
     if (!image) {
         return;
@@ -582,14 +589,26 @@ async function init() {
 
     svg.setAttribute("class", "logo");
     svg.setAttribute("role", "img");
-    svg.setAttribute("aria-label", image.alt || "Piddicus");
+    svg.setAttribute("aria-label", image.getAttribute("aria-label") || "Piddicus");
     svg.removeAttribute("width");
     svg.removeAttribute("height");
 
-    image.replaceWith(svg);
+    image.before(svg);
     makeGrabbable(svg);
+    makeGrabbable(image);
 
+    /* The face is measured with getBBox, which needs the svg on screen, so
+       build it before the theme gets to hide it. Nothing paints in between. */
     const eyes = buildFace(svg);
+
+    function showForTheme() {
+        const face = !window.piddicusTheme || Boolean(window.piddicusTheme.get().face);
+        svg.toggleAttribute("hidden", !face);
+        image.toggleAttribute("hidden", face);
+    }
+
+    showForTheme();
+    document.addEventListener("themechange", showForTheme);
 
     if (!eyes) {
         console.warn("Logo artwork was not recognised as a face; eyes stay still.");

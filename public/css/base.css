@@ -22,6 +22,7 @@
     --color-accent-soft: rgba(254, 198, 217, 0.16);
     --color-secondary: #a16564;
     --color-on-accent: #2a1220;
+    --color-shimmer: #cdb4ff;
 
     /* Card illustrations (public/previews/*.svg are inlined and read these).
        A theme can restyle every preview by redefining this block. */
@@ -40,6 +41,46 @@
     --preview-ramp-2: #bb8090;
     --preview-ramp-3: #d09aae;
     --preview-ramp-4: #e6b3c6;
+
+    /* Wordmark. Root-relative so the same value works from any page. */
+    --logo-image: url("/logo.svg");
+    --logo-ratio: 968 / 348;
+
+    /* Backdrop (js/backdrop.js): which scene plays, how strong it shows,
+       and the colours of each scene. */
+    --backdrop-scene: lava;
+    --backdrop-opacity: 0.26;
+    --backdrop-vignette: none;
+    --lava-1: #fec6d9;
+    --lava-2: #bc7a80;
+    --lava-3: #d6beff;
+    --forge-hot: #fff0f6;
+    --forge-glow: #fec6d9;
+    --forge-ember: #bc7a80;
+    --forge-cast: #a16564;
+    --wave-deep: #3a1f3a;
+    --wave-mid: #a16564;
+    --wave-light: #fec6d9;
+    --wave-foam: #fff0f6;
+
+    /* Cards: the outline (drawn by js/cards.js) and the material. */
+    --card-fill-start: var(--color-accent);
+    --card-fill-start-alpha: 0.11;
+    --card-fill-end: var(--color-accent);
+    --card-fill-end-alpha: 0.06;
+    --card-spot: var(--color-accent);
+    --card-spot-alpha: 0.16;
+    --card-stroke: var(--color-border);
+    --card-stroke-hover: var(--color-border-strong);
+    --card-text: var(--color-text);
+    --card-text-hover: var(--color-accent);
+    --card-text-muted: var(--color-text-faint);
+    --card-inset: 8px;
+    --card-corner: 26px;
+    --card-wavelength: 150px;
+    --card-ripple: 1.3px;
+    --card-bow: 1.6px;
+    --card-grain: 0;
 
     /* Type */
     --font-display: "Fredoka", "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -78,6 +119,8 @@
     --duration-fast: 160ms;
     --duration-base: 320ms;
     --duration-slow: 720ms;
+    --tagline-wobble: 1;
+    --tagline-glow: 0;
 
     /* Layout */
     --content-width: 1120px;

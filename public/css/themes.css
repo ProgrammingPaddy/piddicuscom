@@ -1,0 +1,321 @@
+/* ==========================================================================
+   Themes
+
+   The default look is base.css. A theme is one block here that redefines
+   its tokens under html[data-theme="<name>"], plus the few overrides a
+   token cannot express. js/theme.js sets the attribute and lists the
+   themes for the picker. Asset urls are root-relative so the block works
+   from any page on the site.
+   ========================================================================== */
+
+/* Medieval: bronze on dark stone, after the plaque wordmark ------------- */
+
+:root[data-theme="medieval"] {
+    --color-bg: #121010;
+    --color-bg-elevated: #1d1915;
+    --color-surface: rgba(214, 166, 90, 0.07);
+    --color-surface-hover: rgba(214, 166, 90, 0.12);
+    --color-border: rgba(214, 166, 90, 0.22);
+    --color-border-strong: rgba(214, 166, 90, 0.42);
+    --color-text: #eee2cb;
+    --color-text-muted: #c4b294;
+    --color-text-faint: #9a8a70;
+    --color-accent: #d6a65a;
+    --color-accent-strong: #ecc274;
+    --color-accent-soft: rgba(214, 166, 90, 0.16);
+    --color-secondary: #7d4b2a;
+    --color-on-accent: #23180a;
+    --color-shimmer: #fff0c2;
+
+    --preview-bg-top: #2a221a;
+    --preview-bg-bottom: #1d1813;
+    --preview-panel: #393022;
+    --preview-tertiary: #a4402e;
+    --preview-ramp-2: #8a6738;
+    --preview-ramp-3: #b58a44;
+    --preview-ramp-4: #d8af67;
+
+    --logo-image: url("/logo-medieval.webp");
+    --logo-ratio: 2000 / 667;
+
+    /* Molten bronze pouring past, seen close; the edges fall into shadow. */
+    --backdrop-scene: forge;
+    --backdrop-opacity: 0.75;
+    --backdrop-vignette: radial-gradient(ellipse at 50% 35%, transparent 30%, rgba(0, 0, 0, 0.65) 100%);
+    --lava-1: #c48a3c;
+    --lava-2: #6e3a26;
+    --lava-3: #e4b76a;
+    --forge-hot: #fff2cc;
+    --forge-glow: #ff9a2e;
+    --forge-ember: #c2401c;
+    --forge-cast: #5a4028;
+
+    /* Cinzel's lowercase is small capitals, so display text reads as an
+       inscription. Garamond runs small, so the body sizes go up a notch. */
+    --font-display: "Cinzel", "Times New Roman", serif;
+    --font-title: "Cinzel", "Times New Roman", serif;
+    --font-body: "EB Garamond", Georgia, "Times New Roman", serif;
+    --text-xs: 0.85rem;
+    --text-sm: 0.95rem;
+    --text-base: 1.0625rem;
+    --text-lg: 1.2rem;
+    --text-xl: 1.45rem;
+    --text-2xl: 1.9rem;
+    --text-tagline: clamp(1.5rem, 3.8vw, 2.4rem);
+
+    --radius-sm: 3px;
+    --radius-md: 5px;
+    --radius-lg: 8px;
+    --radius-pill: 4px;
+
+    /* Cards are slabs of dark granite: a faintly warm fill under a
+       speckle of light and dark flecks, edged in bronze. */
+    --card-corner: 8px;
+    --card-ripple: 0px;
+    --card-bow: 0px;
+    --card-grain: 0.34;
+    --card-fill-start: #2c2622;
+    --card-fill-start-alpha: 0.96;
+    --card-fill-end: #1c1816;
+    --card-fill-end-alpha: 0.96;
+    --card-spot: var(--color-accent);
+    --card-spot-alpha: 0.14;
+    --card-stroke: rgba(214, 166, 90, 0.3);
+    --card-stroke-hover: rgba(214, 166, 90, 0.55);
+
+    /* Nothing bounces in a keep, and nothing hurries. */
+    --ease-bounce: cubic-bezier(0.22, 1, 0.36, 1);
+    --duration-slow: 1000ms;
+    --tagline-wobble: 0;
+    --tagline-glow: 26px;
+}
+
+/* The plaque hangs still: no bobbing, no dragging, no tilt on hover, and
+   the cards rise into place rather than popping. */
+[data-theme="medieval"] .hero__logo-float {
+    animation: none;
+}
+
+[data-theme="medieval"] .hero__logo .logo-image {
+    cursor: default;
+}
+
+[data-theme="medieval"] .site-header__brand:hover .site-header__logo {
+    transform: none;
+    filter: brightness(1.15);
+}
+
+[data-theme="medieval"] .card {
+    animation-name: fade-up;
+}
+
+[data-theme="medieval"] .chip:hover {
+    transform: none;
+}
+
+
+/* Inscriptions get air between the letters. */
+[data-theme="medieval"] .hero__tagline,
+[data-theme="medieval"] .chip,
+[data-theme="medieval"] .card__tag,
+[data-theme="medieval"] .menu__count,
+[data-theme="medieval"] .site-header__link,
+[data-theme="medieval"] .theme-picker__option {
+    letter-spacing: 0.06em;
+}
+
+[data-theme="medieval"] .hero__tagline {
+    font-weight: 600;
+}
+
+[data-theme="medieval"] .site-header__link {
+    font-family: var(--font-display);
+    font-weight: 600;
+}
+
+[data-theme="medieval"] .card__title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+}
+
+/* The plaque's ornament makes its letters small, so it sits a little
+   larger in the header and footer. */
+[data-theme="medieval"] .site-header__logo {
+    height: 40px;
+}
+
+[data-theme="medieval"] .site-footer__logo {
+    height: 22px;
+}
+
+/* A double rule under the header and over the footer. The header is
+   near-solid stone rather than frosted glass: blurring what lies behind
+   it would mean re-blurring the moving backdrop every frame. */
+[data-theme="medieval"] .site-header {
+    background: color-mix(in srgb, var(--color-bg) 94%, transparent);
+    border-bottom-color: var(--color-border-strong);
+    box-shadow: 0 3px 0 -2px var(--color-border);
+    backdrop-filter: none;
+}
+
+[data-theme="medieval"] .site-footer {
+    border-top-color: var(--color-border-strong);
+    box-shadow: 0 -3px 0 -2px var(--color-border);
+}
+
+/* Slabs sit still: a small lift on hover, no jelly, and a bronze stud at
+   the top and bottom like the points on the wordmark. */
+[data-theme="medieval"] .card__link:hover {
+    transform: translateY(-2px);
+    animation: none;
+}
+
+[data-theme="medieval"] .card__link::before,
+[data-theme="medieval"] .card__link::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    z-index: 1;
+    width: 7px;
+    height: 7px;
+    background: var(--color-accent);
+    opacity: 0.55;
+    transform: translateX(-50%) rotate(45deg);
+    transition: opacity var(--duration-fast) var(--ease-out);
+}
+
+[data-theme="medieval"] .card__link::before {
+    top: calc(var(--card-inset) - 3.5px);
+}
+
+[data-theme="medieval"] .card__link::after {
+    bottom: calc(var(--card-inset) - 3.5px);
+}
+
+[data-theme="medieval"] .card__link:hover::before,
+[data-theme="medieval"] .card__link:hover::after {
+    opacity: 1;
+}
+
+/* Petals become embers: small, glowing, rising. */
+[data-theme="medieval"] .petal {
+    top: auto;
+    bottom: -4vh;
+    width: calc(var(--size) * 0.45);
+    height: calc(var(--size) * 0.45);
+    animation-name: float-up;
+}
+
+[data-theme="medieval"] .petal::before {
+    background: radial-gradient(circle, var(--color-accent-strong) 30%, var(--color-accent) 55%, transparent 72%);
+    border-radius: 50%;
+}
+
+@keyframes float-up {
+    from {
+        transform: translateY(0);
+    }
+
+    to {
+        transform: translateY(-115vh);
+    }
+}
+
+/* Water: cool glass and white foam, after the splashing wordmark ------- */
+
+:root[data-theme="water"] {
+    --color-bg: #061a2e;
+    --color-bg-elevated: #0c2a46;
+    --color-surface: rgba(95, 215, 255, 0.08);
+    --color-surface-hover: rgba(95, 215, 255, 0.14);
+    --color-border: rgba(95, 215, 255, 0.2);
+    --color-border-strong: rgba(95, 215, 255, 0.4);
+    --color-text: #eaf7ff;
+    --color-text-muted: #a9cfe6;
+    --color-text-faint: #6f9bb8;
+    --color-accent: #5fd7ff;
+    --color-accent-strong: #a6ecff;
+    --color-accent-soft: rgba(95, 215, 255, 0.18);
+    --color-secondary: #1e6fd0;
+    --color-on-accent: #05233a;
+    --color-shimmer: #ffffff;
+
+    --preview-bg-top: #0e2f4e;
+    --preview-bg-bottom: #082238;
+    --preview-panel: #143d60;
+    --preview-tertiary: #7ff5c9;
+    --preview-ramp-2: #2a7fd8;
+    --preview-ramp-3: #46aef0;
+    --preview-ramp-4: #7ddcff;
+
+    --logo-image: url("/logo-water.webp");
+    --logo-ratio: 2000 / 667;
+
+    /* A breaker in the lower half of the view. */
+    --backdrop-scene: wave;
+    --backdrop-opacity: 0.62;
+    --backdrop-vignette: none;
+    --wave-deep: #0a3a6a;
+    --wave-mid: #1f8ae0;
+    --wave-light: #8ae9ff;
+    --wave-foam: #f2fcff;
+
+    /* Rounded and light, like the lettering. */
+    --font-display: "Quicksand", "Nunito", system-ui, sans-serif;
+    --font-title: "Quicksand", "Nunito", system-ui, sans-serif;
+    --font-body: "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+    --radius-sm: 12px;
+    --radius-md: 18px;
+    --radius-lg: 30px;
+
+    /* Cards are glass with a rippled edge. */
+    --card-corner: 30px;
+    --card-wavelength: 110px;
+    --card-ripple: 2.2px;
+    --card-bow: 3px;
+    --card-fill-start: #5fd7ff;
+    --card-fill-start-alpha: 0.14;
+    --card-fill-end: #1e6fd0;
+    --card-fill-end-alpha: 0.1;
+    --card-spot: #ffffff;
+    --card-spot-alpha: 0.2;
+}
+
+[data-theme="water"] .card__title {
+    font-weight: 700;
+}
+
+[data-theme="water"] .hero__tagline {
+    font-weight: 600;
+}
+
+/* The header is a solid band rather than frosted glass: blurring what
+   lies behind it would mean re-blurring the moving sea every frame. */
+[data-theme="water"] .site-header {
+    background: color-mix(in srgb, var(--color-bg) 92%, transparent);
+    backdrop-filter: none;
+}
+
+/* Petals become bubbles: round, rimmed with light, rising. */
+[data-theme="water"] .petal {
+    top: auto;
+    bottom: -4vh;
+    width: calc(var(--size) * 0.9);
+    height: calc(var(--size) * 0.9);
+    animation-name: float-up;
+}
+
+[data-theme="water"] .petal::before {
+    background: radial-gradient(circle at 35% 32%, rgba(255, 255, 255, 0.9), rgba(166, 236, 255, 0.35) 38%, rgba(166, 236, 255, 0.08) 70%, transparent 72%);
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 1px rgba(234, 247, 255, 0.55);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    [data-theme="medieval"] .petal,
+    [data-theme="water"] .petal {
+        animation: none;
+    }
+}

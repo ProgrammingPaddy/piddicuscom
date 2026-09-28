@@ -5,31 +5,33 @@
  * point on the outline is nudged along its normal by a gentle undulation plus
  * a slow bow. Phases are seeded from the card's slug, so cards differ from
  * each other and never change between visits. Nothing here animates; the
- * shape is drawn once and again whenever the card changes size.
+ * shape is drawn once and again whenever the card changes size or the
+ * theme changes. Corner radius and wave sizes come from the --card-*
+ * tokens, so a theme can square the cards off or flatten the wave.
  *
- * The shape is an SVG behind the card's content: a tinted fill, a spotlight
- * that follows the pointer, and a faint stroke.
+ * The shape is an SVG behind the card's content: a tinted fill, a grain
+ * (a seamless noise tile whose strength is the --card-grain token, so a
+ * theme can make the card feel like stone), a spotlight that follows the
+ * pointer, and a faint stroke.
  */
 
 const SVG_NS = "http://www.w3.org/2000/svg";
 
-/** How far the shape sits inside the element's box, in px. */
-const MARGIN = 8;
-
-/** Corner radius of the base rounded rectangle, in px. */
-const CORNER = 26;
+/**
+ * Fallbacks for the --card-* tokens (px) when a page does not set them:
+ * how far inside the box the shape sits, its corner radius, the px of
+ * edge per ripple, the ripple height, and one long bow round the outline.
+ */
+const SHAPE_DEFAULTS = { inset: 8, corner: 26, wavelength: 150, ripple: 1.3, bow: 1.6 };
 
 /** Sampling: px between points along an edge, and points per corner arc. */
 const EDGE_STEP = 8;
 const CORNER_SAMPLES = 8;
 
-const WAVE = {
-    wavelength: 150,   // px along the edge per ripple
-    ripple: 1.3,       // px, the small waves
-    bow: 1.6,          // px, one long bow around the whole outline
-};
-
 const SPOT_RADIUS = 220;
+
+/** Size of the grain tile in px; it repeats seamlessly. */
+const GRAIN_SIZE = 128;
 
 /* Seeding ----------------------------------------------------------------- */
 
@@ -59,14 +61,27 @@ function createRandom(seed) {
 
 /* Geometry ---------------------------------------------------------------- */
 
+/** The --card-* tokens as numbers, read from the link's computed style. */
+function readShape(link) {
+    const style = getComputedStyle(link);
+    const shape = {};
+
+    for (const [name, fallback] of Object.entries(SHAPE_DEFAULTS)) {
+        const value = parseFloat(style.getPropertyValue(`--card-${name}`));
+        shape[name] = Number.isFinite(value) ? value : fallback;
+    }
+
+    return shape;
+}
+
 /**
- * Sample a rounded rectangle of `width` x `height` inset by MARGIN, walking
- * clockwise. Each sample carries its outward normal and its distance along
- * the perimeter.
+ * Sample a rounded rectangle of `width` x `height` inset by the shape's
+ * inset, walking clockwise. Each sample carries its outward normal and its
+ * distance along the perimeter.
  */
-function roundedRectSamples(width, height) {
-    const m = MARGIN;
-    const r = Math.min(CORNER, (Math.min(width, height) - 2 * m) / 2);
+function roundedRectSamples(width, height, shape) {
+    const m = shape.inset;
+    const r = Math.max(0, Math.min(shape.corner, (Math.min(width, height) - 2 * m) / 2));
     const left = m;
     const top = m;
     const right = width - m;
@@ -112,16 +127,16 @@ function roundedRectSamples(width, height) {
     return { samples, perimeter: distance };
 }
 
-function outlinePoints(phases, width, height) {
-    const { samples, perimeter } = roundedRectSamples(width, height);
+function outlinePoints(phases, width, height, shape) {
+    const { samples, perimeter } = roundedRectSamples(width, height, shape);
 
     /* A whole number of ripples fits the perimeter, so the wave closes. */
-    const ripples = Math.max(4, Math.round(perimeter / WAVE.wavelength));
+    const ripples = Math.max(4, Math.round(perimeter / Math.max(1, shape.wavelength)));
 
     return samples.map((sample) => {
         const along = (sample.distance / perimeter) * Math.PI * 2;
-        const offset = WAVE.ripple * Math.sin(ripples * along + phases.ripple)
-            + WAVE.bow * Math.sin(2 * along + phases.bow);
+        const offset = shape.ripple * Math.sin(ripples * along + phases.ripple)
+            + shape.bow * Math.sin(2 * along + phases.bow);
 
         return [sample.x + sample.nx * offset, sample.y + sample.ny * offset];
     });
@@ -144,6 +159,80 @@ function splinePath(points) {
     return `M ${points[0][0].toFixed(1)} ${points[0][1].toFixed(1)} ${segments.join(" ")} Z`;
 }
 
+/* Grain ------------------------------------------------------------------- */
+
+let grainDataUrl = null;
+
+/**
+ * A granite tile: value noise (a soft mottle, a smaller one, and a speckle
+ * of one- and two-pixel flecks) split around its middle into light flecks
+ * (white) and dark flecks (black), with alpha rising with the distance from
+ * the middle. The noise lattices wrap, so the tile repeats without seams.
+ * Painted at low opacity over a dark fill it reads as polished stone.
+ */
+function grainTile() {
+    if (grainDataUrl) {
+        return grainDataUrl;
+    }
+
+    const size = GRAIN_SIZE;
+    const canvas = document.createElement("canvas");
+    canvas.width = size;
+    canvas.height = size;
+
+    const context = canvas.getContext("2d");
+    const image = context.createImageData(size, size);
+    const random = createRandom(11);
+    const smooth = (f) => f * f * (3 - 2 * f);
+
+    const octaves = [[5, 0.3], [18, 0.22]].map(([cells, weight]) => {
+        const lattice = Array.from({ length: cells * cells }, () => random());
+        const at = (i, j) => lattice[((j + cells) % cells) * cells + ((i + cells) % cells)];
+        return { cells, weight, at };
+    });
+
+    /* Flecks: a lattice sampled without smoothing, one at full size and one
+       at half size for the larger grains. */
+    const fine = Array.from({ length: size * size }, () => random());
+    const half = size / 2;
+    const coarse = Array.from({ length: half * half }, () => random());
+
+    for (let y = 0; y < size; y += 1) {
+        for (let x = 0; x < size; x += 1) {
+            let value = 0;
+
+            for (const { cells, weight, at } of octaves) {
+                const gx = (x / size) * cells;
+                const gy = (y / size) * cells;
+                const i = Math.floor(gx);
+                const j = Math.floor(gy);
+                const fx = smooth(gx - i);
+                const fy = smooth(gy - j);
+                const top = at(i, j) * (1 - fx) + at(i + 1, j) * fx;
+                const bottom = at(i, j + 1) * (1 - fx) + at(i + 1, j + 1) * fx;
+                value += weight * (top * (1 - fy) + bottom * fy);
+            }
+
+            value += 0.28 * fine[y * size + x] + 0.2 * coarse[(y >> 1) * half + (x >> 1)];
+
+            /* Push away from the middle: most pixels stay clear, the rest
+               become light or dark flecks. */
+            const off = value - 0.5;
+            const alpha = Math.min(1, Math.abs(off) * 2.4) ** 1.6;
+            const tone = off > 0 ? 255 : 0;
+            const k = (y * size + x) * 4;
+            image.data[k] = tone;
+            image.data[k + 1] = tone;
+            image.data[k + 2] = tone;
+            image.data[k + 3] = Math.round(alpha * 255);
+        }
+    }
+
+    context.putImageData(image, 0, 0);
+    grainDataUrl = canvas.toDataURL("image/png");
+    return grainDataUrl;
+}
+
 /* Building one card ------------------------------------------------------- */
 
 function svgElement(name, attributes = {}) {
@@ -157,6 +246,15 @@ function svgElement(name, attributes = {}) {
 }
 
 let cardCount = 0;
+
+/** Every shaped card's redraw, so a theme change can redraw them all. */
+const redraws = new Set();
+
+document.addEventListener("themechange", () => {
+    for (const redraw of redraws) {
+        redraw();
+    }
+});
 
 /**
  * Shape one card link. `seedText` (usually the project slug or the href)
@@ -186,18 +284,29 @@ export function shapeCardLink(link, seedText) {
         svgElement("stop", { offset: 0.7, class: "card__spot-end" })
     );
 
-    defs.append(tint, spot);
+    const grain = svgElement("pattern", { id: `${id}-grain`, patternUnits: "userSpaceOnUse", width: GRAIN_SIZE, height: GRAIN_SIZE });
+    const grainImage = svgElement("image", { width: GRAIN_SIZE, height: GRAIN_SIZE });
+    grainImage.setAttribute("href", grainTile());
+    grain.append(grainImage);
+
+    defs.append(tint, spot, grain);
 
     const fill = svgElement("path", { class: "card__fill", fill: `url(#${id}-tint)` });
+    const texture = svgElement("path", { class: "card__grain", fill: `url(#${id}-grain)` });
     const glow = svgElement("path", { class: "card__spot", fill: `url(#${id}-spot)` });
     const stroke = svgElement("path", { class: "card__stroke" });
 
-    svg.append(defs, fill, glow, stroke);
+    svg.append(defs, fill, texture, glow, stroke);
     link.prepend(svg);
 
     /* Layout size, not the transformed box: the entrance pop and the hover
        squash scale the card, and the outline must ignore both. */
     function render() {
+        if (!link.isConnected) {
+            redraws.delete(render);
+            return;
+        }
+
         const width = link.offsetWidth;
         const height = link.offsetHeight;
 
@@ -205,13 +314,15 @@ export function shapeCardLink(link, seedText) {
             return;
         }
 
-        const d = splinePath(outlinePoints(phases, width, height));
+        const d = splinePath(outlinePoints(phases, width, height, readShape(link)));
         fill.setAttribute("d", d);
+        texture.setAttribute("d", d);
         glow.setAttribute("d", d);
         stroke.setAttribute("d", d);
     }
 
     render();
+    redraws.add(render);
     new ResizeObserver(render).observe(link);
 
     link.addEventListener("pointermove", (event) => {

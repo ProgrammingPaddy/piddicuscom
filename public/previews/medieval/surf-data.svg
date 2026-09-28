@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" width="320" height="200" role="img" aria-label="A bar chart of survey responses engraved in bronze, above an engraved sea">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="var(--preview-bg-top, #2a221a)"/>
+      <stop offset="1" stop-color="var(--preview-bg-bottom, #1d1813)"/>
+    </linearGradient>
+    <linearGradient id="wave" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="var(--preview-accent, #d6a65a)" stop-opacity="0.3"/>
+      <stop offset="1" stop-color="var(--preview-accent, #d6a65a)" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="320" height="200" fill="url(#bg)"/>
+
+  <!-- Plate border with corner studs -->
+  <rect x="7" y="7" width="306" height="186" fill="none" stroke="var(--preview-accent, #d6a65a)" stroke-width="1" opacity="0.4"/>
+  <g fill="var(--preview-accent, #d6a65a)" opacity="0.7">
+    <rect x="4" y="4" width="6" height="6" transform="rotate(45 7 7)"/>
+    <rect x="310" y="4" width="6" height="6" transform="rotate(45 313 7)"/>
+    <rect x="4" y="190" width="6" height="6" transform="rotate(45 7 193)"/>
+    <rect x="310" y="190" width="6" height="6" transform="rotate(45 313 193)"/>
+  </g>
+
+  <g transform="translate(0 -14)">
+  <!-- Gridlines -->
+  <g stroke="var(--preview-accent, #d6a65a)" stroke-width="0.8" opacity="0.2">
+    <line x1="36" y1="70" x2="296" y2="70"/>
+    <line x1="36" y1="100" x2="296" y2="100"/>
+    <line x1="36" y1="130" x2="296" y2="130"/>
+  </g>
+
+  <!-- Bars, in the bronze ramp -->
+  <g stroke="var(--preview-ink, #1d1915)" stroke-width="0.8">
+    <rect x="52" y="44" width="32" height="104" fill="var(--preview-secondary, #7d4b2a)"/>
+    <rect x="102" y="86" width="32" height="62" fill="var(--preview-ramp-2, #8a6738)"/>
+    <rect x="152" y="90" width="32" height="58" fill="var(--preview-ramp-3, #b58a44)"/>
+    <rect x="202" y="76" width="32" height="72" fill="var(--preview-ramp-4, #d8af67)"/>
+    <rect x="252" y="82" width="32" height="66" fill="var(--preview-accent, #d6a65a)"/>
+  </g>
+  <!-- Trend in red, with diamond marks -->
+  <path d="M68 52 C 85 52, 100 86, 118 86 S 150 90, 168 90 S 200 76, 218 76 S 250 82, 268 82" fill="none" stroke="var(--preview-tertiary, #a4402e)" stroke-width="1.8" stroke-linecap="round"/>
+  <g fill="var(--preview-tertiary, #a4402e)" stroke="var(--preview-accent-strong, #ecc274)" stroke-width="0.8">
+    <rect x="64.5" y="48.5" width="7" height="7" transform="rotate(45 68 52)"/>
+    <rect x="114.5" y="82.5" width="7" height="7" transform="rotate(45 118 86)"/>
+    <rect x="164.5" y="86.5" width="7" height="7" transform="rotate(45 168 90)"/>
+    <rect x="214.5" y="72.5" width="7" height="7" transform="rotate(45 218 76)"/>
+    <rect x="264.5" y="78.5" width="7" height="7" transform="rotate(45 268 82)"/>
+  </g>
+  <!-- Baseline -->
+  <line x1="36" y1="148" x2="296" y2="148" stroke="var(--preview-accent, #d6a65a)" stroke-width="1.2" stroke-linecap="round" opacity="0.8"/>
+  </g>
+
+  <!-- The sea, engraved -->
+  <path d="M0 176 C 30 162, 50 190, 80 176 S 130 162, 160 176 S 210 190, 240 176 S 290 162, 320 176 L320 200 L0 200 Z" fill="url(#wave)"/>
+  <path d="M0 176 C 30 162, 50 190, 80 176 S 130 162, 160 176 S 210 190, 240 176 S 290 162, 320 176" fill="none" stroke="var(--preview-accent, #d6a65a)" stroke-width="1.8" stroke-linecap="round" opacity="0.9"/>
+  <path d="M0 188 C 30 174, 50 202, 80 188 S 130 174, 160 188 S 210 202, 240 188 S 290 174, 320 188" fill="none" stroke="var(--preview-accent, #d6a65a)" stroke-width="1" stroke-linecap="round" opacity="0.45"/>
+</svg>

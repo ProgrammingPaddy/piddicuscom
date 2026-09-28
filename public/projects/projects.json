@@ -6,6 +6,9 @@
       "description": "Build a chord, see it on the fretboard and keyboard, and hear it against the key and scale you pick.",
       "icon": null,
       "preview": "previews/chord-vis.svg",
+      "previews": {
+        "medieval": "previews/medieval/chord-vis.svg"
+      },
       "tags": [
         "music",
         "tools"
@@ -18,6 +21,9 @@
       "description": "Roll a random perk, spell and enemy for a Noita challenge run. Filter the pools, build custom groups, save presets.",
       "icon": null,
       "preview": "previews/noita-slot-machine.svg",
+      "previews": {
+        "medieval": "previews/medieval/noita-slot-machine.svg"
+      },
       "tags": [
         "games",
         "tools"
@@ -30,6 +36,9 @@
       "description": "Five years of the Counter-Strike surf community survey, charted year by year, with every raw response underneath.",
       "icon": null,
       "preview": "previews/surf-data.svg",
+      "previews": {
+        "medieval": "previews/medieval/surf-data.svg"
+      },
       "tags": [
         "data",
         "games"
@@ -42,6 +51,9 @@
       "description": "Movies, TV and anime I have watched, am watching, or mean to. Ratings and a line of notes each.",
       "icon": null,
       "preview": "previews/watch-list.svg",
+      "previews": {
+        "medieval": "previews/medieval/watch-list.svg"
+      },
       "tags": [
         "data"
       ],
@@ -53,6 +65,9 @@
       "description": "Build a watch list: paste, rate, export.",
       "icon": null,
       "preview": "previews/list-editor.svg",
+      "previews": {
+        "medieval": "previews/medieval/list-editor.svg"
+      },
       "tags": [
         "tools"
       ],

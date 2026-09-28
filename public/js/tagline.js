@@ -3,7 +3,9 @@
  * into per-letter spans (the phrase keeps an aria-label with the full text).
  *
  *   enchant   Letters wobble and shimmer like an enchanted item while hovered,
- *             then wind down after the pointer leaves.
+ *             then wind down after the pointer leaves. A theme that sets
+ *             --tagline-glow instead lights every letter, flickering on its
+ *             own like a flame, with a glow of that many px.
  *   gears     Every "o" becomes a small gear that spins up while hovered and
  *             winds down with friction after the pointer leaves.
  */
@@ -15,7 +17,8 @@ const ENCHANT = {
     tilt: 9,            // degrees of rotation at full strength
     rampIn: 0.12,       // fraction of the gap closed per frame while hovered
     windDown: 0.035,    // fraction of the strength lost per frame after leaving
-    shimmer: "#cdb4ff", // colour the sheen mixes towards
+    shimmer: "#cdb4ff", // colour the sheen mixes towards, unless --color-shimmer says
+    ember: 0.55,        // with a flame, the glow every letter keeps between flickers
 };
 
 const GEAR = {
@@ -112,6 +115,20 @@ function animateWhileHovered(phrase, { rampIn, windDown, update, reset }) {
 function enchant(phrase) {
     const letters = splitIntoLetters(phrase);
     let clock = 0;
+    let shimmer = ENCHANT.shimmer;
+    let wobble = 1;
+    let glow = 0;
+
+    /* Read the theme's colour and how much the letters may move each
+       time, so a switch mid-visit shows. */
+    phrase.addEventListener("pointerenter", () => {
+        const style = getComputedStyle(phrase);
+        const amount = parseFloat(style.getPropertyValue("--tagline-wobble"));
+        const flame = parseFloat(style.getPropertyValue("--tagline-glow"));
+        shimmer = style.getPropertyValue("--color-shimmer").trim() || ENCHANT.shimmer;
+        wobble = Number.isFinite(amount) ? amount : 1;
+        glow = Number.isFinite(flame) ? flame : 0;
+    });
 
     animateWhileHovered(phrase, {
         rampIn: ENCHANT.rampIn,
@@ -122,12 +139,24 @@ function enchant(phrase) {
             clock += delta * (0.35 + 0.65 * strength);
 
             letters.forEach((letter, i) => {
-                const lift = Math.sin(clock * 0.012 + i * 0.9) * ENCHANT.lift * strength;
-                const tilt = Math.cos(clock * 0.010 + i * 1.3) * ENCHANT.tilt * strength;
-                const sheen = strength * (0.5 + 0.5 * Math.sin(clock * 0.008 - i * 0.7));
+                const lift = Math.sin(clock * 0.012 + i * 0.9) * ENCHANT.lift * strength * wobble;
+                const tilt = Math.cos(clock * 0.010 + i * 1.3) * ENCHANT.tilt * strength * wobble;
+                let sheen;
+
+                if (glow > 0) {
+                    /* A flame: a slow breath and a quick flutter at rates that
+                       differ a little per letter, so no two flicker together. */
+                    const breath = Math.sin(clock * (0.0028 + 0.0009 * ((i * 7) % 5)) + i * 2.1);
+                    const flutter = Math.sin(clock * (0.011 + 0.003 * ((i * 3) % 4)) + i * 0.9);
+                    sheen = strength * Math.min(1, ENCHANT.ember + 0.3 * breath + 0.18 * flutter + 0.15);
+                    letter.style.textShadow = `0 0 ${(glow * sheen).toFixed(1)}px color-mix(in srgb, ${shimmer} ${(sheen * 100).toFixed(0)}%, transparent), 0 0 ${(glow * 0.35 * sheen).toFixed(1)}px color-mix(in srgb, ${shimmer} ${(sheen * 90).toFixed(0)}%, transparent)`;
+                } else {
+                    /* A sheen that sweeps along the letters. */
+                    sheen = strength * (0.5 + 0.5 * Math.sin(clock * 0.008 - i * 0.7));
+                }
 
                 letter.style.transform = `translateY(${lift.toFixed(2)}px) rotate(${tilt.toFixed(2)}deg)`;
-                letter.style.color = `color-mix(in srgb, currentcolor, ${ENCHANT.shimmer} ${(sheen * 100).toFixed(0)}%)`;
+                letter.style.color = `color-mix(in srgb, currentcolor, ${shimmer} ${(sheen * 100).toFixed(0)}%)`;
             });
         },
 
@@ -135,6 +164,7 @@ function enchant(phrase) {
             for (const letter of letters) {
                 letter.style.transform = "";
                 letter.style.color = "";
+                letter.style.textShadow = "";
             }
         },
     });

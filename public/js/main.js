@@ -61,18 +61,43 @@ async function loadPreview(url, prefix) {
     return document.importNode(svg, true);
 }
 
+/** The theme's own illustration when it has one, else the default. */
+function previewUrl(project) {
+    const theme = window.piddicusTheme ? window.piddicusTheme.get().id : null;
+    return (theme && project.previews && project.previews[theme]) || project.preview || null;
+}
+
+const figureProjects = new WeakMap();
+
 function fillPreview(figure, project) {
-    if (!project.preview) {
-        figure.remove();
+    const url = previewUrl(project);
+
+    figureProjects.set(figure, project);
+    figure.dataset.preview = url || "";
+
+    if (!url) {
+        figure.hidden = true;
         return;
     }
 
-    loadPreview(project.preview, `preview-${project.slug}`)
-        .then((svg) => figure.replaceChildren(svg))
+    loadPreview(url, `preview-${project.slug}`)
+        .then((svg) => {
+            /* A later theme change may have asked for another picture. */
+            if (figure.dataset.preview === url) {
+                figure.replaceChildren(svg);
+                figure.hidden = false;
+            }
+        })
         .catch((error) => {
             console.warn("Preview unavailable:", error);
-            figure.remove();
+            figure.hidden = true;
         });
+}
+
+function refillPreviews() {
+    for (const figure of grid.querySelectorAll(".card__preview")) {
+        fillPreview(figure, figureProjects.get(figure));
+    }
 }
 
 /* Rendering --------------------------------------------------------------- */
@@ -229,6 +254,7 @@ async function init() {
     document.getElementById("year").textContent = new Date().getFullYear();
     initReveal();
     initCardHoverSignal();
+    document.addEventListener("themechange", refillPreviews);
 
     filterBar.addEventListener("click", (event) => {
         const chip = event.target.closest(".chip");
