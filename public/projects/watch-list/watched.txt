@@ -1,4 +1,4 @@
-# Rated list
+# Watch List
 #
 # One title per line:   Title | rating | notes
 #   rating  out of 10, halves allowed (7, 7.5, 8 ...)

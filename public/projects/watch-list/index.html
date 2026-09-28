@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#1d151c">
-    <title>Watch Log</title>
+    <title>Watch List</title>
     <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -37,8 +37,14 @@
 
         .heading__links {
             display: flex;
-            flex-wrap: wrap;
+            align-items: center;
             gap: var(--space-4);
+        }
+
+        .heading__divider {
+            width: 1px;
+            height: 1em;
+            background: var(--color-border-strong);
         }
 
         .link {
@@ -327,11 +333,12 @@
 <body>
     <main class="page">
         <div class="heading">
-            <h1 class="title">Watch Log</h1>
+            <h1 class="title">Watch List</h1>
             <nav class="heading__links" aria-label="Your own list">
-                <a class="link" href="../list-editor/">Make your own &rarr;</a>
+                <a class="link" href="../list-editor/">Create</a>
+                <span class="heading__divider" aria-hidden="true"></span>
                 <input class="file-input" id="import-file" type="file" accept=".txt,.json,.csv,text/plain,application/json,text/csv">
-                <label class="link" for="import-file">Use your own list</label>
+                <label class="link" for="import-file">Import</label>
             </nav>
         </div>
 

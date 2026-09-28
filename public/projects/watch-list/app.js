@@ -1,5 +1,5 @@
 /**
- * Watch Log: reads watched.txt and renders it as a ranked, sortable table.
+ * Watch List: reads watched.txt and renders it as a ranked, sortable table.
  *
  * The file is one title per line, "Title | rating | notes", under "# anime",
  * "# show" or "# movie" section lines that set the type. Nothing here writes
@@ -14,7 +14,7 @@ const DATA_URL = "watched.txt";
 const TYPES = ["anime", "show", "movie"];
 
 /** A visitor's own list, kept in their browser; the List Editor writes it too. */
-const OVERRIDE_KEY = "watch-log-override";
+const OVERRIDE_KEY = "watch-list-override";
 
 const table = document.getElementById("table");
 const body = document.getElementById("rows");
@@ -390,7 +390,7 @@ async function load() {
 
         show(await response.text(), false);
     } catch (error) {
-        console.error("Could not load the watch log:", error);
+        console.error("Could not load the watch list:", error);
         count.textContent = "The log could not be loaded.";
     }
 }

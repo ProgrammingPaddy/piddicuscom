@@ -9,16 +9,16 @@
 
 const DRAFT_KEY = "list-editor-draft";
 
-/** The Watch Log page reads these: its live file, and a local override. */
-const LOG_URL = "../watch-log/watched.txt";
-const LOG_PAGE = "../watch-log/";
-const OVERRIDE_KEY = "watch-log-override";
+/** The Watch List page reads these: its live file, and a local override. */
+const LOG_URL = "../watch-list/watched.txt";
+const LOG_PAGE = "../watch-list/";
+const OVERRIDE_KEY = "watch-list-override";
 const TYPES = ["anime", "show", "movie"];
 
 /** The slider's leftmost stop means "no rating". */
 const UNRATED = -0.5;
 
-const HEADER = `# Rated list
+const HEADER = `# Watch List
 #
 # One title per line:   Title | rating | notes
 #   rating  out of 10, halves allowed (7, 7.5, 8 ...)
@@ -288,7 +288,7 @@ function createRow(row, index) {
 
 function saveDraft() {
     localStorage.setItem(DRAFT_KEY, JSON.stringify(rows));
-    elements.preview.value = exportText();
+    elements.preview.value = rows.some((row) => row.title) ? exportText() : "";
 }
 
 function render() {
@@ -352,16 +352,16 @@ elements.loadLog.addEventListener("click", async () => {
 
         const loaded = parseDocument(await response.text());
 
-        if (rows.length > 0 && !window.confirm(`Replace the ${rows.length} rows in the list with the Watch Log's ${loaded.length}?`)) {
+        if (rows.length > 0 && !window.confirm(`Replace the ${rows.length} rows in the list with the Watch List's ${loaded.length}?`)) {
             return;
         }
 
         rows = loaded;
         render();
-        say(`Loaded ${loaded.length} from the Watch Log.`);
+        say(`Loaded ${loaded.length} from the Watch List.`);
     } catch (error) {
         console.error(error);
-        say("Could not load the Watch Log.");
+        say("Could not load the Watch List.");
     }
 });
 

@@ -45,11 +45,11 @@ at 320x200. SVGs are inlined into the page, so colour them with the
 `fill="var(--preview-accent, #fec6d9)"`) and any future theme recolours
 them for free. The build links previews automatically.
 
-**Watch Log.** The ratings page reads `public/projects/watch-log/watched.txt`,
+**Watch List.** The ratings page reads `public/projects/watch-list/watched.txt`,
 one title per line as `Title | rating | notes` (rating out of 10 in halves,
 notes optional) under `# anime`, `# show` or `# movie` lines that set the
 type. Edit, commit, push. Nobody else can change it because only commits can.
-The List Editor project on the site builds that file: paste titles one per
+The Watch List Editor project on the site builds that file: paste titles one per
 line, set types and ratings in a table, export (also JSON and CSV).
 
 **Back-to-menu bar.** Add one line anywhere in the project's HTML:
