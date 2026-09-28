@@ -8,6 +8,11 @@
  */
 
 const DRAFT_KEY = "list-editor-draft";
+
+/** The Watch Log page reads these: its live file, and a local override. */
+const LOG_URL = "../watch-log/watched.txt";
+const LOG_PAGE = "../watch-log/";
+const OVERRIDE_KEY = "watch-log-override";
 const TYPES = ["anime", "show", "movie"];
 
 /** The slider's leftmost stop means "no rating". */
@@ -29,6 +34,8 @@ const elements = {
     pasteRatingValue: document.getElementById("paste-rating-value"),
     add: document.getElementById("add"),
     loadText: document.getElementById("load-text"),
+    loadLog: document.getElementById("load-log"),
+    viewLog: document.getElementById("view-log"),
     importFile: document.getElementById("import-file"),
     sort: document.getElementById("sort"),
     clear: document.getElementById("clear"),
@@ -333,6 +340,39 @@ elements.loadText.addEventListener("click", () => {
     elements.paste.value = "";
     render();
     say(`Loaded ${loaded.length}.`);
+});
+
+elements.loadLog.addEventListener("click", async () => {
+    try {
+        const response = await fetch(LOG_URL, { cache: "no-cache" });
+
+        if (!response.ok) {
+            throw new Error(`${LOG_URL} responded ${response.status}`);
+        }
+
+        const loaded = parseDocument(await response.text());
+
+        if (rows.length > 0 && !window.confirm(`Replace the ${rows.length} rows in the list with the Watch Log's ${loaded.length}?`)) {
+            return;
+        }
+
+        rows = loaded;
+        render();
+        say(`Loaded ${loaded.length} from the Watch Log.`);
+    } catch (error) {
+        console.error(error);
+        say("Could not load the Watch Log.");
+    }
+});
+
+elements.viewLog.addEventListener("click", () => {
+    if (rows.filter((row) => row.title).length === 0) {
+        say("The list is empty.");
+        return;
+    }
+
+    localStorage.setItem(OVERRIDE_KEY, exportText());
+    window.location.href = LOG_PAGE;
 });
 
 elements.importFile.addEventListener("change", async () => {

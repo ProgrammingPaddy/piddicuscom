@@ -321,6 +321,7 @@
             <h2 class="panel__title" id="rows-title">List</h2>
             <p class="panel__hint">Drag a slider all the way left to leave something unrated.</p>
             <div class="controls">
+                <button class="button" id="load-log" type="button">Load the Watch Log</button>
                 <input class="file-input" id="import-file" type="file" accept=".txt,.json,.csv,text/plain,application/json,text/csv">
                 <label class="button" for="import-file">Import a file</label>
                 <button class="button" id="sort" type="button">Sort by rating</button>
@@ -345,12 +346,18 @@
 
         <section class="panel" aria-labelledby="export-title">
             <h2 class="panel__title" id="export-title">Export</h2>
-            <p class="panel__hint">Text keeps the list readable and re-loadable here. JSON and CSV are for other tools.</p>
+            <p class="panel__hint">
+                Text keeps the list readable and re-loadable here; JSON and CSV
+                are for other tools. Viewing in the Watch Log shows your list
+                there, on this device only.
+            </p>
             <div class="controls">
                 <button class="button button--primary" id="copy" type="button">Copy text</button>
                 <button class="button" id="download" type="button">Download text</button>
                 <button class="button button--quiet" id="download-json" type="button">Download JSON</button>
                 <button class="button button--quiet" id="download-csv" type="button">Download CSV</button>
+                <span class="spacer"></span>
+                <button class="button" id="view-log" type="button">View in the Watch Log</button>
             </div>
             <textarea class="field preview" id="preview" readonly aria-label="Export preview"></textarea>
         </section>

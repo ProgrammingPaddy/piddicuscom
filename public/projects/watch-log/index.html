@@ -27,6 +27,66 @@
             font-weight: 800;
         }
 
+        .heading {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: var(--space-3) var(--space-6);
+        }
+
+        .heading__links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-4);
+        }
+
+        .link {
+            font-family: var(--font-display);
+            font-size: var(--text-sm);
+            color: var(--color-text-muted);
+            cursor: pointer;
+            transition: color var(--duration-fast) var(--ease-out);
+        }
+
+        .link:hover {
+            color: var(--color-accent);
+        }
+
+        .file-input {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            clip: rect(0 0 0 0);
+        }
+
+        .file-input:focus-visible + label {
+            outline: 2px solid var(--color-accent);
+        }
+
+        .banner {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: var(--space-3);
+            margin-top: var(--space-4);
+            padding: var(--space-3) var(--space-4);
+            font-size: var(--text-sm);
+            color: var(--color-on-accent);
+            background: var(--color-accent);
+            border-radius: var(--radius-md);
+        }
+
+        .banner__reset {
+            padding: var(--space-1) var(--space-3);
+            font-family: var(--font-display);
+            font-size: var(--text-xs);
+            color: var(--color-on-accent);
+            border: 1px solid currentcolor;
+            border-radius: var(--radius-pill);
+        }
+
         .toolbar {
             display: flex;
             flex-wrap: wrap;
@@ -268,7 +328,19 @@
 </head>
 <body>
     <main class="page">
-        <h1 class="title">Watch Log</h1>
+        <div class="heading">
+            <h1 class="title">Watch Log</h1>
+            <nav class="heading__links" aria-label="Your own list">
+                <a class="link" href="../list-editor/">Make your own &rarr;</a>
+                <input class="file-input" id="import-file" type="file" accept=".txt,.json,.csv,text/plain,application/json,text/csv">
+                <label class="link" for="import-file">Use your own list</label>
+            </nav>
+        </div>
+
+        <p class="banner" id="banner" hidden>
+            Showing your list, kept only in this browser.
+            <button class="banner__reset" id="reset" type="button">Show the original</button>
+        </p>
 
         <div class="toolbar">
             <div class="chips" id="chips" role="group" aria-label="Filter by type"></div>

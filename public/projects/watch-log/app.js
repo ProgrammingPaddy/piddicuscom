@@ -3,23 +3,38 @@
  *
  * The file is one title per line, "Title | rating | notes", under "# anime",
  * "# show" or "# movie" section lines that set the type. Nothing here writes
- * anywhere; the log only changes when the file does.
+ * to the site; the published log only changes when the file does.
+ *
+ * A visitor can view their own list instead: the List Editor hands one over,
+ * or a file can be imported here. That lives in their browser only, and a
+ * banner offers the way back to the original.
  */
 
 const DATA_URL = "watched.txt";
 const TYPES = ["anime", "show", "movie"];
+
+/** A visitor's own list, kept in their browser; the List Editor writes it too. */
+const OVERRIDE_KEY = "watch-log-override";
 
 const table = document.getElementById("table");
 const body = document.getElementById("rows");
 const chips = document.getElementById("chips");
 const search = document.getElementById("search");
 const count = document.getElementById("count");
+const banner = document.getElementById("banner");
+const reset = document.getElementById("reset");
+const importFile = document.getElementById("import-file");
 
 let entries = [];
 let activeType = null;
 let sort = { key: "rating", direction: "desc" };
 
 /* Parsing ----------------------------------------------------------------- */
+
+function cleanRating(value) {
+    const number = Number.parseFloat(value);
+    return Number.isFinite(number) ? Math.round(Math.max(0, Math.min(10, number)) * 2) / 2 : null;
+}
 
 function parseLog(text) {
     const parsed = [];
@@ -44,22 +59,55 @@ function parseLog(text) {
 
         const [title, rating, ...rest] = line.split("|").map((part) => part.trim());
 
-        if (!title) {
-            return;
+        if (title) {
+            parsed.push({ id: index, title, type, rating: cleanRating(rating), notes: rest.join(" | ") });
         }
-
-        const value = Number.parseFloat(rating);
-
-        parsed.push({
-            id: index,
-            title,
-            type,
-            rating: Number.isFinite(value) ? Math.round(Math.max(0, Math.min(10, value)) * 2) / 2 : null,
-            notes: rest.join(" | "),
-        });
     });
 
     return parsed;
+}
+
+/** Turn the List Editor's JSON or CSV exports into the text format. */
+function toLogText(name, text) {
+    let rows;
+
+    if (name.endsWith(".json")) {
+        const data = JSON.parse(text);
+        rows = Array.isArray(data) ? data : [];
+    } else if (name.endsWith(".csv")) {
+        const [header, ...lines] = text.replace(/\r\n/g, "\n").split("\n").filter(Boolean);
+        const columns = header.split(",").map((column) => column.trim().toLowerCase());
+        rows = lines.map((line) => {
+            const values = line.split(",").map((value) => value.trim().replace(/^"|"$/g, ""));
+            const get = (key) => values[columns.indexOf(key)] ?? "";
+            return { title: get("title"), type: get("type"), rating: get("rating"), notes: get("notes") };
+        });
+    } else {
+        return text;
+    }
+
+    const clean = rows
+        .map((row) => ({
+            title: String(row.title || "").trim().replace(/\|/g, "/"),
+            type: TYPES.includes(row.type) ? row.type : "show",
+            rating: cleanRating(row.rating),
+            notes: String(row.notes || "").trim().replace(/\|/g, "/"),
+        }))
+        .filter((row) => row.title);
+
+    const formatRow = (row) => {
+        if (row.notes) {
+            return `${row.title} | ${row.rating ?? ""} | ${row.notes}`;
+        }
+
+        return row.rating === null ? row.title : `${row.title} | ${row.rating}`;
+    };
+
+    return TYPES
+        .map((type) => ({ type, items: clean.filter((row) => row.type === type) }))
+        .filter((section) => section.items.length > 0)
+        .map((section) => `# ${section.type}\n${section.items.map(formatRow).join("\n")}`)
+        .join("\n\n");
 }
 
 /* Rendering --------------------------------------------------------------- */
@@ -216,7 +264,10 @@ function toggleNotes(row) {
     }
 
     if (open) {
-        row.nextElementSibling?.classList.contains("notes") && row.nextElementSibling.remove();
+        if (row.nextElementSibling?.classList.contains("notes")) {
+            row.nextElementSibling.remove();
+        }
+
         row.setAttribute("aria-expanded", "false");
     } else {
         row.after(createNotesRow(entry));
@@ -279,9 +330,55 @@ function init() {
             }
         }
     });
+
+    reset.addEventListener("click", () => {
+        localStorage.removeItem(OVERRIDE_KEY);
+        load();
+    });
+
+    importFile.addEventListener("change", async () => {
+        const file = importFile.files[0];
+
+        if (!file) {
+            return;
+        }
+
+        try {
+            const text = toLogText(file.name.toLowerCase(), await file.text());
+
+            if (parseLog(text).length === 0) {
+                throw new Error("no entries");
+            }
+
+            localStorage.setItem(OVERRIDE_KEY, text);
+            show(text, true);
+        } catch (error) {
+            console.error("Could not read the list:", error);
+            count.textContent = `Could not read ${file.name}.`;
+        }
+
+        importFile.value = "";
+    });
+}
+
+/* Loading ----------------------------------------------------------------- */
+
+function show(text, isOverride) {
+    entries = parseLog(text);
+    banner.hidden = !isOverride;
+    activeType = null;
+    renderChips();
+    render();
 }
 
 async function load() {
+    const override = localStorage.getItem(OVERRIDE_KEY);
+
+    if (override) {
+        show(override, true);
+        return;
+    }
+
     try {
         const response = await fetch(DATA_URL, { cache: "no-cache" });
 
@@ -289,15 +386,11 @@ async function load() {
             throw new Error(`${DATA_URL} responded ${response.status}`);
         }
 
-        entries = parseLog(await response.text());
+        show(await response.text(), false);
     } catch (error) {
         console.error("Could not load the watch log:", error);
         count.textContent = "The log could not be loaded.";
-        return;
     }
-
-    renderChips();
-    render();
 }
 
 init();
