@@ -14,6 +14,7 @@ public/               Everything served
     <name>.html       A single-file project works too.
     _template/        Starter to copy (never listed, never deployed)
     projects.json     Generated menu manifest. Do not edit.
+  previews/           Card illustrations, one per project (<name>.svg)
 scripts/              build.mjs (manifest), sync.mjs (repo-backed projects)
 .githooks/pre-commit  Regenerates the manifest on every commit
 wrangler.jsonc        Cloudflare config (assets-only, no Worker script)
@@ -36,6 +37,20 @@ Drop a folder with an `index.html` (or a lone `.html` file) into
 `public/projects`, commit, push. The hook keeps `projects.json` in sync.
 Delete the folder to remove the project. Names starting with `_` or `.`
 are ignored.
+
+**Card preview.** A card shows an illustration of the project when
+`public/previews/<name>.svg` exists (`.webp` and `.png` work too). Draw it
+at 320x200. SVGs are inlined into the page, so colour them with the
+`--preview-*` tokens from `css/base.css` (with a fallback, e.g.
+`fill="var(--preview-accent, #fec6d9)"`) and any future theme recolours
+them for free. The build links previews automatically.
+
+**Watch Log.** The ratings page reads `public/projects/watch-log/watched.txt`,
+one title per line as `Title | rating | notes` (rating out of 10 in halves,
+notes optional) under `# anime`, `# show` or `# movie` lines that set the
+type. Edit, commit, push. Nobody else can change it because only commits can.
+The List Editor project on the site builds that file: paste titles one per
+line, set types and ratings in a table, export (also JSON and CSV).
 
 **Back-to-menu bar.** Add one line anywhere in the project's HTML:
 

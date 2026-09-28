@@ -5,6 +5,7 @@
       "title": "Chord Vis",
       "description": "Build a chord, see it on the fretboard and keyboard, and hear it against the key and scale you pick.",
       "icon": null,
+      "preview": "previews/chord-vis.svg",
       "tags": [
         "music",
         "tools"
@@ -16,6 +17,7 @@
       "title": "Noita Slot Machine",
       "description": "Roll a random perk, spell and enemy for a Noita challenge run. Filter the pools, build custom groups, save presets.",
       "icon": null,
+      "preview": "previews/noita-slot-machine.svg",
       "tags": [
         "games",
         "tools"
@@ -27,11 +29,34 @@
       "title": "Surf Survey Results",
       "description": "Five years of the Counter-Strike surf community survey, charted year by year, with every raw response underneath.",
       "icon": null,
+      "preview": "previews/surf-data.svg",
       "tags": [
         "data",
         "games"
       ],
       "href": "projects/surf-data/"
+    },
+    {
+      "slug": "watch-log",
+      "title": "Watch Log",
+      "description": "Movies, TV and anime I have watched, am watching, or mean to. Ratings and a line of notes each.",
+      "icon": null,
+      "preview": "previews/watch-log.svg",
+      "tags": [
+        "data"
+      ],
+      "href": "projects/watch-log/"
+    },
+    {
+      "slug": "list-editor",
+      "title": "List Editor",
+      "description": "Paste a list, tidy it in a table, export it as the Watch Log file, JSON or CSV.",
+      "icon": null,
+      "preview": "previews/list-editor.svg",
+      "tags": [
+        "tools"
+      ],
+      "href": "projects/list-editor/"
     }
   ]
 }

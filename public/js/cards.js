@@ -1,38 +1,32 @@
 /**
- * Gummy card outlines.
+ * Wavy card edges.
  *
- * Each card's shape is a superellipse (a rounded rectangle whose curvature
- * never breaks) with a faint low-frequency ripple on its radius. The ripple's
- * phases drift slowly, so the outline is always gently shifting; hovering
- * nudges the amplitude and pace up a little. Everything is seeded from the
- * card's slug so shapes differ per card and never change between visits.
+ * A card is a rounded rectangle whose edge carries a slight, fixed wave: each
+ * point on the outline is nudged along its normal by a gentle undulation plus
+ * a slow bow. Phases are seeded from the card's slug, so cards differ from
+ * each other and never change between visits. Nothing here animates; the
+ * shape is drawn once and again whenever the card changes size.
  *
- * The shape is drawn by an SVG behind the card's content: a tinted fill, a
- * pointer-following spotlight, and a faint stroke. The content itself never
- * repaints while the shape moves. Cards off screen are not animated.
+ * The shape is an SVG behind the card's content: a tinted fill, a spotlight
+ * that follows the pointer, and a faint stroke.
  */
 
 const SVG_NS = "http://www.w3.org/2000/svg";
 
 /** How far the shape sits inside the element's box, in px. */
-const MARGIN = 12;
+const MARGIN = 8;
 
-/** Points sampled around the outline. */
-const SAMPLES = 32;
+/** Corner radius of the base rounded rectangle, in px. */
+const CORNER = 26;
 
-/** Frames per second for the drift. It is slow; more would be wasted. */
-const FPS = 20;
+/** Sampling: px between points along an edge, and points per corner arc. */
+const EDGE_STEP = 8;
+const CORNER_SAMPLES = 8;
 
-const SHAPE = {
-    exponent: [3.1, 4.2],          // superellipse roundness, per card
-    waves: [                        // ripple harmonics: lobes, amplitude range, speed range (rad/s)
-        { lobes: 2, amplitude: [0.010, 0.020], speed: [0.10, 0.18] },
-        { lobes: 3, amplitude: [0.008, 0.016], speed: [0.14, 0.24] },
-        { lobes: 5, amplitude: [0.004, 0.008], speed: [0.20, 0.32] },
-    ],
-    hoverAmplitude: 1.7,           // ripple amplitude multiplier while hovered
-    hoverSpeed: 1.6,               // ripple speed multiplier while hovered
-    hoverEase: 0.08,               // how quickly the hover boost blends in/out
+const WAVE = {
+    wavelength: 150,   // px along the edge per ripple
+    ripple: 1.3,       // px, the small waves
+    bow: 1.6,          // px, one long bow around the whole outline
 };
 
 const SPOT_RADIUS = 220;
@@ -63,52 +57,74 @@ function createRandom(seed) {
     };
 }
 
-function pickShape(random) {
-    const between = ([min, max]) => min + random() * (max - min);
-
-    return {
-        exponent: between(SHAPE.exponent),
-        waves: SHAPE.waves.map((wave) => ({
-            lobes: wave.lobes,
-            amplitude: between(wave.amplitude),
-            speed: between(wave.speed) * (random() < 0.5 ? -1 : 1),
-            phase: random() * Math.PI * 2,
-        })),
-    };
-}
-
 /* Geometry ---------------------------------------------------------------- */
 
-/** Distance from the centre to a superellipse edge in direction `angle`. */
-function superellipseRadius(angle, a, b, n) {
-    const cos = Math.abs(Math.cos(angle) / a);
-    const sin = Math.abs(Math.sin(angle) / b);
+/**
+ * Sample a rounded rectangle of `width` x `height` inset by MARGIN, walking
+ * clockwise. Each sample carries its outward normal and its distance along
+ * the perimeter.
+ */
+function roundedRectSamples(width, height) {
+    const m = MARGIN;
+    const r = Math.min(CORNER, (Math.min(width, height) - 2 * m) / 2);
+    const left = m;
+    const top = m;
+    const right = width - m;
+    const bottom = height - m;
+    const edgeW = right - left - 2 * r;
+    const edgeH = bottom - top - 2 * r;
+    const arc = (Math.PI / 2) * r;
+    const samples = [];
+    let distance = 0;
 
-    return (cos ** n + sin ** n) ** (-1 / n);
-}
+    function edge(x0, y0, x1, y1, nx, ny, length) {
+        const count = Math.max(1, Math.round(length / EDGE_STEP));
 
-function outlinePoints(shape, width, height, time, boost) {
-    const cx = width / 2;
-    const cy = height / 2;
-    const a = cx - MARGIN;
-    const b = cy - MARGIN;
-    const amplitudeScale = 1 + (SHAPE.hoverAmplitude - 1) * boost;
-    const speedScale = 1 + (SHAPE.hoverSpeed - 1) * boost;
-    const points = [];
-
-    for (let i = 0; i < SAMPLES; i += 1) {
-        const angle = (i / SAMPLES) * Math.PI * 2;
-        let ripple = 0;
-
-        for (const wave of shape.waves) {
-            ripple += wave.amplitude * Math.sin(wave.lobes * angle + wave.phase + time * wave.speed * speedScale);
+        for (let i = 0; i < count; i += 1) {
+            const f = i / count;
+            samples.push({ x: x0 + (x1 - x0) * f, y: y0 + (y1 - y0) * f, nx, ny, distance: distance + length * f });
         }
 
-        const radius = superellipseRadius(angle, a, b, shape.exponent) * (1 + ripple * amplitudeScale);
-        points.push([cx + Math.cos(angle) * radius, cy + Math.sin(angle) * radius]);
+        distance += length;
     }
 
-    return points;
+    function corner(cx, cy, startAngle) {
+        for (let i = 0; i < CORNER_SAMPLES; i += 1) {
+            const f = i / CORNER_SAMPLES;
+            const angle = startAngle + (Math.PI / 2) * f;
+            const nx = Math.cos(angle);
+            const ny = Math.sin(angle);
+            samples.push({ x: cx + nx * r, y: cy + ny * r, nx, ny, distance: distance + arc * f });
+        }
+
+        distance += arc;
+    }
+
+    edge(left + r, top, right - r, top, 0, -1, edgeW);
+    corner(right - r, top + r, -Math.PI / 2);
+    edge(right, top + r, right, bottom - r, 1, 0, edgeH);
+    corner(right - r, bottom - r, 0);
+    edge(right - r, bottom, left + r, bottom, 0, 1, edgeW);
+    corner(left + r, bottom - r, Math.PI / 2);
+    edge(left, bottom - r, left, top + r, -1, 0, edgeH);
+    corner(left + r, top + r, Math.PI);
+
+    return { samples, perimeter: distance };
+}
+
+function outlinePoints(phases, width, height) {
+    const { samples, perimeter } = roundedRectSamples(width, height);
+
+    /* A whole number of ripples fits the perimeter, so the wave closes. */
+    const ripples = Math.max(4, Math.round(perimeter / WAVE.wavelength));
+
+    return samples.map((sample) => {
+        const along = (sample.distance / perimeter) * Math.PI * 2;
+        const offset = WAVE.ripple * Math.sin(ripples * along + phases.ripple)
+            + WAVE.bow * Math.sin(2 * along + phases.bow);
+
+        return [sample.x + sample.nx * offset, sample.y + sample.ny * offset];
+    });
 }
 
 /** Closed Catmull-Rom spline through the points, as cubic Bezier path data. */
@@ -128,44 +144,6 @@ function splinePath(points) {
     return `M ${points[0][0].toFixed(1)} ${points[0][1].toFixed(1)} ${segments.join(" ")} Z`;
 }
 
-/* Shared animation loop --------------------------------------------------- */
-
-const cards = new Set();
-let loopRunning = false;
-let lastTick = 0;
-
-const visibility = new IntersectionObserver((entries) => {
-    for (const entry of entries) {
-        const card = entry.target.__card;
-
-        if (card) {
-            card.visible = entry.isIntersecting;
-        }
-    }
-});
-
-function tick(now) {
-    if (now - lastTick >= 1000 / FPS) {
-        lastTick = now;
-        const time = now / 1000;
-
-        for (const card of cards) {
-            if (card.visible || card.boost > 0) {
-                card.render(time);
-            }
-        }
-    }
-
-    requestAnimationFrame(tick);
-}
-
-function startLoop() {
-    if (!loopRunning) {
-        loopRunning = true;
-        requestAnimationFrame(tick);
-    }
-}
-
 /* Building one card ------------------------------------------------------- */
 
 function svgElement(name, attributes = {}) {
@@ -182,7 +160,7 @@ let cardCount = 0;
 
 /**
  * Shape one card link. `seedText` (usually the project slug or the href)
- * decides the shape.
+ * decides where the waves fall.
  */
 export function shapeCardLink(link, seedText) {
     if (link.querySelector(".card__shape")) {
@@ -190,7 +168,8 @@ export function shapeCardLink(link, seedText) {
     }
 
     const id = `card-shape-${cardCount += 1}`;
-    const shape = pickShape(createRandom(hashString(seedText)));
+    const random = createRandom(hashString(seedText));
+    const phases = { ripple: random() * Math.PI * 2, bow: random() * Math.PI * 2 };
 
     const svg = svgElement("svg", { class: "card__shape", "aria-hidden": "true" });
     const defs = svgElement("defs");
@@ -216,58 +195,28 @@ export function shapeCardLink(link, seedText) {
     svg.append(defs, fill, glow, stroke);
     link.prepend(svg);
 
-    const card = {
-        visible: true,
-        boost: 0,
-        hovered: false,
-        width: 0,
-        height: 0,
-        render(time) {
-            if (card.width === 0) {
-                return;
-            }
-
-            card.boost += ((card.hovered ? 1 : 0) - card.boost) * SHAPE.hoverEase;
-
-            if (card.boost < 0.001) {
-                card.boost = 0;
-            }
-
-            const d = splinePath(outlinePoints(shape, card.width, card.height, time, card.boost));
-            fill.setAttribute("d", d);
-            glow.setAttribute("d", d);
-            stroke.setAttribute("d", d);
-        },
-    };
-
     /* Layout size, not the transformed box: the entrance pop and the hover
        squash scale the card, and the outline must ignore both. */
-    function measure() {
-        card.width = link.offsetWidth;
-        card.height = link.offsetHeight;
-        card.render(performance.now() / 1000);
+    function render() {
+        const width = link.offsetWidth;
+        const height = link.offsetHeight;
+
+        if (width === 0 || height === 0) {
+            return;
+        }
+
+        const d = splinePath(outlinePoints(phases, width, height));
+        fill.setAttribute("d", d);
+        glow.setAttribute("d", d);
+        stroke.setAttribute("d", d);
     }
 
-    measure();
-    new ResizeObserver(measure).observe(link);
+    render();
+    new ResizeObserver(render).observe(link);
 
     link.addEventListener("pointermove", (event) => {
         const box = link.getBoundingClientRect();
         spot.setAttribute("cx", (event.clientX - box.left).toFixed(0));
         spot.setAttribute("cy", (event.clientY - box.top).toFixed(0));
     });
-
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-        return;
-    }
-
-    link.__card = card;
-    visibility.observe(link);
-    cards.add(card);
-    startLoop();
-
-    link.addEventListener("pointerenter", () => { card.hovered = true; });
-    link.addEventListener("pointerleave", () => { card.hovered = false; });
-    link.addEventListener("focus", () => { card.hovered = true; });
-    link.addEventListener("blur", () => { card.hovered = false; });
 }

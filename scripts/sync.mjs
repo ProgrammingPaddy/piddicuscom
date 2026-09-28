@@ -63,7 +63,10 @@ function git(args, options = {}) {
 
 function cloneShallow(repo, branch) {
     const cloneDir = fs.mkdtempSync(path.join(os.tmpdir(), "piddicus-"));
-    const args = ["clone", "--quiet", "--depth", "1"];
+
+    /* No line-ending conversion: files are copied byte for byte, so the site
+       does not show every synced file as modified on Windows. */
+    const args = ["-c", "core.autocrlf=false", "clone", "--quiet", "--depth", "1"];
 
     if (branch) {
         args.push("--branch", branch);

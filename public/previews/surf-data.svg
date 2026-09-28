@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" width="320" height="200" role="img" aria-label="A bar chart of survey responses across five years above a wave">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="var(--preview-bg-top, #2f2130)"/>
+      <stop offset="1" stop-color="var(--preview-bg-bottom, #241a26)"/>
+    </linearGradient>
+    <linearGradient id="wave" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="var(--preview-accent, #fec6d9)" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="var(--preview-accent, #fec6d9)" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="320" height="200" fill="url(#bg)"/>
+
+  <g transform="translate(0 -14)">
+  <!-- Gridlines -->
+  <g stroke="var(--preview-panel, #3b2a3b)" stroke-width="1">
+    <line x1="36" y1="70" x2="296" y2="70"/>
+    <line x1="36" y1="100" x2="296" y2="100"/>
+    <line x1="36" y1="130" x2="296" y2="130"/>
+  </g>
+
+  <!-- Bars: one per year, in the pink ramp -->
+  <g>
+    <rect x="52" y="44" width="32" height="104" rx="7" fill="var(--preview-secondary, #a16564)"/>
+    <rect x="102" y="86" width="32" height="62" rx="7" fill="var(--preview-ramp-2, #bb8090)"/>
+    <rect x="152" y="90" width="32" height="58" rx="7" fill="var(--preview-ramp-3, #d09aae)"/>
+    <rect x="202" y="76" width="32" height="72" rx="7" fill="var(--preview-ramp-4, #e6b3c6)"/>
+    <rect x="252" y="82" width="32" height="66" rx="7" fill="var(--preview-accent, #fec6d9)"/>
+  </g>
+  <!-- Trend across the bar tops -->
+  <path d="M68 52 C 85 52, 100 86, 118 86 S 150 90, 168 90 S 200 76, 218 76 S 250 82, 268 82" fill="none" stroke="var(--preview-tertiary, #cdb4ff)" stroke-width="2" stroke-linecap="round" opacity="0.9"/>
+  <g fill="var(--preview-tertiary, #cdb4ff)">
+    <circle cx="68" cy="52" r="3.5"/>
+    <circle cx="118" cy="86" r="3.5"/>
+    <circle cx="168" cy="90" r="3.5"/>
+    <circle cx="218" cy="76" r="3.5"/>
+    <circle cx="268" cy="82" r="3.5"/>
+  </g>
+
+  <!-- Baseline -->
+  <line x1="36" y1="148" x2="296" y2="148" stroke="var(--preview-secondary, #a16564)" stroke-width="1.5" stroke-linecap="round"/>
+  </g>
+
+  <!-- The surf -->
+  <path d="M0 176 C 30 162, 50 190, 80 176 S 130 162, 160 176 S 210 190, 240 176 S 290 162, 320 176 L320 200 L0 200 Z" fill="url(#wave)"/>
+  <path d="M0 176 C 30 162, 50 190, 80 176 S 130 162, 160 176 S 210 190, 240 176 S 290 162, 320 176" fill="none" stroke="var(--preview-accent, #fec6d9)" stroke-width="2.5" stroke-linecap="round" opacity="0.8"/>
+</svg>

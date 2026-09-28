@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" width="320" height="200" role="img" aria-label="A ranked list of shows with ratings">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="var(--preview-bg-top, #2f2130)"/>
+      <stop offset="1" stop-color="var(--preview-bg-bottom, #241a26)"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="320" height="200" fill="url(#bg)"/>
+
+  <!-- Column headings -->
+  <g font-family="Fredoka, Nunito, system-ui, sans-serif" font-size="8" font-weight="500" fill="var(--preview-muted, #977d8c)" letter-spacing="0.8">
+    <text x="24" y="26">#</text>
+    <text x="44" y="26">TITLE</text>
+    <text x="236" y="26">RATING</text>
+  </g>
+  <line x1="20" y1="32" x2="300" y2="32" stroke="var(--preview-panel, #3b2a3b)" stroke-width="1"/>
+
+  <!-- Rows -->
+  <g font-family="Baloo 2, Fredoka, Nunito, system-ui, sans-serif" font-size="12" font-weight="800" fill="var(--preview-cream, #f7edf1)">
+    <g font-family="Fredoka, Nunito, system-ui, sans-serif" font-size="10" font-weight="500" fill="var(--preview-muted, #977d8c)">
+      <text x="24" y="54">1</text>
+      <text x="24" y="86">2</text>
+      <text x="24" y="118">3</text>
+      <text x="24" y="150">4</text>
+      <text x="24" y="182">5</text>
+    </g>
+    <text x="44" y="55">Frieren</text>
+    <text x="44" y="87">Breaking Bad</text>
+    <text x="44" y="119">Cowboy Bebop</text>
+    <text x="44" y="151">Severance</text>
+    <text x="44" y="183">The Bear</text>
+  </g>
+
+  <!-- Type tags -->
+  <g font-family="Fredoka, Nunito, system-ui, sans-serif" font-size="8" font-weight="500" fill="var(--preview-accent, #fec6d9)" text-anchor="middle">
+    <rect x="160" y="44" width="36" height="14" rx="7" fill="var(--preview-accent, #fec6d9)" opacity="0.18"/>
+    <text x="178" y="54">anime</text>
+    <rect x="160" y="76" width="36" height="14" rx="7" fill="var(--preview-accent, #fec6d9)" opacity="0.18"/>
+    <text x="178" y="86">show</text>
+    <rect x="160" y="108" width="36" height="14" rx="7" fill="var(--preview-accent, #fec6d9)" opacity="0.18"/>
+    <text x="178" y="118">anime</text>
+    <rect x="160" y="140" width="36" height="14" rx="7" fill="var(--preview-accent, #fec6d9)" opacity="0.18"/>
+    <text x="178" y="150">show</text>
+    <rect x="160" y="172" width="36" height="14" rx="7" fill="var(--preview-accent, #fec6d9)" opacity="0.18"/>
+    <text x="178" y="182">show</text>
+  </g>
+
+  <!-- Ratings: five dots and a number -->
+  <g fill="var(--preview-accent, #fec6d9)">
+    <g><circle cx="236" cy="51" r="3.5"/><circle cx="246" cy="51" r="3.5"/><circle cx="256" cy="51" r="3.5"/><circle cx="266" cy="51" r="3.5"/><circle cx="276" cy="51" r="3.5"/></g>
+    <g><circle cx="236" cy="83" r="3.5"/><circle cx="246" cy="83" r="3.5"/><circle cx="256" cy="83" r="3.5"/><circle cx="266" cy="83" r="3.5"/><circle cx="276" cy="83" r="3.5"/></g>
+    <g><circle cx="236" cy="115" r="3.5"/><circle cx="246" cy="115" r="3.5"/><circle cx="256" cy="115" r="3.5"/><circle cx="266" cy="115" r="3.5"/><circle cx="276" cy="115" r="3.5" fill="var(--preview-panel, #3b2a3b)"/></g>
+    <g><circle cx="236" cy="147" r="3.5"/><circle cx="246" cy="147" r="3.5"/><circle cx="256" cy="147" r="3.5"/><circle cx="266" cy="147" r="3.5"/><circle cx="276" cy="147" r="3.5" fill="var(--preview-panel, #3b2a3b)"/></g>
+    <g><circle cx="236" cy="179" r="3.5"/><circle cx="246" cy="179" r="3.5"/><circle cx="256" cy="179" r="3.5"/><circle cx="266" cy="179" r="3.5"/><circle cx="276" cy="179" r="3.5" fill="var(--preview-panel, #3b2a3b)"/></g>
+  </g>
+  <g font-family="Fredoka, Nunito, system-ui, sans-serif" font-size="10" font-weight="500" fill="var(--preview-cream, #f7edf1)">
+    <text x="288" y="54">9.5</text>
+    <text x="288" y="86">9.5</text>
+    <text x="288" y="118">9</text>
+    <text x="288" y="150">8.5</text>
+    <text x="288" y="182">8</text>
+  </g>
+
+  <!-- Row dividers -->
+  <g stroke="var(--preview-panel, #3b2a3b)" stroke-width="1">
+    <line x1="20" y1="66" x2="300" y2="66"/>
+    <line x1="20" y1="98" x2="300" y2="98"/>
+    <line x1="20" y1="130" x2="300" y2="130"/>
+    <line x1="20" y1="162" x2="300" y2="162"/>
+  </g>
+</svg>

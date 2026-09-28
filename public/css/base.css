@@ -23,8 +23,27 @@
     --color-secondary: #a16564;
     --color-on-accent: #2a1220;
 
+    /* Card illustrations (public/previews/*.svg are inlined and read these).
+       A theme can restyle every preview by redefining this block. */
+    --preview-bg-top: #2f2130;
+    --preview-bg-bottom: #241a26;
+    --preview-panel: #3b2a3b;
+    --preview-accent: var(--color-accent);
+    --preview-accent-strong: var(--color-accent-strong);
+    --preview-secondary: var(--color-secondary);
+    --preview-tertiary: #cdb4ff;
+    --preview-cream: var(--color-text);
+    --preview-line: var(--color-text-muted);
+    --preview-muted: var(--color-text-faint);
+    --preview-ink: var(--color-bg-elevated);
+    --preview-on-accent: var(--color-on-accent);
+    --preview-ramp-2: #bb8090;
+    --preview-ramp-3: #d09aae;
+    --preview-ramp-4: #e6b3c6;
+
     /* Type */
     --font-display: "Fredoka", "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-title: "Baloo 2", "Fredoka", "Nunito", system-ui, sans-serif;
     --font-body: "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
     --font-mono: ui-monospace, "Cascadia Code", Consolas, monospace;
     --text-xs: 0.8rem;

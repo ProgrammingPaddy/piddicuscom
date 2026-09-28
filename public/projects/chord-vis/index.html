@@ -172,6 +172,9 @@ input[type=range]::-moz-range-thumb{width:10px;height:12px;border:0;border-radiu
 #neckSvg{display:block;min-width:1020px;width:100%;height:206px;user-select:none}
 #neckSvg text{font-family:Inter,ui-sans-serif,system-ui,sans-serif}
 #gHit rect:hover{fill:rgba(233,234,238,.07)}
+#gBarre rect{fill:#23252b;stroke:#383c45}
+#gBarre rect:hover{fill:#2b2e35;stroke:#4a4f5a}
+#gBarre rect.on{fill:rgba(79,140,255,.35);stroke:var(--accent)}
 .hidden{display:none !important}
 
 /* ---------- modal ---------- */
@@ -462,6 +465,8 @@ input[type=range]::-moz-range-thumb{width:10px;height:12px;border:0;border-radiu
       <li><b>Tuning</b> and <b>capo</b> recompute everything; fret numbers with a capo are relative to the capo, like real chord charts. The neck shows 18 frets by default and can switch to 24. Voicings respect the selected <b>inversion</b>: the lowest sounding string carries the bass.</li>
       <li><b>Clicking frets builds your own shape</b>: one note per string, exactly where you click. The app names what you built but never adds notes to it. Click a placed note to remove it; clicking a fret on an occupied string moves that string's note. Choosing a chord (builder, palette, or a pill) switches back to engine voicings and replaces your shape.</li>
       <li><b>Each string has three states</b>: untouched (nothing shown), open, or muted. The column at the nut cycles them: click once for an open string (○), again to mute it (red ×), again to clear. Fretted, open, and muted are all part of the shape; untouched strings are simply undecided.</li>
+      <li><b>Barre row</b>: the small buttons above the frets bar every string at that fret. Strings already fretted higher and muted strings keep their state, so a real barre chord is barre first, fingers on top. Click the same button again to lift the barre.</li>
+      <li><b>Inversion and Oct −/+</b> always act on the chord currently shown in the readout: if you clicked notes by hand, they adopt the top reading of those notes and re-voice it.</li>
     </ul>
     <h3>Playback &amp; mixing</h3>
     <ul>
@@ -607,7 +612,7 @@ const state={root:'C',quality:'maj',extension:'plain',inversion:0,selected:new S
 const scaleState={key:'C',scaleId:'major',enabled:true,pinned:false};
 const G={on:true,pianoOn:true,tuningId:'standard',capo:0,lefty:false,showFingers:false,
   neckMode:'chord',frets:18,showInfo:false,voicings:[],vIndex:0,specKey:'',spec:null,
-  userFrets:null,userShape:null,bestExact:null};
+  userFrets:null,userShape:null,bestExact:null,barreFret:null};
 let palSize=4;
 
 const TUNINGS=[
@@ -761,7 +766,7 @@ function strumVoicing(v){
 
 /* ---------------- chord selection & detection ---------------- */
 function selectChord(play=true){
-  state.source='chord';G.userFrets=null;state.selected=new Set(chordMidi());
+  state.source='chord';G.userFrets=null;G.barreFret=null;state.selected=new Set(chordMidi());
   if(scaleState.pinned)scaleState.key=state.root;
   render(); // render first so the guitar voicing exists before we play it
   if(play)playSelection()}
@@ -1118,7 +1123,13 @@ function buildNeck(){
     const x=posX(G.capo);
     g+=`<rect x="${x-8}" y="${NECK.yTop-16}" width="16" height="${NECK.yBot-NECK.yTop+32}" rx="6" fill="rgba(232,176,75,.22)" stroke="rgba(232,176,75,.55)"/>`;
     g+=`<text x="${x}" y="${NECK.yTop-19}" font-size="9.5" fill="var(--amber)" text-anchor="middle">capo</text>`}
-  svg.innerHTML=g+`<g id="gMuted"></g><g id="gScale"></g><g id="gDots"></g><g id="gHit"></g>`;
+  svg.innerHTML=g+`<g id="gMuted"></g><g id="gScale"></g><g id="gDots"></g><g id="gBarre"></g><g id="gHit"></g>`;
+  // barre row: one button above each fret; barres every string there (higher frets and mutes keep their state)
+  const gb=svg.querySelector('#gBarre');let bb='';
+  for(let f=G.capo+1;f<=G.frets;f++){
+    bb+=`<rect x="${posX(f)-11}" y="3" width="22" height="11" rx="3" data-bf="${f}" style="cursor:pointer"><title>Barre fret ${f} · click again to lift</title></rect>`}
+  gb.innerHTML=bb;
+  gb.querySelectorAll('rect').forEach(r=>r.addEventListener('pointerdown',()=>pressBarre(+r.dataset.bf)));
   const hit=svg.querySelector('#gHit');let h='';
   for(let s=0;s<6;s++){
     const y=stringY(s),hh=(NECK.yBot-NECK.yTop)/5;
@@ -1147,15 +1158,35 @@ function pressGuitar(s,f){
     else{G.userFrets[s]=G.capo;playGuitarNote(tuning().midis[s]+G.capo)}}
   else if(cur===f)G.userFrets[s]=null;
   else{G.userFrets[s]=f;playGuitarNote(tuning().midis[s]+f)}
+  syncSelFromFrets();
+  render()}
+function syncSelFromFrets(){
   const sel=new Set();
   G.userFrets.forEach((fr,ss)=>{if(typeof fr==='number')sel.add(tuning().midis[ss]+fr)});
   state.selected=sel;
-  render()}
+  if(G.barreFret!==null&&!G.userFrets.some(fr=>fr===G.barreFret))G.barreFret=null}
+function pressBarre(f){
+  // bar every string at fret f; strings already fretted higher, and muted strings, keep their state
+  ensureAudio();
+  if(state.source!=='guitar'||!G.userFrets){
+    G.userFrets=[null,null,null,null,null,null];
+    state.selected.clear();state.source='guitar';G.barreFret=null}
+  if(G.barreFret===f){
+    G.userFrets=G.userFrets.map(fr=>fr===f?null:fr);
+    G.barreFret=null}
+  else{
+    if(G.barreFret!==null)G.userFrets=G.userFrets.map(fr=>fr===G.barreFret?null:fr);
+    G.userFrets=G.userFrets.map(fr=>fr==='x'?'x':(typeof fr==='number'&&fr>f)?fr:f);
+    G.barreFret=f}
+  syncSelFromFrets();
+  render();
+  if(G.barreFret!==null)strumVoicing(G.userShape)}
 function renderGuitar(){
   if(!G.on)return;
   const svg=$('neckSvg');
   const mutedG=svg.querySelector('#gMuted'),scaleG=svg.querySelector('#gScale'),dotsG=svg.querySelector('#gDots');
   if(!scaleG)return;
+  svg.querySelectorAll('#gBarre rect').forEach(r=>r.setAttribute('class',(state.source==='guitar'&&G.barreFret===+r.dataset.bf)?'on':''));
   const open=openMidis(),v=currentVoicing();
   const scaleSet=new Set(scalePcs()),keyPc=pc(scaleState.key);
   const info=SCALE_INFO[scaleState.scaleId];
@@ -1447,7 +1478,7 @@ function buildKeyboard(){
     k.innerHTML=`<div>${pcName(m)}<span class="mini">${midiName(m)}</span></div>`;
     k.onpointerdown=()=>press(m);$('blackKeys').appendChild(k)}}
 function press(midi){
-  if(state.source==='guitar'){G.userFrets=null;state.selected.clear()} // switching instruments starts fresh
+  if(state.source==='guitar'){G.userFrets=null;G.barreFret=null;state.selected.clear()} // switching instruments starts fresh
   state.source='piano';
   if(!state.multi){[...state.selected].forEach(stopNote);state.selected.clear();state.selected.add(midi);startNote(midi)}
   else if(state.selected.has(midi)){state.selected.delete(midi);stopNote(midi)}
@@ -1465,13 +1496,24 @@ function buildControls(){
     if(ex.forceQuality)state.quality=ex.forceQuality;
     if(ex.id==='m7b5')state.quality='min';selectChord()});
     b.dataset.extension=ex.id;$('extensionButtons').appendChild(b)})}
+function activeChordSel(){
+  // The chord the UI is actually showing: the built chord, or the top reading
+  // of manually clicked notes. Inversion/octave controls operate on THIS.
+  if(state.source==='chord')return{root:state.root,quality:state.quality,extension:state.extension};
+  return G.bestExact?{root:G.bestExact.root,quality:G.bestExact.quality,extension:G.bestExact.extension}:null}
 function renderInversions(){
-  const count=intervals().length;
-  state.inversion=Math.min(state.inversion,count-1);
+  const a=activeChordSel();
   const box=$('inversionButtons');box.innerHTML='';
+  if(!a){
+    const b=makeBtn('Root',null,'btn tiny');b.disabled=true;box.appendChild(b);return}
+  const qual=QUALITIES.find(x=>x.id===a.quality),ext=EXTENSIONS.find(x=>x.id===a.extension);
+  const count=intervals(qual,ext).length;
+  if(state.source==='chord')state.inversion=Math.min(state.inversion,count-1);
   for(let i=0;i<count;i++){
     const label=i===0?'Root':i===1?'1st':i===2?'2nd':i===3?'3rd':`${i}th`;
-    const b=makeBtn(label,()=>{state.inversion=i;selectChord()},'btn tiny');
+    const b=makeBtn(label,()=>{
+      state.root=a.root;state.quality=a.quality;state.extension=a.extension;
+      state.inversion=i;selectChord()},'btn tiny');
     b.dataset.inversion=i;b.classList.toggle('active',state.source==='chord'&&state.inversion===i);
     box.appendChild(b)}}
 
@@ -1485,6 +1527,7 @@ function render(){
   const bestExact=matches.length&&matches[0].exact?matches[0]:null;
   G.bestExact=bestExact;
   renderInversions();
+  $('octaveDown').disabled=$('octaveUp').disabled=!activeChordSel();
   $('currentChord').textContent=!selected.length?'No chord'
     :!manual?nameFor(state.root)
     :selPcsNow.length===1?pcName(selPcsNow[0])+' (single note)'
@@ -1543,15 +1586,14 @@ function buildGuitarControls(){
   $('capoSelect').onchange=ev=>{G.capo=+ev.target.value;
     if(G.userFrets){ // fretted notes below the new capo are unreachable
       G.userFrets=G.userFrets.map(f=>typeof f==='number'&&f<G.capo?null:f);
-      const sel=new Set();
-      G.userFrets.forEach((fr,ss)=>{if(typeof fr==='number')sel.add(tuning().midis[ss]+fr)});
-      state.selected=sel}
+      syncSelFromFrets()}
     G.specKey='';buildNeck();render()};
   $('leftyToggle').onclick=()=>{G.lefty=!G.lefty;$('leftyToggle').textContent=G.lefty?'Left-handed':'Right-handed';buildNeck();render()};
   document.querySelectorAll('#fretSeg button').forEach(b=>b.onclick=()=>{
     G.frets=+b.dataset.fr;
     document.querySelectorAll('#fretSeg button').forEach(x=>x.classList.toggle('on',x===b));
-    if(G.userFrets)G.userFrets=G.userFrets.map(f=>typeof f==='number'&&f>G.frets?null:f);
+    if(G.userFrets){G.userFrets=G.userFrets.map(f=>typeof f==='number'&&f>G.frets?null:f);syncSelFromFrets()}
+    if(G.barreFret!==null&&G.barreFret>G.frets)G.barreFret=null;
     G.specKey='';buildNeck();render()});
   document.querySelectorAll('#fingerSeg button').forEach(b=>b.onclick=()=>{
     G.showFingers=b.dataset.fm==='fingers';
@@ -1576,7 +1618,7 @@ function buildGuitarControls(){
     $('pianoWrap').classList.toggle('hidden',!G.pianoOn)}}
 document.querySelectorAll('#palSeg button').forEach(b=>b.onclick=()=>{
   if(b.disabled)return;palSize=+b.dataset.size;renderPalette()});
-$('clearBtn').onclick=()=>{[...state.selected].forEach(stopNote);state.selected.clear();G.userFrets=null;state.source='piano';render()};
+$('clearBtn').onclick=()=>{[...state.selected].forEach(stopNote);state.selected.clear();G.userFrets=null;G.barreFret=null;state.source='piano';render()};
 $('playBtn').onclick=()=>playSelection();
 document.querySelectorAll('#primarySeg button').forEach(b=>b.onclick=()=>{
   state.primary=b.dataset.pi;
@@ -1585,8 +1627,12 @@ $('multiToggle').onclick=()=>{state.multi=!state.multi;$('multiToggle').textCont
 $('arpToggle').onclick=()=>{state.arpeggio=!state.arpeggio;$('arpToggle').textContent=state.arpeggio?'Arpeggio':'Block chord';$('arpToggle').classList.toggle('active',state.arpeggio)};
 $('sustainToggle').onclick=()=>{state.sustain=!state.sustain;$('sustainToggle').textContent=state.sustain?'Sustain on':'Sustain off';$('sustainToggle').classList.toggle('active',state.sustain);
   if(!state.sustain)[...active.keys()].forEach(stopNote)};
-$('octaveDown').onclick=()=>{state.octave=Math.max(1,state.octave-1);selectChord()};
-$('octaveUp').onclick=()=>{state.octave=Math.min(5,state.octave+1);selectChord()};
+$('octaveDown').onclick=()=>{const a=activeChordSel();if(!a)return;
+  state.root=a.root;state.quality=a.quality;state.extension=a.extension;
+  state.octave=Math.max(1,state.octave-1);selectChord()};
+$('octaveUp').onclick=()=>{const a=activeChordSel();if(!a)return;
+  state.root=a.root;state.quality=a.quality;state.extension=a.extension;
+  state.octave=Math.min(5,state.octave+1);selectChord()};
 $('volMaster').oninput=ev=>{state.volMaster=ev.target.value/100;if(masterGain)masterGain.gain.value=state.volMaster};
 $('volKeys').oninput=ev=>{state.volKeys=ev.target.value/100;if(keysBus)keysBus.gain.value=state.volKeys};
 $('volGuitar').oninput=ev=>{state.volGuitar=ev.target.value/100;if(guitarBus)guitarBus.gain.value=state.volGuitar};

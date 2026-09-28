@@ -15,7 +15,8 @@
  * have project.repo.json (saved by sync from the repo's own project.json);
  * the site's project.json overrides it field by field. An "icon" is an image
  * inside the folder (or a URL); without one the homepage draws a mark from
- * the project's initials.
+ * the project's initials. A preview illustration at public/previews/<slug>.svg
+ * (or .webp/.png) is linked when present.
  *
  * Usage: node scripts/build.mjs [--quiet]
  */
@@ -28,10 +29,15 @@ import {
     manifestPath,
     projectConfigName,
     projectsDir,
+    publicDir,
     readJson,
     relative,
     repoConfigName,
 } from "./lib.mjs";
+
+/** Card preview illustrations, one per project slug, drawn by hand. */
+const previewsDir = path.join(publicDir, "previews");
+const PREVIEW_TYPES = [".svg", ".webp", ".png"];
 
 /** Only this much of an entry page is scanned for <title> and <meta> tags. */
 const HEAD_SCAN_BYTES = 64 * 1024;
@@ -134,6 +140,11 @@ function findEntryPage(folder) {
 
 /* Metadata ----------------------------------------------------------------- */
 
+function findPreview(slug) {
+    const type = PREVIEW_TYPES.find((extension) => fs.existsSync(path.join(previewsDir, slug + extension)));
+    return type ? `previews/${encodeURIComponent(slug)}${type}` : null;
+}
+
 function buildEntry(slug, href, config, page, icon) {
     const tags = config.tags ?? splitKeywords(page.keywords);
 
@@ -142,6 +153,7 @@ function buildEntry(slug, href, config, page, icon) {
         title: config.title || page.title || titleFromSlug(slug),
         description: config.description ?? page.description ?? "",
         icon,
+        preview: findPreview(slug),
         tags: normaliseTags(tags),
         href,
         order: typeof config.order === "number" ? config.order : null,

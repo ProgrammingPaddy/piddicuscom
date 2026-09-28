@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" width="320" height="200" role="img" aria-label="A chord shown on a fretboard and a keyboard">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="var(--preview-bg-top, #2f2130)"/>
+      <stop offset="1" stop-color="var(--preview-bg-bottom, #241a26)"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="320" height="200" fill="url(#bg)"/>
+
+  <!-- Chord name -->
+  <rect x="24" y="14" width="58" height="22" rx="11" fill="var(--preview-accent, #fec6d9)"/>
+  <text x="53" y="29.5" text-anchor="middle" font-family="Fredoka, Nunito, system-ui, sans-serif" font-size="13" font-weight="700" fill="var(--preview-on-accent, #2a1220)">Cmaj7</text>
+  <text x="96" y="29" font-family="Nunito, system-ui, sans-serif" font-size="11" fill="var(--preview-muted, #977d8c)">I in C major</text>
+
+  <!-- Fretboard -->
+  <rect x="24" y="46" width="272" height="72" rx="10" fill="var(--preview-panel, #3b2a3b)"/>
+  <rect x="24" y="46" width="6" height="72" rx="3" fill="var(--preview-accent, #fec6d9)" opacity="0.85"/>
+  <g stroke="var(--preview-secondary, #a16564)" stroke-width="2.5">
+    <line x1="92" y1="48" x2="92" y2="116"/>
+    <line x1="160" y1="48" x2="160" y2="116"/>
+    <line x1="228" y1="48" x2="228" y2="116"/>
+  </g>
+  <g stroke="var(--preview-line, #cbb3bf)" stroke-linecap="round">
+    <line x1="30" y1="56" x2="296" y2="56" stroke-width="1"/>
+    <line x1="30" y1="66" x2="296" y2="66" stroke-width="1.2"/>
+    <line x1="30" y1="76" x2="296" y2="76" stroke-width="1.5"/>
+    <line x1="30" y1="86" x2="296" y2="86" stroke-width="1.8"/>
+    <line x1="30" y1="96" x2="296" y2="96" stroke-width="2.1"/>
+    <line x1="30" y1="106" x2="296" y2="106" stroke-width="2.4"/>
+  </g>
+  <!-- Fingers -->
+  <g fill="var(--preview-accent, #fec6d9)">
+    <circle cx="61" cy="66" r="7"/>
+    <circle cx="126" cy="86" r="7"/>
+    <circle cx="194" cy="96" r="7"/>
+  </g>
+  <!-- Open strings -->
+  <g fill="none" stroke="var(--preview-accent, #fec6d9)" stroke-width="1.5">
+    <circle cx="14" cy="56" r="3.5"/>
+    <circle cx="14" cy="76" r="3.5"/>
+  </g>
+  <!-- Muted low string -->
+  <g stroke="var(--preview-muted, #977d8c)" stroke-width="1.5" stroke-linecap="round">
+    <line x1="11" y1="103" x2="17" y2="109"/>
+    <line x1="17" y1="103" x2="11" y2="109"/>
+  </g>
+
+  <!-- Keyboard -->
+  <g>
+    <rect x="24" y="132" width="272" height="54" rx="8" fill="var(--preview-panel, #3b2a3b)"/>
+    <!-- White keys: C D E F G A B C D E F G A B -->
+    <g fill="var(--preview-cream, #f7edf1)">
+      <rect x="27" y="135" width="17" height="48" rx="3" fill="var(--preview-accent, #fec6d9)"/>
+      <rect x="46" y="135" width="17" height="48" rx="3"/>
+      <rect x="65" y="135" width="17" height="48" rx="3" fill="var(--preview-accent, #fec6d9)"/>
+      <rect x="84" y="135" width="17" height="48" rx="3"/>
+      <rect x="103" y="135" width="17" height="48" rx="3" fill="var(--preview-accent, #fec6d9)"/>
+      <rect x="122" y="135" width="17" height="48" rx="3"/>
+      <rect x="141" y="135" width="17" height="48" rx="3" fill="var(--preview-accent, #fec6d9)"/>
+      <rect x="160" y="135" width="17" height="48" rx="3"/>
+      <rect x="179" y="135" width="17" height="48" rx="3"/>
+      <rect x="198" y="135" width="17" height="48" rx="3"/>
+      <rect x="217" y="135" width="17" height="48" rx="3"/>
+      <rect x="236" y="135" width="17" height="48" rx="3"/>
+      <rect x="255" y="135" width="17" height="48" rx="3"/>
+      <rect x="274" y="135" width="19" height="48" rx="3"/>
+    </g>
+    <!-- Black keys -->
+    <g fill="var(--preview-ink, #2a1e2a)">
+      <rect x="39" y="135" width="11" height="29" rx="2.5"/>
+      <rect x="58" y="135" width="11" height="29" rx="2.5"/>
+      <rect x="96" y="135" width="11" height="29" rx="2.5"/>
+      <rect x="115" y="135" width="11" height="29" rx="2.5"/>
+      <rect x="134" y="135" width="11" height="29" rx="2.5"/>
+      <rect x="172" y="135" width="11" height="29" rx="2.5"/>
+      <rect x="191" y="135" width="11" height="29" rx="2.5"/>
+      <rect x="229" y="135" width="11" height="29" rx="2.5"/>
+      <rect x="248" y="135" width="11" height="29" rx="2.5"/>
+      <rect x="267" y="135" width="11" height="29" rx="2.5"/>
+    </g>
+  </g>
+</svg>

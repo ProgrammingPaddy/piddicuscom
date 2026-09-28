@@ -1,0 +1,355 @@
+# Watch Log
+#
+# One title per line:   Title | rating | notes
+#   rating  out of 10, halves allowed (7, 7.5, 8 ...)
+#   notes   optional
+# A line "# anime", "# show" or "# movie" sets the type for the lines
+# under it. Other # lines are comments. Blank lines are ignored.
+# Edit, commit, push, or build it with the List Editor on the site.
+
+# movie
+Wanted
+Army of Thieves
+Salt
+Hanna
+Anna
+Kingsman Secret Service
+The Man from U.N.C.L.E.
+The Gray Man
+Bullet Train
+The Old Guard
+Blackhat
+War Dogs
+Drive
+Baby Driver
+21
+Alita Battle Angel
+American Animals
+Layer Cake
+Gone Girl
+Mr. Right
+Collateral
+The Man from Nowhere
+Punch Drunk Love
+Live Die Repeat (Edge of Tomorrow)
+The Adjustment Bureau
+Limitless
+Antarctica: A Year on Ice
+Boss Level
+Parasite
+Nightcrawler
+Meet Joe Black
+Kick-Ass
+This Is Spinal Tap
+Hit Man
+Falling Down
+
+# show
+Person of Interest
+The Blacklist
+White Collar
+Killing Eve
+Heroes
+Limitless
+Fringe
+Lost
+Alias
+Dark
+Hanna
+Patriot
+The Booth at the End
+Suits
+Brooklyn 99
+Game of Thrones
+Breaking Bad
+Better Call Saul
+iZombie
+The Witcher
+Cursed
+The Good Place
+Lucifer
+Arrow
+Black Mirror
+Community
+The OA
+Warrior Nun
+Altered Carbon
+Kyle XY
+Travelers
+Startup
+The 4400
+House of Cards
+The Queens Gambit
+Bad Blood
+Lupin
+The Midnight Gospel
+One Punch Man
+Jupiter's Legacy
+Scrubs
+The Expanse
+Reacher
+Treadstone
+Psych
+Succession
+Chuck
+Covert Affairs
+Orphan Black
+Boston Legal
+Dead Like Me
+24
+Leverage
+Burn Notice
+Sneeky Pete
+Forever
+Prison Break
+Rick and Morty
+The Boys
+The Americans
+Invincible
+The Night Manager
+Homeland
+Futurama
+The Mandalorian
+The Book of Boba Fett
+Hawkeye
+Loki
+The Sopranos
+Utopia
+Peacemaker
+The Mentalist
+Counterpart
+You Are Wanted
+Deutschland 83
+Timeless
+The Flight Attendant
+Pushing Daisies
+Dollhouse
+New Amsterdam (2008)
+Fargo
+Inside Job
+The Librarians
+Superman and Lois
+An Idiot Abroad
+Captain Fall
+Who is Erin Carter?
+Solar Opposites
+One Piece (Live Action)
+I Think You Should Leave
+Resident Alien
+Imposters
+Warrior
+Elementary
+Fallout
+The Gentlemen
+Reaper
+Tires
+Fubar
+Royal Pains
+Murder Mindfully
+How I Met Your Mother
+Smallville
+Modern Family
+Solo Leveling
+Sakamoto Days
+Buffy the Vampire Slayer
+Angel
+The Recruit
+That Time I Got Reincarnated as a Slime
+A Discovery of Witches
+Castle
+Jericho
+Eureka
+11.22.63
+Banshee
+Severance
+Billions
+The Walking Dead
+Curb Your Enthusiasm
+Seinfeld
+Slow Horses
+The Glades
+Mad Men
+Cupid
+
+# anime
+Solo Leveling
+Sakamoto Days
+Spy x Family
+One Piece
+Buddy Daddies
+KILL BLUE
+That Time I Got Reincarnated as a Slime
+Kaguya-sama: Love is War
+Is It Wrong to Try to Pick Up Girls in a Dungeon?
+The Ossan Newbie Adventurer
+I Want to End this Love Game
+Black Summoner
+The New Gate
+The Devil is a Part-Timer
+Kaiju No. 8
+Cautious Hero
+Assassination Classroom
+To Your Eternity
+Wistoria: Wand and Sword
+In Another World With My Smartphone
+Plunderer
+Campfire Cooking in Another World
+Mushoku Tensei
+Clevatess
+ERASED
+I'm Quitting Heroing
+Suppose a Kid from the Last Dungeon Boonies Moved to a Starter Town
+The Unaware Atelier Meister
+Failure Frame
+My Next Life as a Villainess: All Roads Lead to Doom!
+More Than a Married Couple, but Not Lovers
+The Great Cleric
+Villainess Level 99
+I Was Reincarnated as the 7th Prince
+Mashle
+Black Clover
+My Hero Academia
+I Parry Everything
+One Punch Man
+JoJo’s Bizarre Adventure
+There Was a Cute Girl in the Hero’s Party, So I Tried Confessing to Her
+Wise Man's Grandchild
+Skeleton Knight in Another World
+Am I Actually the Strongest?
+The Brilliant Healer's New Life in the Shadows
+Scooped Up by an S-Rank Adventurer
+A Couple of Cuckoos
+The Angel Next Door Spoils Me Rotten
+Gals Can't Be Kind to Otaku!?
+Doctor Elise: The Royal Lady with the Lamp
+May I Ask for One Final Thing?
+The Quintessential Quintuplets
+Love After World Domination
+My Unique Skill Makes Me OP Even at Level 1
+Shangri La Frontier
+In the Land of Leadale
+Jujutsu Kaisen
+The Daily Life of the Immortal King
+Got a Cheat Skill in Another World and Became Unrivaled in the Real World Too
+The 8th Son? Are You Kidding Me?
+I'm a Noble on the Brink of Ruin, So I Might as Well Try Mastering Magic
+The Greatest Demon Lord is Reincarnated as a Typical Nobody
+Death March to the Parallel World Rhapsody
+Demon Lord, Retry!
+You and I Are Polar Opposites
+The Strongest Magician in the Demon Kings Army is a Human
+Banished from the Heros Party, I Decided to Live a Quiet Life in the Countryside
+Chilling in Another World with Level 2 Super Cheat Powers
+Berzerk of Gluttony
+Horimiya
+Tune In to the Midnight Heart
+Welcome to Japan, Miss Elf!
+My Dress-Up Darling
+By the Grace of the Gods
+The Misfit of Demon King Academy
+The Aristocrat's Otherworldly Adventure: Serving Gods Who Go To Far
+Eminence in Shadow
+The Beginning After the End
+Beast Tamer
+Tsukimichi: Moonlit Fantasy
+I May Be a Guild Receptionist, but I’ll Solo Any Boss to Clock Out on Time
+The Reincarnation of the Strongest Exorcist in Another World
+Champignon Witch
+The Wrong Way to Use Healing Magic
+A Returners Magic Should Be Special
+The Rising of the Shield Hero
+Life with an Ordinary Guy Who Reincarnated into a Total Fantasy Knockout
+Girlfriend, Girlfriend
+Akashic Records of Bastard Magic Instructor
+The Demon King’s Daughter Is Too Kind
+Code Geass
+Overlord
+The Fruit of Evolution
+Tomo-chan Is a Girl!
+The Iceblade Sorcerer Shall Rule the World
+Chilling in My 30s After Getting Fired from the Demon King's Army
+Alya Sometimes Hides Her Feelings in Russian
+My Instant Death Ability Is So Overpowered, No One in This Other World Stands a Chance Against Me
+My Love Story with Yamada-kun at Lv999
+She Professed Herself Pupil of the Wise Man
+New Saga
+Headhunted to Another World
+A Gatherer's Adventure in Isekai
+7th Time Loop
+Demon Slayer
+I'm the Evil Lord of an Intergalactic Empire
+Apocalypse Bringer Mynoghra
+A Galaxy Next Door
+You Can't Be in a Rom-Com with Your Childhood Friend
+The Too-Perfect Saint
+Betrothed to My Sister’s Ex
+Our Dating Story: The Experienced You and the Inexperienced Me
+Even Given the Worthless Appraiser Class
+Hana Kimi
+Handyman Saito in Another World
+Re:Monster
+Didn't I Say to Make My Abilities Average in the Next Life?!
+Bofuri
+Possibly the Greatest Alchemist of All Time
+The Unwanted Undead Adventurer
+The Villainess Is Adored by the Prince of the Neighboring Kingdom
+To Be Hero X
+The Water Magician
+Reincarnated as a Sword
+Shikimori's Not Just a Cutie!
+I've Been Killing Slimes for 300 Years and Maxxed Out My Level
+Why Raeliana Ended Up at the Duke’s Mansion
+Magic Maker: How to Make Magic in Another World
+Ascendance of a Bookworm
+A Gentle Noble’s Vacation Recommendation
+Attack on Titan
+Re:Zero
+The Daily Life of a Middle-Aged Online Shopper in Another World
+So I'm a Spider, So What?
+Mining Company Black
+The Most Heretical Last Boss Queen
+Demon King Daimao
+My Status as an Assassin Obviously Exceeds the Heros
+The Worlds Finest Assassin
+Ranking of Kings
+How Not to Summon a Demon Lord
+My Isekai Life
+The Irregular at Magic High School
+The Hidden Dungeon Only I Can Enter
+The Legendary Hero is Dead!
+Arifureta: From Commonplace to World's Strongest
+A Livid Lady's Guide to Getting Even: How I Crushed My Homeland with My Grimoires
+Hanaori-san Still Wants to Fight in the Next Life
+The Insipid Prince's Furtive Grab for the Throne
+The Duke's Son Claims He Won't Love Me, But Showers Me in Adoration
+Though I am an Inept Villainess
+The 100 Girlfriend Who Really Really Really Really Really Love You
+An Observation Log of My Fiance Who Calle Herself the Villainess
+KAIJU GIRL CARAMELISE
+Victoria of Many Faces
+The Oblivious Saint Can't Control Her Power
+BLACK TORCH
+The Villager of Level 999
+As a Reincarnated Aristocrat I'll Use My Appraisal Skill to Rise in the World
+Noblesse
+Shangri-La Frontier
+The Exiled Heavy Knight Knows How to Game the System
+From Overshadowed to Overpowered: Second Reincarnation of a Talentless Sage
+World's Strongest Rearguard
+I Became a Legend after My 10-Year Long Last Stand
+Tomb Raider King
+The Frontier Lord Begins with Zero Subjects
+Nina the Starry Bride
+MY love STORY!!
+The Problem Children are Coming from Another World Aren't They?
+The Genius Prince's Guide to Raising a Nation Out of Debt
+Hero Without a Class
+From Bureaucrat to Villainess: Dad's Been Reincarnated
+My Gift Lvl 9999 Unlimited Gacha
+The Klutzy Class Monitor and the Girl with the Short Skirt
+Vermeil in Gold
+The Demon Sword Master of Excalibur Academy
+Chivalry of a Failed Knight
+HELL MODE
+Ragna Crimson
+Undead Unluck

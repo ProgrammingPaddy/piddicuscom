@@ -1,0 +1,336 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" width="320" height="200" role="img" aria-label="Three slot reels showing a perk, a spell and an enemy">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="var(--preview-bg-top, #2f2130)"/>
+      <stop offset="1" stop-color="var(--preview-bg-bottom, #241a26)"/>
+    </linearGradient>
+    <linearGradient id="fade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="var(--preview-panel, #3b2a3b)" stop-opacity="1"/>
+      <stop offset="0.4" stop-color="var(--preview-panel, #3b2a3b)" stop-opacity="0"/>
+      <stop offset="0.6" stop-color="var(--preview-panel, #3b2a3b)" stop-opacity="0"/>
+      <stop offset="1" stop-color="var(--preview-panel, #3b2a3b)" stop-opacity="1"/>
+    </linearGradient>
+    <clipPath id="reel3"><rect x="206" y="26" width="90" height="112" rx="14"/></clipPath>
+  </defs>
+
+  <rect width="320" height="200" fill="url(#bg)"/>
+
+  <!-- Reel windows -->
+  <g fill="var(--preview-panel, #3b2a3b)" stroke="var(--preview-secondary, #a16564)" stroke-width="1.5">
+    <rect x="24" y="26" width="90" height="112" rx="14"/>
+    <rect x="115" y="26" width="90" height="112" rx="14"/>
+    <rect x="206" y="26" width="90" height="112" rx="14"/>
+  </g>
+
+  <!-- Pixel icons, drawn crisp like the game's sprites -->
+  <g shape-rendering="crispEdges">
+    <!-- Perk: a heart -->
+    <g>
+      <rect x="55.8" y="72.4" width="4.45" height="4.45" fill="var(--preview-accent, #fec6d9)"/>
+      <rect x="60.2" y="72.4" width="4.45" height="4.45" fill="var(--preview-accent, #fec6d9)"/>
+      <rect x="73.4" y="72.4" width="4.45" height="4.45" fill="var(--preview-accent, #fec6d9)"/>
+      <rect x="77.8" y="72.4" width="4.45" height="4.45" fill="var(--preview-accent, #fec6d9)"/>
+      <rect x="51.4" y="76.8" width="4.45" height="4.45" fill="var(--preview-accent, #fec6d9)"/>
+      <rect x="55.8" y="76.8" width="4.45" height="4.45" fill="var(--preview-accent, #fec6d9)"/>
+      <rect x="60.2" y="76.8" width="4.45" height="4.45" fill="var(--preview-accent, #fec6d9)"/>
+      <rect x="64.6" y="76.8" width="4.45" height="4.45" fill="var(--preview-accent, #fec6d9)"/>
+      <rect x="69.0" y="76.8" width="4.45" height="4.45" fill="var(--preview-accent, #fec6d9)"/>
+      <rect x="73.4" y="76.8" width="4.45" height="4.45" fill="var(--preview-accent, #fec6d9)"/>
+      <rect x="77.8" y="76.8" width="4.45" height="4.45" fill="var(--preview-accent, #fec6d9)"/>
+      <rect x="82.2" y="76.8" width="4.45" height="4.45" fill="var(--preview-accent, #fec6d9)"/>
+      <rect x="47.0" y="81.2" width="4.45" height="4.45" fill="var(--preview-accent, #fec6d9)"/>
+      <rect x="51.4" y="81.2" width="4.45" height="4.45" fill="var(--preview-cream, #f7edf1)"/>
+      <rect x="55.8" y="81.2" width="4.45" height="4.45" fill="var(--preview-accent, #fec6d9)"/>
+      <rect x="60.2" y="81.2" width="4.45" height="4.45" fill="var(--preview-accent, #fec6d9)"/>
+      <rect x="64.6" y="81.2" width="4.45" height="4.45" fill="var(--preview-accent, #fec6d9)"/>
+      <rect x="69.0" y="81.2" width="4.45" height="4.45" fill="var(--preview-accent, #fec6d9)"/>
+      <rect x="73.4" y="81.2" width="4.45" height="4.45" fill="var(--preview-accent, #fec6d9)"/>
+      <rect x="77.8" y="81.2" width="4.45" height="4.45" fill="var(--preview-accent, #fec6d9)"/>
+      <rect x="82.2" y="81.2" width="4.45" height="4.45" fill="var(--preview-accent, #fec6d9)"/>
+      <rect x="86.6" y="81.2" width="4.45" height="4.45" fill="var(--preview-accent, #fec6d9)"/>
+      <rect x="47.0" y="85.6" width="4.45" height="4.45" fill="var(--preview-accent, #fec6d9)"/>
+      <rect x="51.4" y="85.6" width="4.45" height="4.45" fill="var(--preview-accent, #fec6d9)"/>
+      <rect x="55.8" y="85.6" width="4.45" height="4.45" fill="var(--preview-accent, #fec6d9)"/>
+      <rect x="60.2" y="85.6" width="4.45" height="4.45" fill="var(--preview-accent, #fec6d9)"/>
+      <rect x="64.6" y="85.6" width="4.45" height="4.45" fill="var(--preview-accent, #fec6d9)"/>
+      <rect x="69.0" y="85.6" width="4.45" height="4.45" fill="var(--preview-accent, #fec6d9)"/>
+      <rect x="73.4" y="85.6" width="4.45" height="4.45" fill="var(--preview-accent, #fec6d9)"/>
+      <rect x="77.8" y="85.6" width="4.45" height="4.45" fill="var(--preview-accent, #fec6d9)"/>
+      <rect x="82.2" y="85.6" width="4.45" height="4.45" fill="var(--preview-accent, #fec6d9)"/>
+      <rect x="86.6" y="85.6" width="4.45" height="4.45" fill="var(--preview-accent, #fec6d9)"/>
+      <rect x="51.4" y="90.0" width="4.45" height="4.45" fill="var(--preview-accent, #fec6d9)"/>
+      <rect x="55.8" y="90.0" width="4.45" height="4.45" fill="var(--preview-accent, #fec6d9)"/>
+      <rect x="60.2" y="90.0" width="4.45" height="4.45" fill="var(--preview-accent, #fec6d9)"/>
+      <rect x="64.6" y="90.0" width="4.45" height="4.45" fill="var(--preview-accent, #fec6d9)"/>
+      <rect x="69.0" y="90.0" width="4.45" height="4.45" fill="var(--preview-accent, #fec6d9)"/>
+      <rect x="73.4" y="90.0" width="4.45" height="4.45" fill="var(--preview-accent, #fec6d9)"/>
+      <rect x="77.8" y="90.0" width="4.45" height="4.45" fill="var(--preview-accent, #fec6d9)"/>
+      <rect x="82.2" y="90.0" width="4.45" height="4.45" fill="var(--preview-accent, #fec6d9)"/>
+      <rect x="55.8" y="94.4" width="4.45" height="4.45" fill="var(--preview-accent, #fec6d9)"/>
+      <rect x="60.2" y="94.4" width="4.45" height="4.45" fill="var(--preview-accent, #fec6d9)"/>
+      <rect x="64.6" y="94.4" width="4.45" height="4.45" fill="var(--preview-accent, #fec6d9)"/>
+      <rect x="69.0" y="94.4" width="4.45" height="4.45" fill="var(--preview-accent, #fec6d9)"/>
+      <rect x="73.4" y="94.4" width="4.45" height="4.45" fill="var(--preview-accent, #fec6d9)"/>
+      <rect x="77.8" y="94.4" width="4.45" height="4.45" fill="var(--preview-accent, #fec6d9)"/>
+      <rect x="60.2" y="98.8" width="4.45" height="4.45" fill="var(--preview-accent, #fec6d9)"/>
+      <rect x="64.6" y="98.8" width="4.45" height="4.45" fill="var(--preview-accent, #fec6d9)"/>
+      <rect x="69.0" y="98.8" width="4.45" height="4.45" fill="var(--preview-accent, #fec6d9)"/>
+      <rect x="73.4" y="98.8" width="4.45" height="4.45" fill="var(--preview-accent, #fec6d9)"/>
+      <rect x="64.6" y="103.2" width="4.45" height="4.45" fill="var(--preview-accent, #fec6d9)"/>
+      <rect x="69.0" y="103.2" width="4.45" height="4.45" fill="var(--preview-accent, #fec6d9)"/>
+    </g>
+    <!-- Spell: a wand with a glowing tip -->
+    <g>
+      <rect x="168.8" y="70.2" width="4.45" height="4.45" fill="var(--preview-cream, #f7edf1)"/>
+      <rect x="164.4" y="74.6" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="168.8" y="74.6" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="173.2" y="74.6" width="4.45" height="4.45" fill="var(--preview-cream, #f7edf1)"/>
+      <rect x="160.0" y="79.0" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="164.4" y="79.0" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="168.8" y="79.0" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="155.6" y="83.4" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="160.0" y="83.4" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="164.4" y="83.4" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="151.2" y="87.8" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="155.6" y="87.8" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="164.4" y="87.8" width="4.45" height="4.45" fill="var(--preview-cream, #f7edf1)"/>
+      <rect x="146.8" y="92.2" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="151.2" y="92.2" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="142.4" y="96.6" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="146.8" y="96.6" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="138.0" y="101.0" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="142.4" y="101.0" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="138.0" y="105.4" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+    </g>
+    <!-- Enemy: a hiisi, its reel still spinning -->
+    <g clip-path="url(#reel3)">
+      <g opacity="0.3">
+        <rect x="237.8" y="-12.0" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="242.2" y="-12.0" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="246.6" y="-12.0" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="251.0" y="-12.0" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="255.4" y="-12.0" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="259.8" y="-12.0" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="233.4" y="-7.6" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="237.8" y="-7.6" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="242.2" y="-7.6" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="246.6" y="-7.6" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="251.0" y="-7.6" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="255.4" y="-7.6" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="259.8" y="-7.6" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="264.2" y="-7.6" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="233.4" y="-3.2" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="237.8" y="-3.2" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="242.2" y="-3.2" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="246.6" y="-3.2" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="251.0" y="-3.2" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="255.4" y="-3.2" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="259.8" y="-3.2" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="264.2" y="-3.2" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="233.4" y="1.2" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="237.8" y="1.2" width="4.45" height="4.45" fill="var(--preview-ink, #2a1e2a)"/>
+      <rect x="242.2" y="1.2" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="246.6" y="1.2" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="251.0" y="1.2" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="255.4" y="1.2" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="259.8" y="1.2" width="4.45" height="4.45" fill="var(--preview-ink, #2a1e2a)"/>
+      <rect x="264.2" y="1.2" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="237.8" y="5.6" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="242.2" y="5.6" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="246.6" y="5.6" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="251.0" y="5.6" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="255.4" y="5.6" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="259.8" y="5.6" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="242.2" y="10.0" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="246.6" y="10.0" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="251.0" y="10.0" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="255.4" y="10.0" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="233.4" y="14.4" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="237.8" y="14.4" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="242.2" y="14.4" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="246.6" y="14.4" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="251.0" y="14.4" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="255.4" y="14.4" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="259.8" y="14.4" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="264.2" y="14.4" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="229.0" y="18.8" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="233.4" y="18.8" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="237.8" y="18.8" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="242.2" y="18.8" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="246.6" y="18.8" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="251.0" y="18.8" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="255.4" y="18.8" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="259.8" y="18.8" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="264.2" y="18.8" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="268.6" y="18.8" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="229.0" y="23.2" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="233.4" y="23.2" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="242.2" y="23.2" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="246.6" y="23.2" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="251.0" y="23.2" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="255.4" y="23.2" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="264.2" y="23.2" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="268.6" y="23.2" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="237.8" y="27.6" width="4.45" height="4.45" fill="var(--preview-ink, #2a1e2a)"/>
+      <rect x="259.8" y="27.6" width="4.45" height="4.45" fill="var(--preview-ink, #2a1e2a)"/>
+      </g>
+      <g>
+        <rect x="237.8" y="68.0" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="242.2" y="68.0" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="246.6" y="68.0" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="251.0" y="68.0" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="255.4" y="68.0" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="259.8" y="68.0" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="233.4" y="72.4" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="237.8" y="72.4" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="242.2" y="72.4" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="246.6" y="72.4" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="251.0" y="72.4" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="255.4" y="72.4" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="259.8" y="72.4" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="264.2" y="72.4" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="233.4" y="76.8" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="237.8" y="76.8" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="242.2" y="76.8" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="246.6" y="76.8" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="251.0" y="76.8" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="255.4" y="76.8" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="259.8" y="76.8" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="264.2" y="76.8" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="233.4" y="81.2" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="237.8" y="81.2" width="4.45" height="4.45" fill="var(--preview-ink, #2a1e2a)"/>
+      <rect x="242.2" y="81.2" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="246.6" y="81.2" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="251.0" y="81.2" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="255.4" y="81.2" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="259.8" y="81.2" width="4.45" height="4.45" fill="var(--preview-ink, #2a1e2a)"/>
+      <rect x="264.2" y="81.2" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="237.8" y="85.6" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="242.2" y="85.6" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="246.6" y="85.6" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="251.0" y="85.6" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="255.4" y="85.6" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="259.8" y="85.6" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="242.2" y="90.0" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="246.6" y="90.0" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="251.0" y="90.0" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="255.4" y="90.0" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="233.4" y="94.4" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="237.8" y="94.4" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="242.2" y="94.4" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="246.6" y="94.4" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="251.0" y="94.4" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="255.4" y="94.4" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="259.8" y="94.4" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="264.2" y="94.4" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="229.0" y="98.8" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="233.4" y="98.8" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="237.8" y="98.8" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="242.2" y="98.8" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="246.6" y="98.8" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="251.0" y="98.8" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="255.4" y="98.8" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="259.8" y="98.8" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="264.2" y="98.8" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="268.6" y="98.8" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="229.0" y="103.2" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="233.4" y="103.2" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="242.2" y="103.2" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="246.6" y="103.2" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="251.0" y="103.2" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="255.4" y="103.2" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="264.2" y="103.2" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="268.6" y="103.2" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="237.8" y="107.6" width="4.45" height="4.45" fill="var(--preview-ink, #2a1e2a)"/>
+      <rect x="259.8" y="107.6" width="4.45" height="4.45" fill="var(--preview-ink, #2a1e2a)"/>
+      </g>
+      <g opacity="0.3">
+        <rect x="237.8" y="148.0" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="242.2" y="148.0" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="246.6" y="148.0" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="251.0" y="148.0" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="255.4" y="148.0" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="259.8" y="148.0" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="233.4" y="152.4" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="237.8" y="152.4" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="242.2" y="152.4" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="246.6" y="152.4" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="251.0" y="152.4" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="255.4" y="152.4" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="259.8" y="152.4" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="264.2" y="152.4" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="233.4" y="156.8" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="237.8" y="156.8" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="242.2" y="156.8" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="246.6" y="156.8" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="251.0" y="156.8" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="255.4" y="156.8" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="259.8" y="156.8" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="264.2" y="156.8" width="4.45" height="4.45" fill="var(--preview-secondary, #a16564)"/>
+      <rect x="233.4" y="161.2" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="237.8" y="161.2" width="4.45" height="4.45" fill="var(--preview-ink, #2a1e2a)"/>
+      <rect x="242.2" y="161.2" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="246.6" y="161.2" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="251.0" y="161.2" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="255.4" y="161.2" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="259.8" y="161.2" width="4.45" height="4.45" fill="var(--preview-ink, #2a1e2a)"/>
+      <rect x="264.2" y="161.2" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="237.8" y="165.6" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="242.2" y="165.6" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="246.6" y="165.6" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="251.0" y="165.6" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="255.4" y="165.6" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="259.8" y="165.6" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="242.2" y="170.0" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="246.6" y="170.0" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="251.0" y="170.0" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="255.4" y="170.0" width="4.45" height="4.45" fill="var(--preview-ramp-2, #bb8090)"/>
+      <rect x="233.4" y="174.4" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="237.8" y="174.4" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="242.2" y="174.4" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="246.6" y="174.4" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="251.0" y="174.4" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="255.4" y="174.4" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="259.8" y="174.4" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="264.2" y="174.4" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="229.0" y="178.8" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="233.4" y="178.8" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="237.8" y="178.8" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="242.2" y="178.8" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="246.6" y="178.8" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="251.0" y="178.8" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="255.4" y="178.8" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="259.8" y="178.8" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="264.2" y="178.8" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="268.6" y="178.8" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="229.0" y="183.2" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="233.4" y="183.2" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="242.2" y="183.2" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="246.6" y="183.2" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="251.0" y="183.2" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="255.4" y="183.2" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="264.2" y="183.2" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="268.6" y="183.2" width="4.45" height="4.45" fill="var(--preview-tertiary, #cdb4ff)"/>
+      <rect x="237.8" y="187.6" width="4.45" height="4.45" fill="var(--preview-ink, #2a1e2a)"/>
+      <rect x="259.8" y="187.6" width="4.45" height="4.45" fill="var(--preview-ink, #2a1e2a)"/>
+      </g>
+    </g>
+  </g>
+  <rect x="206" y="26" width="90" height="112" rx="14" fill="url(#fade)"/>
+  <!-- Motion streaks on the spinning reel -->
+  <g stroke="var(--preview-accent, #fec6d9)" stroke-width="2" stroke-linecap="round" opacity="0.5">
+    <line x1="218" y1="56" x2="218" y2="70"/>
+    <line x1="284" y1="100" x2="284" y2="118"/>
+  </g>
+
+  <!-- Labels sit above everything in the windows -->
+  <g font-family="Fredoka, Nunito, system-ui, sans-serif" font-size="9" font-weight="700" fill="var(--preview-muted, #977d8c)" text-anchor="middle" letter-spacing="1.2">
+    <text x="69" y="42">PERK</text>
+    <text x="160" y="42">SPELL</text>
+    <text x="251" y="42">ENEMY</text>
+  </g>
+
+  <!-- Roll button -->
+  <rect x="106" y="154" width="108" height="30" rx="15" fill="var(--preview-accent, #fec6d9)"/>
+  <text x="160" y="174" text-anchor="middle" font-family="Fredoka, Nunito, system-ui, sans-serif" font-size="13" font-weight="700" fill="var(--preview-on-accent, #2a1220)" letter-spacing="1.5">ROLL</text>
+</svg>

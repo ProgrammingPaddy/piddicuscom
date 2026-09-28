@@ -10,7 +10,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Fredoka:wght@400;500;600&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/layout.css">
@@ -46,7 +46,7 @@
                 </span>
             </h1>
             <p class="hero__tagline reveal">
-                <span class="hero__phrase" data-effect="enchant">Fun projects</span>
+                <span class="hero__phrase" data-effect="enchant">Fun stuff</span>
                 <span class="hero__tagline-soft">and <span class="hero__phrase" data-effect="gears">helpful tools.</span></span>
             </p>
         </section>
@@ -77,14 +77,8 @@
     <template id="card-template">
         <li class="card">
             <a class="card__link" href="#">
-                <div class="card__top">
-                    <h2 class="card__title"></h2>
-                    <span class="card__meta" aria-hidden="true">
-                        <span class="card__index"></span>
-                        <span class="card__arrow">&rarr;</span>
-                    </span>
-                </div>
-                <p class="card__description"></p>
+                <figure class="card__preview"></figure>
+                <h2 class="card__title"></h2>
                 <ul class="card__tags"></ul>
             </a>
         </li>

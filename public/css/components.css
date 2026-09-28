@@ -45,17 +45,15 @@
 .card-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--space-3);
 }
 
-/* Cards are gummy. js/cards.js draws each card's slowly shifting outline in
-   a .card__shape svg behind the content: a tinted fill, a spotlight that
-   follows the pointer, and a faint stroke. The link itself paints nothing. */
+/* Cards: a rounded rectangle with a slightly wavy edge, drawn by js/cards.js
+   in a .card__shape svg behind the content (tinted fill, pointer spotlight,
+   faint stroke). The link itself paints nothing. Hover squashes and lifts. */
 .card {
     position: relative;
-}
-
-.card-grid {
-    gap: var(--space-2);
+    border-radius: var(--radius-lg);
 }
 
 .card__link {
@@ -64,7 +62,7 @@
     flex-direction: column;
     gap: var(--space-3);
     height: 100%;
-    padding: calc(var(--space-4) + 12px);
+    padding: calc(var(--space-4) + 8px);
     outline: none;
     transition: transform var(--duration-base) var(--ease-bounce);
 }
@@ -132,90 +130,63 @@
     animation: jelly 700ms var(--ease-out);
 }
 
-.card__top {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: var(--space-3);
+/* Illustration of the project (inline svg from public/previews). */
+.card__preview {
+    margin: 0;
+    overflow: hidden;
+    aspect-ratio: 16 / 10;
+    background: var(--preview-bg-bottom);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
 }
 
-/* The title is a pink blob. --blob-rest and --blob-hover are border-radius
-   values seeded per project in JS; the shape morphs between them on hover. */
+.card__preview svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    transition: transform var(--duration-slow) var(--ease-out);
+}
+
+.card__link:hover .card__preview svg {
+    transform: scale(1.04);
+}
+
 .card__title {
-    display: inline-flex;
+    display: flex;
     align-items: center;
     gap: var(--space-2);
-    max-width: 100%;
-    padding: 0.5em 1.05em;
-    font-size: var(--text-lg);
-    font-weight: 600;
-    line-height: 1.2;
-    color: var(--color-on-accent);
-    background: var(--color-accent);
-    border-radius: var(--blob-rest, 50%);
-    box-shadow: 0 10px 22px -12px var(--color-accent);
-    text-wrap: balance;
-    transition:
-        border-radius var(--duration-slow) var(--ease-bounce),
-        transform var(--duration-base) var(--ease-bounce);
+    margin-top: var(--space-1);
+    font-family: var(--font-title);
+    font-size: 1.35rem;
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: 0.01em;
+    transition: color var(--duration-fast) var(--ease-out);
+}
+
+.card__link:hover .card__title {
+    color: var(--color-accent);
 }
 
 .card__title-icon {
     flex-shrink: 0;
-    width: 1.4em;
-    height: 1.4em;
+    width: 1.25em;
+    height: 1.25em;
     object-fit: cover;
     border-radius: 50%;
-}
-
-.card__link:hover .card__title {
-    border-radius: var(--blob-hover, 50%);
-    transform: rotate(-2deg) scale(1.03);
-}
-
-.card__meta {
-    display: flex;
-    flex-shrink: 0;
-    align-items: center;
-    gap: var(--space-3);
-    padding-top: 0.55em;
-    font-family: var(--font-display);
-    font-size: var(--text-sm);
-    color: var(--color-text-faint);
-}
-
-.card__arrow {
-    font-size: var(--text-lg);
-    transition:
-        transform var(--duration-base) var(--ease-out),
-        color var(--duration-base) var(--ease-out);
-}
-
-.card__link:hover .card__arrow {
-    color: var(--color-accent);
-    transform: translateX(4px);
-}
-
-.card__description {
-    flex-grow: 1;
-    font-size: var(--text-sm);
-    color: var(--color-text-muted);
 }
 
 .card__tags {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-2);
-    margin-top: var(--space-2);
+    gap: 0 var(--space-3);
+    margin-top: calc(-1 * var(--space-1));
 }
 
 .card__tag {
-    padding: 0.1em var(--space-3);
     font-family: var(--font-display);
     font-size: var(--text-xs);
-    color: var(--color-accent);
-    background: var(--color-accent-soft);
-    border-radius: var(--radius-pill);
+    color: var(--color-text-faint);
 }
 
 /* Empty state ------------------------------------------------------------ */

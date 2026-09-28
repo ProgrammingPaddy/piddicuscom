@@ -300,7 +300,7 @@
 
     .chip:hover,
     .card__link:hover,
-    .card__link:hover .card__title,
+    .card__link:hover .card__preview svg,
     .site-header__brand:hover .site-header__logo {
         transform: none;
     }

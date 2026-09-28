@@ -29,52 +29,55 @@ async function loadManifest() {
     return Array.isArray(data.projects) ? data.projects : [];
 }
 
-/* Title blobs ------------------------------------------------------------- */
+/* Previews ---------------------------------------------------------------- */
+
+const previewCache = new Map();
 
 /**
- * Each card's title sits in a pink blob whose shape is seeded from the slug,
- * so it differs per project but never changes between visits, and morphs to
- * a second seeded shape on hover. The card's own outline is cards.js's job.
+ * Fetch a preview SVG once and return a fresh copy of its root element.
+ * Inline SVG picks up the page's --preview-* tokens, so themes can recolour
+ * it; an <img> could not. Ids are prefixed so several previews can share a
+ * page without their gradients colliding.
  */
+async function loadPreview(url, prefix) {
+    if (!previewCache.has(url)) {
+        previewCache.set(url, fetch(url).then((response) => {
+            if (!response.ok) {
+                throw new Error(`${url} responded ${response.status}`);
+            }
 
-function hashString(text) {
-    let hash = 2166136261;
-
-    for (const char of text) {
-        hash ^= char.codePointAt(0);
-        hash = Math.imul(hash, 16777619) >>> 0;
+            return response.text();
+        }));
     }
 
-    return hash;
+    const markup = (await previewCache.get(url))
+        .replace(/id="([^"]+)"/g, `id="${prefix}-$1"`)
+        .replace(/url\(#([^)]+)\)/g, `url(#${prefix}-$1)`);
+
+    const svg = new DOMParser().parseFromString(markup, "image/svg+xml").documentElement;
+    svg.removeAttribute("width");
+    svg.removeAttribute("height");
+
+    return document.importNode(svg, true);
 }
 
-/** Small deterministic PRNG (mulberry32), returns numbers in [0, 1). */
-function createRandom(seed) {
-    let state = seed >>> 0;
+function fillPreview(figure, project) {
+    if (!project.preview) {
+        figure.remove();
+        return;
+    }
 
-    return () => {
-        state = (state + 0x6d2b79f5) >>> 0;
-        let t = state;
-        t = Math.imul(t ^ (t >>> 15), t | 1);
-        t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-    };
+    loadPreview(project.preview, `preview-${project.slug}`)
+        .then((svg) => figure.replaceChildren(svg))
+        .catch((error) => {
+            console.warn("Preview unavailable:", error);
+            figure.remove();
+        });
 }
 
-/** An organic border-radius: four horizontal and four vertical radii. */
-function blobRadius(random) {
-    const pick = () => Math.round(30 + random() * 40);
-    const [a, b, c, d] = [pick(), pick(), pick(), pick()];
-
-    return `${a}% ${100 - a}% ${100 - b}% ${b}% / ${c}% ${d}% ${100 - d}% ${100 - c}%`;
-}
+/* Rendering --------------------------------------------------------------- */
 
 function fillTitle(title, project) {
-    const random = createRandom(hashString(project.slug));
-
-    title.style.setProperty("--blob-rest", blobRadius(random));
-    title.style.setProperty("--blob-hover", blobRadius(random));
-
     if (project.icon) {
         const image = document.createElement("img");
         image.className = "card__title-icon";
@@ -87,12 +90,6 @@ function fillTitle(title, project) {
     title.append(document.createTextNode(project.title));
 }
 
-/* Rendering --------------------------------------------------------------- */
-
-function formatIndex(index) {
-    return String(index + 1).padStart(2, "0");
-}
-
 function createCard(project, index) {
     const fragment = cardTemplate.content.cloneNode(true);
     const card = fragment.querySelector(".card");
@@ -103,9 +100,9 @@ function createCard(project, index) {
 
     link.href = project.href;
     link.dataset.seed = project.slug;
+    link.title = project.description || "";
     fillTitle(fragment.querySelector(".card__title"), project);
-    fragment.querySelector(".card__description").textContent = project.description || "";
-    fragment.querySelector(".card__index").textContent = formatIndex(index);
+    fillPreview(fragment.querySelector(".card__preview"), project);
 
     for (const tag of project.tags || []) {
         const item = document.createElement("li");

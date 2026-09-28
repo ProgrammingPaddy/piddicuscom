@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Paste a list, tidy it in a table, export it as text, JSON or CSV.">
+    <meta name="theme-color" content="#1d151c">
+    <title>List Editor</title>
+    <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Fredoka:wght@400;500;600&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <!-- Site tokens and reset, so this page follows the site's theme. -->
+    <link rel="stylesheet" href="../../css/base.css">
+
+    <style>
+        .page {
+            width: min(100% - var(--space-12), 960px);
+            margin: 0 auto;
+            padding: var(--space-12) 0 var(--space-24);
+        }
+
+        .title {
+            font-family: var(--font-title);
+            font-size: var(--text-tagline);
+            font-weight: 800;
+        }
+
+        .lead {
+            max-width: 60ch;
+            margin-top: var(--space-2);
+            color: var(--color-text-muted);
+        }
+
+        .panel {
+            margin-top: var(--space-8);
+            padding: var(--space-6);
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+        }
+
+        .panel__title {
+            font-family: var(--font-display);
+            font-size: var(--text-lg);
+            font-weight: 500;
+        }
+
+        .panel__hint {
+            margin-top: var(--space-1);
+            font-size: var(--text-sm);
+            color: var(--color-text-faint);
+        }
+
+        .field,
+        .select {
+            padding: var(--space-2) var(--space-3);
+            font: inherit;
+            font-size: var(--text-sm);
+            color: var(--color-text);
+            background: var(--color-bg-elevated);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-sm);
+        }
+
+        .field::placeholder {
+            color: var(--color-text-faint);
+        }
+
+        .field:focus-visible,
+        .select:focus-visible {
+            outline: 2px solid var(--color-accent);
+            outline-offset: 0;
+        }
+
+        .paste {
+            width: 100%;
+            min-height: 8rem;
+            margin-top: var(--space-4);
+            font-family: var(--font-mono);
+            resize: vertical;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: var(--space-3);
+            margin-top: var(--space-4);
+        }
+
+        .controls label {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            font-size: var(--text-sm);
+            color: var(--color-text-muted);
+        }
+
+        .controls .spacer {
+            flex: 1;
+        }
+
+        .button {
+            padding: var(--space-2) var(--space-4);
+            font-family: var(--font-display);
+            font-size: var(--text-sm);
+            color: var(--color-text);
+            border: 1px solid var(--color-border-strong);
+            border-radius: var(--radius-pill);
+            cursor: pointer;
+            transition:
+                background-color var(--duration-fast) var(--ease-out),
+                transform var(--duration-base) var(--ease-bounce);
+        }
+
+        .button:hover {
+            background: var(--color-surface-hover);
+            transform: translateY(-1px);
+        }
+
+        .button--primary {
+            color: var(--color-on-accent);
+            background: var(--color-accent);
+            border-color: var(--color-accent);
+        }
+
+        .button--primary:hover {
+            background: var(--color-accent-strong);
+        }
+
+        .button--quiet {
+            color: var(--color-text-muted);
+            border-color: var(--color-border);
+        }
+
+        /* The file input hides behind its label, which looks like a button. */
+        .file-input {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            clip: rect(0 0 0 0);
+        }
+
+        .file-input:focus-visible + label {
+            outline: 2px solid var(--color-accent);
+        }
+
+        /* Rating sliders: leftmost stop is "no rating". ------------------- */
+
+        .slider {
+            width: 7rem;
+            height: 18px;
+            margin: 0;
+            accent-color: var(--color-accent);
+            cursor: pointer;
+        }
+
+        .slider__value {
+            display: inline-block;
+            min-width: 2em;
+            margin-left: var(--space-2);
+            font-family: var(--font-display);
+            font-size: var(--text-sm);
+            color: var(--color-text);
+            text-align: right;
+        }
+
+        /* Rows ----------------------------------------------------------- */
+
+        .rows {
+            width: 100%;
+            margin-top: var(--space-4);
+            border-collapse: collapse;
+        }
+
+        .rows th {
+            padding: var(--space-2) var(--space-2);
+            font-family: var(--font-display);
+            font-size: var(--text-xs);
+            font-weight: 500;
+            text-align: left;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--color-text-faint);
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .rows td {
+            padding: var(--space-1) var(--space-2);
+            border-bottom: 1px solid var(--color-border);
+            vertical-align: middle;
+        }
+
+        .rows .field,
+        .rows .select {
+            width: 100%;
+            padding: var(--space-1) var(--space-2);
+            background: transparent;
+            border-color: transparent;
+        }
+
+        .rows .field:hover,
+        .rows .select:hover {
+            border-color: var(--color-border);
+        }
+
+        .rows .field:focus-visible,
+        .rows .select:focus-visible {
+            background: var(--color-bg-elevated);
+        }
+
+        .col--index {
+            width: 2.5rem;
+            font-family: var(--font-display);
+            color: var(--color-text-faint);
+        }
+
+        .col--type {
+            width: 7rem;
+        }
+
+        .col--rating {
+            width: 10.5rem;
+            white-space: nowrap;
+        }
+
+        .col--remove {
+            width: 2.5rem;
+            text-align: right;
+        }
+
+        .remove {
+            padding: 0 var(--space-2);
+            font-size: var(--text-lg);
+            line-height: 1;
+            color: var(--color-text-faint);
+            border-radius: var(--radius-sm);
+        }
+
+        .remove:hover {
+            color: var(--color-accent);
+        }
+
+        .empty {
+            padding: var(--space-8);
+            text-align: center;
+            color: var(--color-text-faint);
+        }
+
+        .status {
+            min-height: 1.5em;
+            font-size: var(--text-sm);
+            color: var(--color-accent);
+        }
+
+        .preview {
+            width: 100%;
+            min-height: 12rem;
+            margin-top: var(--space-4);
+            font-family: var(--font-mono);
+            font-size: var(--text-xs);
+            resize: vertical;
+        }
+
+        @media (max-width: 640px) {
+            .page {
+                width: min(100% - var(--space-8), 960px);
+            }
+
+            .col--type,
+            .rows th:nth-child(3) {
+                display: none;
+            }
+
+            .slider {
+                width: 5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="page">
+        <h1 class="title">List Editor</h1>
+        <p class="lead">
+            Paste a list, tidy it up in a table, export it as text, JSON or CSV.
+            Rate things out of ten, in halves, with notes if you like. Nothing
+            here leaves your browser.
+        </p>
+
+        <section class="panel" aria-labelledby="paste-title">
+            <h2 class="panel__title" id="paste-title">Paste</h2>
+            <p class="panel__hint">
+                One title per line. <code>Title | rating | notes</code> works, so does
+                just the title, so do tab-separated columns from a spreadsheet.
+                To pick up where you left off, paste a whole exported list and load it.
+            </p>
+            <textarea class="field paste" id="paste" placeholder="Frieren: Beyond Journey's End | 9.5 | Quiet and devastating.&#10;Cowboy Bebop | 9&#10;Mob Psycho 100" aria-label="Pasted list"></textarea>
+            <div class="controls">
+                <label>Type
+                    <select class="select" id="paste-type">
+                        <option value="anime">anime</option>
+                        <option value="show">show</option>
+                        <option value="movie">movie</option>
+                    </select>
+                </label>
+                <label>Rating if missing
+                    <input class="slider" id="paste-rating" type="range" min="-0.5" max="10" step="0.5" value="-0.5">
+                    <output class="slider__value" id="paste-rating-value">&mdash;</output>
+                </label>
+                <button class="button button--primary" id="add" type="button">Add lines to the list</button>
+                <span class="spacer"></span>
+                <button class="button" id="load-text" type="button">Load whole list from above</button>
+            </div>
+        </section>
+
+        <section class="panel" aria-labelledby="rows-title">
+            <h2 class="panel__title" id="rows-title">List</h2>
+            <p class="panel__hint">Drag a slider all the way left to leave something unrated.</p>
+            <div class="controls">
+                <input class="file-input" id="import-file" type="file" accept=".txt,.json,.csv,text/plain,application/json,text/csv">
+                <label class="button" for="import-file">Import a file</label>
+                <button class="button" id="sort" type="button">Sort by rating</button>
+                <button class="button button--quiet" id="clear" type="button">Clear</button>
+                <span class="status" id="status" aria-live="polite"></span>
+            </div>
+            <table class="rows" id="rows-table">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Title</th>
+                        <th scope="col">Type</th>
+                        <th scope="col">Rating</th>
+                        <th scope="col">Notes</th>
+                        <th scope="col" aria-label="Remove"></th>
+                    </tr>
+                </thead>
+                <tbody id="rows"></tbody>
+            </table>
+            <p class="empty" id="empty">Nothing yet. Paste some titles above or import a file.</p>
+        </section>
+
+        <section class="panel" aria-labelledby="export-title">
+            <h2 class="panel__title" id="export-title">Export</h2>
+            <p class="panel__hint">Text keeps the list readable and re-loadable here. JSON and CSV are for other tools.</p>
+            <div class="controls">
+                <button class="button button--primary" id="copy" type="button">Copy text</button>
+                <button class="button" id="download" type="button">Download text</button>
+                <button class="button button--quiet" id="download-json" type="button">Download JSON</button>
+                <button class="button button--quiet" id="download-csv" type="button">Download CSV</button>
+            </div>
+            <textarea class="field preview" id="preview" readonly aria-label="Export preview"></textarea>
+        </section>
+    </main>
+
+    <script src="editor.js" type="module"></script>
+    <!-- Adds the "back to the menu" bar at the top of the page. -->
+    <script src="../../js/return-home.js" defer></script>
+</body>
+</html>
