@@ -1,355 +1,350 @@
-# Watch Log
+# Rated list
 #
 # One title per line:   Title | rating | notes
 #   rating  out of 10, halves allowed (7, 7.5, 8 ...)
 #   notes   optional
 # A line "# anime", "# show" or "# movie" sets the type for the lines
 # under it. Other # lines are comments. Blank lines are ignored.
-# Edit, commit, push, or build it with the List Editor on the site.
-
-# movie
-Wanted
-Army of Thieves
-Salt
-Hanna
-Anna
-Kingsman Secret Service
-The Man from U.N.C.L.E.
-The Gray Man
-Bullet Train
-The Old Guard
-Blackhat
-War Dogs
-Drive
-Baby Driver
-21
-Alita Battle Angel
-American Animals
-Layer Cake
-Gone Girl
-Mr. Right
-Collateral
-The Man from Nowhere
-Punch Drunk Love
-Live Die Repeat (Edge of Tomorrow)
-The Adjustment Bureau
-Limitless
-Antarctica: A Year on Ice
-Boss Level
-Parasite
-Nightcrawler
-Meet Joe Black
-Kick-Ass
-This Is Spinal Tap
-Hit Man
-Falling Down
-
-# show
-Person of Interest
-The Blacklist
-White Collar
-Killing Eve
-Heroes
-Limitless
-Fringe
-Lost
-Alias
-Dark
-Hanna
-Patriot
-The Booth at the End
-Suits
-Brooklyn 99
-Game of Thrones
-Breaking Bad
-Better Call Saul
-iZombie
-The Witcher
-Cursed
-The Good Place
-Lucifer
-Arrow
-Black Mirror
-Community
-The OA
-Warrior Nun
-Altered Carbon
-Kyle XY
-Travelers
-Startup
-The 4400
-House of Cards
-The Queens Gambit
-Bad Blood
-Lupin
-The Midnight Gospel
-One Punch Man
-Jupiter's Legacy
-Scrubs
-The Expanse
-Reacher
-Treadstone
-Psych
-Succession
-Chuck
-Covert Affairs
-Orphan Black
-Boston Legal
-Dead Like Me
-24
-Leverage
-Burn Notice
-Sneeky Pete
-Forever
-Prison Break
-Rick and Morty
-The Boys
-The Americans
-Invincible
-The Night Manager
-Homeland
-Futurama
-The Mandalorian
-The Book of Boba Fett
-Hawkeye
-Loki
-The Sopranos
-Utopia
-Peacemaker
-The Mentalist
-Counterpart
-You Are Wanted
-Deutschland 83
-Timeless
-The Flight Attendant
-Pushing Daisies
-Dollhouse
-New Amsterdam (2008)
-Fargo
-Inside Job
-The Librarians
-Superman and Lois
-An Idiot Abroad
-Captain Fall
-Who is Erin Carter?
-Solar Opposites
-One Piece (Live Action)
-I Think You Should Leave
-Resident Alien
-Imposters
-Warrior
-Elementary
-Fallout
-The Gentlemen
-Reaper
-Tires
-Fubar
-Royal Pains
-Murder Mindfully
-How I Met Your Mother
-Smallville
-Modern Family
-Solo Leveling
-Sakamoto Days
-Buffy the Vampire Slayer
-Angel
-The Recruit
-That Time I Got Reincarnated as a Slime
-A Discovery of Witches
-Castle
-Jericho
-Eureka
-11.22.63
-Banshee
-Severance
-Billions
-The Walking Dead
-Curb Your Enthusiasm
-Seinfeld
-Slow Horses
-The Glades
-Mad Men
-Cupid
 
 # anime
-Solo Leveling
-Sakamoto Days
-Spy x Family
-One Piece
-Buddy Daddies
-KILL BLUE
-That Time I Got Reincarnated as a Slime
-Kaguya-sama: Love is War
-Is It Wrong to Try to Pick Up Girls in a Dungeon?
-The Ossan Newbie Adventurer
-I Want to End this Love Game
-Black Summoner
-The New Gate
-The Devil is a Part-Timer
-Kaiju No. 8
-Cautious Hero
-Assassination Classroom
-To Your Eternity
-Wistoria: Wand and Sword
-In Another World With My Smartphone
-Plunderer
-Campfire Cooking in Another World
-Mushoku Tensei
-Clevatess
-ERASED
-I'm Quitting Heroing
-Suppose a Kid from the Last Dungeon Boonies Moved to a Starter Town
-The Unaware Atelier Meister
-Failure Frame
-My Next Life as a Villainess: All Roads Lead to Doom!
-More Than a Married Couple, but Not Lovers
-The Great Cleric
-Villainess Level 99
-I Was Reincarnated as the 7th Prince
-Mashle
-Black Clover
-My Hero Academia
-I Parry Everything
-One Punch Man
-JoJo’s Bizarre Adventure
-There Was a Cute Girl in the Hero’s Party, So I Tried Confessing to Her
-Wise Man's Grandchild
-Skeleton Knight in Another World
-Am I Actually the Strongest?
-The Brilliant Healer's New Life in the Shadows
-Scooped Up by an S-Rank Adventurer
-A Couple of Cuckoos
-The Angel Next Door Spoils Me Rotten
-Gals Can't Be Kind to Otaku!?
-Doctor Elise: The Royal Lady with the Lamp
-May I Ask for One Final Thing?
-The Quintessential Quintuplets
-Love After World Domination
-My Unique Skill Makes Me OP Even at Level 1
-Shangri La Frontier
-In the Land of Leadale
-Jujutsu Kaisen
-The Daily Life of the Immortal King
-Got a Cheat Skill in Another World and Became Unrivaled in the Real World Too
-The 8th Son? Are You Kidding Me?
-I'm a Noble on the Brink of Ruin, So I Might as Well Try Mastering Magic
-The Greatest Demon Lord is Reincarnated as a Typical Nobody
-Death March to the Parallel World Rhapsody
-Demon Lord, Retry!
-You and I Are Polar Opposites
-The Strongest Magician in the Demon Kings Army is a Human
-Banished from the Heros Party, I Decided to Live a Quiet Life in the Countryside
-Chilling in Another World with Level 2 Super Cheat Powers
-Berzerk of Gluttony
-Horimiya
-Tune In to the Midnight Heart
-Welcome to Japan, Miss Elf!
-My Dress-Up Darling
-By the Grace of the Gods
-The Misfit of Demon King Academy
-The Aristocrat's Otherworldly Adventure: Serving Gods Who Go To Far
-Eminence in Shadow
-The Beginning After the End
-Beast Tamer
-Tsukimichi: Moonlit Fantasy
-I May Be a Guild Receptionist, but I’ll Solo Any Boss to Clock Out on Time
-The Reincarnation of the Strongest Exorcist in Another World
-Champignon Witch
-The Wrong Way to Use Healing Magic
-A Returners Magic Should Be Special
-The Rising of the Shield Hero
-Life with an Ordinary Guy Who Reincarnated into a Total Fantasy Knockout
-Girlfriend, Girlfriend
-Akashic Records of Bastard Magic Instructor
-The Demon King’s Daughter Is Too Kind
-Code Geass
-Overlord
-The Fruit of Evolution
-Tomo-chan Is a Girl!
-The Iceblade Sorcerer Shall Rule the World
-Chilling in My 30s After Getting Fired from the Demon King's Army
-Alya Sometimes Hides Her Feelings in Russian
-My Instant Death Ability Is So Overpowered, No One in This Other World Stands a Chance Against Me
-My Love Story with Yamada-kun at Lv999
-She Professed Herself Pupil of the Wise Man
-New Saga
-Headhunted to Another World
-A Gatherer's Adventure in Isekai
-7th Time Loop
-Demon Slayer
-I'm the Evil Lord of an Intergalactic Empire
-Apocalypse Bringer Mynoghra
-A Galaxy Next Door
-You Can't Be in a Rom-Com with Your Childhood Friend
-The Too-Perfect Saint
-Betrothed to My Sister’s Ex
-Our Dating Story: The Experienced You and the Inexperienced Me
-Even Given the Worthless Appraiser Class
-Hana Kimi
-Handyman Saito in Another World
-Re:Monster
-Didn't I Say to Make My Abilities Average in the Next Life?!
-Bofuri
-Possibly the Greatest Alchemist of All Time
-The Unwanted Undead Adventurer
-The Villainess Is Adored by the Prince of the Neighboring Kingdom
-To Be Hero X
-The Water Magician
-Reincarnated as a Sword
-Shikimori's Not Just a Cutie!
-I've Been Killing Slimes for 300 Years and Maxxed Out My Level
-Why Raeliana Ended Up at the Duke’s Mansion
-Magic Maker: How to Make Magic in Another World
-Ascendance of a Bookworm
-A Gentle Noble’s Vacation Recommendation
-Attack on Titan
-Re:Zero
-The Daily Life of a Middle-Aged Online Shopper in Another World
-So I'm a Spider, So What?
-Mining Company Black
-The Most Heretical Last Boss Queen
-Demon King Daimao
-My Status as an Assassin Obviously Exceeds the Heros
-The Worlds Finest Assassin
-Ranking of Kings
-How Not to Summon a Demon Lord
-My Isekai Life
-The Irregular at Magic High School
-The Hidden Dungeon Only I Can Enter
-The Legendary Hero is Dead!
-Arifureta: From Commonplace to World's Strongest
-A Livid Lady's Guide to Getting Even: How I Crushed My Homeland with My Grimoires
-Hanaori-san Still Wants to Fight in the Next Life
-The Insipid Prince's Furtive Grab for the Throne
-The Duke's Son Claims He Won't Love Me, But Showers Me in Adoration
-Though I am an Inept Villainess
-The 100 Girlfriend Who Really Really Really Really Really Love You
-An Observation Log of My Fiance Who Calle Herself the Villainess
-KAIJU GIRL CARAMELISE
-Victoria of Many Faces
-The Oblivious Saint Can't Control Her Power
-BLACK TORCH
-The Villager of Level 999
-As a Reincarnated Aristocrat I'll Use My Appraisal Skill to Rise in the World
-Noblesse
-Shangri-La Frontier
-The Exiled Heavy Knight Knows How to Game the System
-From Overshadowed to Overpowered: Second Reincarnation of a Talentless Sage
-World's Strongest Rearguard
-I Became a Legend after My 10-Year Long Last Stand
-Tomb Raider King
-The Frontier Lord Begins with Zero Subjects
+Solo Leveling | 10
+Sakamoto Days | 10
+Spy x Family | 10
+One Piece | 10
+Buddy Daddies | 8.5
+KILL BLUE | 9
+That Time I Got Reincarnated as a Slime | 9.5
+Kaguya-sama: Love is War | 10
+Is It Wrong to Try to Pick Up Girls in a Dungeon? | 9
+The Ossan Newbie Adventurer | 9
+I Want to End this Love Game | 9
+Black Summoner | 8
+The New Gate | 7
+The Devil is a Part-Timer | 8.5
+Kaiju No. 8 | 8
+Cautious Hero | 6.5
+Assassination Classroom | 8.5
+To Your Eternity | 8
+Wistoria: Wand and Sword | 6.5
+In Another World With My Smartphone | 5
+Plunderer | 7.5
+Campfire Cooking in Another World | 8
+Mushoku Tensei | 8.5
+Clevatess | 8
+ERASED | 9
+I'm Quitting Heroing | 7.5
+Suppose a Kid from the Last Dungeon Boonies Moved to a Starter Town | 7.5
+The Unaware Atelier Meister | 7
+Failure Frame | 8.5
+My Next Life as a Villainess: All Roads Lead to Doom! | 10
+More Than a Married Couple, but Not Lovers | 9.5
+The Great Cleric | 9
+Villainess Level 99 | 8.5
+I Was Reincarnated as the 7th Prince | 8
+Mashle | 8.5
+Black Clover | 9
+My Hero Academia | 8.5
+I Parry Everything | 8
+One Punch Man | 9 | Season 3 hurt this rating.
+JoJo’s Bizarre Adventure | 9
+There Was a Cute Girl in the Hero’s Party, So I Tried Confessing to Her | 8
+Wise Man's Grandchild | 7.5
+Skeleton Knight in Another World | 7.5
+Am I Actually the Strongest? | 8
+The Brilliant Healer's New Life in the Shadows | 8
+Scooped Up by an S-Rank Adventurer | 8
+A Couple of Cuckoos | 8.5
+The Angel Next Door Spoils Me Rotten | 8.5
+Gals Can't Be Kind to Otaku!? | 8.5
+Doctor Elise: The Royal Lady with the Lamp | 9
+May I Ask for One Final Thing? | 8.5
+The Quintessential Quintuplets | 9
+Love After World Domination | 7
+My Unique Skill Makes Me OP Even at Level 1 | 8.5
+In the Land of Leadale | 8.5
+Jujutsu Kaisen | 7
+The Daily Life of the Immortal King | 7
+Got a Cheat Skill in Another World and Became Unrivaled in the Real World Too | 7.5
+The 8th Son? Are You Kidding Me? | 7.5
+I'm a Noble on the Brink of Ruin, So I Might as Well Try Mastering Magic | 8.5
+The Greatest Demon Lord is Reincarnated as a Typical Nobody | 7.5
+Death March to the Parallel World Rhapsody | 8
+Demon Lord, Retry! | 7
+You and I Are Polar Opposites | 9
+The Strongest Magician in the Demon Kings Army is a Human | 7.5
+Banished from the Heros Party, I Decided to Live a Quiet Life in the Countryside | 7
+Chilling in Another World with Level 2 Super Cheat Powers | 8
+Berzerk of Gluttony | 8.5
+Horimiya | 8.5
+Tune In to the Midnight Heart | 9.5
+Welcome to Japan, Miss Elf! | 8.5
+My Dress-Up Darling | 9
+By the Grace of the Gods | 7.5
+The Misfit of Demon King Academy | 9
+The Aristocrat's Otherworldly Adventure: Serving Gods Who Go To Far | 7.5
+Eminence in Shadow | 8
+The Beginning After the End | 8
+Beast Tamer | 7.5
+Tsukimichi: Moonlit Fantasy | 8
+I May Be a Guild Receptionist, but I’ll Solo Any Boss to Clock Out on Time | 8
+The Reincarnation of the Strongest Exorcist in Another World | 8
+Champignon Witch | 7.5
+The Wrong Way to Use Healing Magic | 7.5
+A Returners Magic Should Be Special | 7.5
+The Rising of the Shield Hero | 7
+Life with an Ordinary Guy Who Reincarnated into a Total Fantasy Knockout | 6.5
+Girlfriend, Girlfriend | 8.5
+Akashic Records of Bastard Magic Instructor | 8
+The Demon King’s Daughter Is Too Kind | 7.5
+Code Geass | 7.5
+Overlord | 8
+The Fruit of Evolution | 7.5
+Tomo-chan Is a Girl! | 7
+The Iceblade Sorcerer Shall Rule the World | 6.5
+Chilling in My 30s After Getting Fired from the Demon King's Army | 6
+Alya Sometimes Hides Her Feelings in Russian | 6.5
+My Instant Death Ability Is So Overpowered, No One in This Other World Stands a Chance Against Me | 8.5
+My Love Story with Yamada-kun at Lv999 | 7.5
+She Professed Herself Pupil of the Wise Man | 7
+New Saga | 6.5
+Headhunted to Another World | 6
+A Gatherer's Adventure in Isekai | 6
+7th Time Loop | 5
+Demon Slayer | 6.5
+I'm the Evil Lord of an Intergalactic Empire | 7.5
+Apocalypse Bringer Mynoghra | 7.5
+A Galaxy Next Door | 8
+You Can't Be in a Rom-Com with Your Childhood Friend | 8.5
+The Too-Perfect Saint | 6.5
+Betrothed to My Sister’s Ex | 7
+Our Dating Story: The Experienced You and the Inexperienced Me | 6.5
+Even Given the Worthless Appraiser Class | 6.5
+Hana Kimi | 6.5
+Handyman Saito in Another World | 4.5
+Re:Monster | 5
+Didn't I Say to Make My Abilities Average in the Next Life?! | 6
+Bofuri | 6.5
+Possibly the Greatest Alchemist of All Time | 6
+The Unwanted Undead Adventurer | 7
+The Villainess Is Adored by the Prince of the Neighboring Kingdom | 6.5
+To Be Hero X | 7.5
+The Water Magician | 7
+Reincarnated as a Sword | 6.5
+Shikimori's Not Just a Cutie! | 7
+I've Been Killing Slimes for 300 Years and Maxxed Out My Level | 5
+Why Raeliana Ended Up at the Duke’s Mansion | 5.5
+Magic Maker: How to Make Magic in Another World | 7
+Ascendance of a Bookworm | 7
+A Gentle Noble’s Vacation Recommendation | 4.5
+Attack on Titan | 6
+Re:Zero | 5.5
+The Daily Life of a Middle-Aged Online Shopper in Another World | 4
+So I'm a Spider, So What? | 7
+Mining Company Black | 5
+The Most Heretical Last Boss Queen | 8
+Demon King Daimao | 6.5
+My Status as an Assassin Obviously Exceeds the Heros | 4.5
+The Worlds Finest Assassin | 5.5
+Ranking of Kings | 6
+How Not to Summon a Demon Lord | 6
+My Isekai Life | 4
+The Irregular at Magic High School | 3.5
+The Hidden Dungeon Only I Can Enter | 3.5
+The Legendary Hero is Dead! | 2.5
+Arifureta: From Commonplace to World's Strongest | 0
+A Livid Lady's Guide to Getting Even: How I Crushed My Homeland with My Grimoires | 8.5
+Hanaori-san Still Wants to Fight in the Next Life | 6
+The Insipid Prince's Furtive Grab for the Throne | 7.5
+The Duke's Son Claims He Won't Love Me, But Showers Me in Adoration | 7.5
+Though I am an Inept Villainess | 10
+The 100 Girlfriend Who Really Really Really Really Really Love You | 8.5
+An Observation Log of My Fiance Who Calle Herself the Villainess | 7.5
+KAIJU GIRL CARAMELISE | 8.5
+Victoria of Many Faces | 9
+The Oblivious Saint Can't Control Her Power | 7
+BLACK TORCH | 6.5
+The Villager of Level 999 | 7.5
+As a Reincarnated Aristocrat I'll Use My Appraisal Skill to Rise in the World | 7
+Noblesse | 8
+Shangri-La Frontier | 8.5
+The Exiled Heavy Knight Knows How to Game the System | 8
+From Overshadowed to Overpowered: Second Reincarnation of a Talentless Sage | 4.5
+World's Strongest Rearguard | 4.5
+I Became a Legend after My 10-Year Long Last Stand | 7
+Tomb Raider King | 8
+The Frontier Lord Begins with Zero Subjects | 6
 Nina the Starry Bride
-MY love STORY!!
-The Problem Children are Coming from Another World Aren't They?
-The Genius Prince's Guide to Raising a Nation Out of Debt
-Hero Without a Class
-From Bureaucrat to Villainess: Dad's Been Reincarnated
-My Gift Lvl 9999 Unlimited Gacha
-The Klutzy Class Monitor and the Girl with the Short Skirt
-Vermeil in Gold
-The Demon Sword Master of Excalibur Academy
-Chivalry of a Failed Knight
-HELL MODE
-Ragna Crimson
-Undead Unluck
+MY love STORY!! | 5
+The Problem Children are Coming from Another World Aren't They? | 2.5
+The Genius Prince's Guide to Raising a Nation Out of Debt | 7
+Hero Without a Class | 7.5
+From Bureaucrat to Villainess: Dad's Been Reincarnated | 7.5
+My Gift Lvl 9999 Unlimited Gacha | 8.5
+The Klutzy Class Monitor and the Girl with the Short Skirt | 9
+Vermeil in Gold | 7.5
+The Demon Sword Master of Excalibur Academy | 6
+Chivalry of a Failed Knight | 5
+HELL MODE | 8.5
+Ragna Crimson | 7.5
+Undead Unluck | 8.5
+
+# show
+Person of Interest | 10
+The Blacklist | 8.5
+White Collar | 8
+Killing Eve | 9.5
+Heroes | 9
+Limitless | 6.5
+Fringe | 9.5
+Lost | 9
+Alias | 8
+Dark | 10
+Hanna | 8.5
+Patriot | 10
+The Booth at the End | 10
+Suits | 8
+Brooklyn 99 | 7.5
+Game of Thrones | 6.5
+Breaking Bad | 7.5
+Better Call Saul | 9
+iZombie | 8.5
+The Witcher | 7
+Cursed | 7.5
+The Good Place | 9.5
+Lucifer | 10
+Arrow | 6.5 | S1 is the best by far. It gets a 9.5 but the later seasons drag it down substantially.
+Black Mirror | 8
+Community | 5
+The OA | 9
+Warrior Nun | 8
+Altered Carbon | 7
+Kyle XY | 8.5
+Travelers | 9.5
+Startup | 8
+The 4400 | 7.5
+House of Cards | 6.5
+The Queens Gambit | 8.5
+Bad Blood | 7.5
+Lupin | 7.5
+The Midnight Gospel | 9
+Jupiter's Legacy | 6
+Scrubs | 8.5
+The Expanse | 8.5
+Reacher | 6
+Treadstone | 6.5
+Psych | 7.5
+Succession | 7.5
+Chuck | 8.5
+Covert Affairs | 7.5
+Orphan Black | 7
+Boston Legal | 8
+Dead Like Me | 8
+24 | 7.5
+Leverage | 9
+Burn Notice | 9
+Sneeky Pete | 7.5
+Forever | 9.5
+Prison Break | 7.5 | Goes off the rails after the first two seasons.
+Rick and Morty | 9
+The Boys | 8
+The Americans | 10
+Invincible | 9
+The Night Manager | 9
+Homeland | 8
+Futurama | 8
+The Mandalorian | 7.5
+The Book of Boba Fett | 5
+Hawkeye | 5.5
+Loki | 9
+The Sopranos | 8
+Utopia | 7
+Peacemaker | 9
+The Mentalist | 9.5
+Counterpart | 10
+You Are Wanted | 8
+Deutschland 83 | 6.5
+Timeless | 8
+The Flight Attendant | 5.5
+Pushing Daisies | 9.5
+Dollhouse | 7.5
+New Amsterdam (2008) | 8.5
+Fargo | 9
+Inside Job | 7
+The Librarians | 7.5
+Superman and Lois | 7.5
+An Idiot Abroad | 10
+Captain Fall | 6.5
+Who is Erin Carter? | 6
+Solar Opposites | 6.5
+One Piece (Live Action) | 10
+I Think You Should Leave | 8.5
+Resident Alien | 7
+Imposters | 7
+Warrior | 9.5
+Elementary | 7.5
+Fallout | 8.5
+The Gentlemen | 9
+Reaper | 9
+Tires | 8
+Fubar | 7.5
+Royal Pains | 8
+Murder Mindfully | 8.5
+How I Met Your Mother | 8
+Smallville | 8
+Modern Family | 9.5
+Sakamoto Days | 10
+Buffy the Vampire Slayer | 9.5
+Angel | 8.5
+The Recruit | 7.5
+A Discovery of Witches | 5
+Castle | 8
+Jericho | 7.5
+Eureka | 7.5
+11.22.63 | 9.5
+Banshee | 7.5
+Severance | 7.5
+Billions | 7.5
+The Walking Dead | 7.5
+Curb Your Enthusiasm | 10
+Seinfeld | 10
+Slow Horses | 7
+The Glades | 7.5
+Mad Men | 8
+Cupid | 9
+
+# movie
+Wanted | 8
+Army of Thieves | 8
+Salt | 8
+Hanna | 7
+Anna | 7.5
+Kingsman Secret Service | 8
+The Man from U.N.C.L.E. | 7.5
+The Gray Man | 7.5
+Bullet Train | 8
+The Old Guard | 7.5
+Blackhat | 7
+War Dogs | 8
+Drive | 7
+Baby Driver | 8.5
+21 | 7.5
+Alita Battle Angel | 8
+American Animals | 10
+Layer Cake | 8.5
+Gone Girl | 8.5
+Mr. Right | 8.5
+Collateral | 8
+The Man from Nowhere | 7.5
+Punch Drunk Love | 7
+Live Die Repeat (Edge of Tomorrow) | 9.5
+The Adjustment Bureau | 9
+Limitless | 8.5
+Antarctica: A Year on Ice | 10
+Boss Level | 6
+Parasite | 9
+Nightcrawler | 8.5
+Meet Joe Black | 8
+Kick-Ass | 9
+This Is Spinal Tap | 10
+Hit Man | 7.5
+Falling Down | 9.5

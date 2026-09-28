@@ -112,19 +112,21 @@ function toLogText(name, text) {
 
 /* Rendering --------------------------------------------------------------- */
 
-function ratingDots(rating) {
-    const dots = document.createElement("span");
-    dots.className = "dots";
-    dots.setAttribute("aria-hidden", "true");
+/** Five bars, two points each, filled left to right by the exact fraction. */
+function ratingBars(rating) {
+    const bars = document.createElement("span");
+    bars.className = "bars";
+    bars.setAttribute("aria-hidden", "true");
 
     for (let i = 0; i < 5; i += 1) {
-        const dot = document.createElement("span");
-        const filled = rating / 2 - i;
-        dot.className = `dot${filled >= 1 ? " dot--on" : filled >= 0.5 ? " dot--half" : ""}`;
-        dots.append(dot);
+        const bar = document.createElement("span");
+        const fill = Math.max(0, Math.min(1, rating / 2 - i));
+        bar.className = "bar";
+        bar.style.setProperty("--fill", `${Math.round(fill * 100)}%`);
+        bars.append(bar);
     }
 
-    return dots;
+    return bars;
 }
 
 function cell(className, content) {
@@ -162,7 +164,7 @@ function createRow(entry, rank) {
         const number = document.createElement("span");
         number.className = "rating__number";
         number.textContent = String(entry.rating);
-        rating.append(ratingDots(entry.rating), number);
+        rating.append(ratingBars(entry.rating), number);
     }
 
     row.append(

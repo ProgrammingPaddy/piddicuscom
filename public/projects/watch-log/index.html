@@ -255,24 +255,22 @@
             color: var(--color-text);
         }
 
-        .dots {
+        /* Five rounded bars, each worth two points and filled left to right
+           by the exact fraction, so 9 and 9.5 look different. */
+        .bars {
             display: inline-flex;
             gap: 3px;
         }
 
-        .dot {
-            width: 9px;
-            height: 9px;
-            background: var(--color-border-strong);
-            border-radius: 50%;
-        }
-
-        .dot--on {
-            background: var(--color-accent);
-        }
-
-        .dot--half {
-            background: linear-gradient(90deg, var(--color-accent) 50%, var(--color-border-strong) 50%);
+        .bar {
+            width: 16px;
+            height: 8px;
+            background: linear-gradient(
+                90deg,
+                var(--color-accent) var(--fill, 0%),
+                var(--color-border-strong) var(--fill, 0%)
+            );
+            border-radius: 4px;
         }
 
         .cell--notes {
@@ -320,7 +318,7 @@
                 width: auto;
             }
 
-            .dots {
+            .bars {
                 display: none;
             }
         }
