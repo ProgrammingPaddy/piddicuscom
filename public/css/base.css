@@ -23,6 +23,7 @@
     --color-secondary: #a16564;
     --color-on-accent: #2a1220;
     --color-shimmer: #cdb4ff;
+    --color-danger: #ffb4b4;
 
     /* Card illustrations (public/previews/*.svg are inlined and read these).
        A theme can restyle every preview by redefining this block. */
@@ -112,6 +113,7 @@
     --space-24: 6rem;
 
     /* Shape */
+    --radius-xs: 6px;
     --radius-sm: 10px;
     --radius-md: 16px;
     --radius-lg: 26px;

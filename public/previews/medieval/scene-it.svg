@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" width="320" height="200" role="img" aria-label="A stack of slate tablets, the front one sealed as seen">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="var(--preview-bg-top, #2a221a)"/>
+      <stop offset="1" stop-color="var(--preview-bg-bottom, #1d1813)"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="320" height="200" fill="url(#bg)"/>
+
+  <!-- Plate border with corner studs -->
+  <rect x="7" y="7" width="306" height="186" fill="none" stroke="var(--preview-accent, #d6a65a)" stroke-width="1" opacity="0.4"/>
+  <g fill="var(--preview-accent, #d6a65a)" opacity="0.7">
+    <rect x="4" y="4" width="6" height="6" transform="rotate(45 7 7)"/>
+    <rect x="310" y="4" width="6" height="6" transform="rotate(45 313 7)"/>
+    <rect x="4" y="190" width="6" height="6" transform="rotate(45 7 193)"/>
+    <rect x="310" y="190" width="6" height="6" transform="rotate(45 313 193)"/>
+  </g>
+
+  <!-- Tablets waiting underneath, fanned back -->
+  <g transform="rotate(-6 160 96)">
+    <rect x="104" y="30" width="112" height="132" fill="var(--preview-panel, #393022)" opacity="0.5"/>
+    <rect x="104" y="30" width="112" height="132" fill="none" stroke="var(--preview-accent, #d6a65a)" stroke-width="1" opacity="0.25"/>
+  </g>
+  <g transform="rotate(-3 160 96)">
+    <rect x="104" y="30" width="112" height="132" fill="var(--preview-panel, #393022)" opacity="0.75"/>
+    <rect x="104" y="30" width="112" height="132" fill="none" stroke="var(--preview-accent, #d6a65a)" stroke-width="1" opacity="0.35"/>
+  </g>
+
+  <!-- The tablet in front: bronze rim, engraved title strokes, a rank of studs -->
+  <g transform="rotate(4 160 96)">
+    <rect x="104" y="30" width="112" height="132" fill="var(--preview-panel, #393022)"/>
+    <rect x="104" y="30" width="112" height="132" fill="none" stroke="var(--preview-accent, #d6a65a)" stroke-width="1" opacity="0.6"/>
+    <rect x="109" y="35" width="102" height="122" fill="none" stroke="var(--preview-accent, #d6a65a)" stroke-width="0.6" opacity="0.3"/>
+    <g fill="var(--preview-accent, #d6a65a)" opacity="0.8">
+      <rect x="107" y="32" width="5" height="5" transform="rotate(45 109.5 34.5)"/>
+      <rect x="208" y="32" width="5" height="5" transform="rotate(45 210.5 34.5)"/>
+      <rect x="107" y="155" width="5" height="5" transform="rotate(45 109.5 157.5)"/>
+      <rect x="208" y="155" width="5" height="5" transform="rotate(45 210.5 157.5)"/>
+    </g>
+    <text x="160" y="56" font-family="Cinzel, 'Times New Roman', serif" font-size="9" font-weight="700" fill="var(--preview-accent, #d6a65a)" text-anchor="middle" letter-spacing="1">MCMXCIV</text>
+    <g fill="var(--preview-cream, #eee2cb)" opacity="0.8">
+      <rect x="118" y="66" width="84" height="7" rx="1"/>
+      <rect x="118" y="80" width="58" height="7" rx="1"/>
+    </g>
+    <g fill="var(--preview-line, #c4b294)" opacity="0.6">
+      <rect x="118" y="98" width="44" height="4" rx="1"/>
+      <rect x="118" y="108" width="68" height="4" rx="1"/>
+      <rect x="118" y="118" width="52" height="4" rx="1"/>
+    </g>
+    <g fill="var(--preview-accent, #d6a65a)">
+      <rect x="121" y="136" width="8" height="8" transform="rotate(45 125 140)"/>
+      <rect x="139" y="136" width="8" height="8" transform="rotate(45 143 140)"/>
+      <rect x="157" y="136" width="8" height="8" transform="rotate(45 161 140)"/>
+      <rect x="175" y="136" width="8" height="8" transform="rotate(45 179 140)"/>
+      <rect x="193" y="136" width="8" height="8" transform="rotate(45 197 140)" fill="none" stroke="var(--preview-accent, #d6a65a)" stroke-width="1"/>
+    </g>
+  </g>
+
+  <!-- Not seen: a dark roundel struck through, to the left -->
+  <circle cx="46" cy="96" r="22" fill="var(--preview-ink, #1d1915)" stroke="var(--preview-accent, #d6a65a)" stroke-width="1.5" opacity="0.9"/>
+  <circle cx="46" cy="96" r="17" fill="none" stroke="var(--preview-accent, #d6a65a)" stroke-width="0.6" opacity="0.4"/>
+  <path d="M38 88 l16 16 M54 88 l-16 16" stroke="var(--preview-line, #c4b294)" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- Seen: a bronze seal, to the right -->
+  <circle cx="274" cy="96" r="22" fill="var(--preview-accent, #d6a65a)"/>
+  <circle cx="274" cy="96" r="17" fill="none" stroke="var(--preview-on-accent, #23180a)" stroke-width="0.8" opacity="0.5"/>
+  <path d="M263 97 l7 7 l15 -16" fill="none" stroke="var(--preview-on-accent, #23180a)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Marks toward the seal -->
+  <g fill="var(--preview-accent, #d6a65a)" opacity="0.6">
+    <rect x="231" y="75" width="6" height="6" transform="rotate(45 234 78)"/>
+    <rect x="235" y="93" width="6" height="6" transform="rotate(45 238 96)"/>
+    <rect x="231" y="111" width="6" height="6" transform="rotate(45 234 114)"/>
+  </g>
+</svg>

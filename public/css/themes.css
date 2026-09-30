@@ -26,6 +26,7 @@
     --color-secondary: #7d4b2a;
     --color-on-accent: #23180a;
     --color-shimmer: #fff0c2;
+    --color-danger: #d97a5a;
 
     --preview-bg-top: #2a221a;
     --preview-bg-bottom: #1d1813;
@@ -63,6 +64,7 @@
     --text-2xl: 1.9rem;
     --text-tagline: clamp(1.5rem, 3.8vw, 2.4rem);
 
+    --radius-xs: 2px;
     --radius-sm: 3px;
     --radius-md: 5px;
     --radius-lg: 8px;
@@ -240,6 +242,7 @@
     --color-secondary: #1e6fd0;
     --color-on-accent: #05233a;
     --color-shimmer: #ffffff;
+    --color-danger: #ffa08e;
 
     --preview-bg-top: #0e2f4e;
     --preview-bg-bottom: #082238;
@@ -271,6 +274,7 @@
     --font-title: "Quicksand", "Nunito", system-ui, sans-serif;
     --font-body: "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
 
+    --radius-xs: 8px;
     --radius-sm: 12px;
     --radius-md: 18px;
     --radius-lg: 30px;

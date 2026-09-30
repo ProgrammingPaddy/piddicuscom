@@ -79,6 +79,9 @@
       "description": "Flick through popular movies and TV shows, mark the ones you have seen, rate them, export the list.",
       "icon": null,
       "preview": "previews/scene-it.svg",
+      "previews": {
+        "medieval": "previews/medieval/scene-it.svg"
+      },
       "tags": [
         "tools"
       ],

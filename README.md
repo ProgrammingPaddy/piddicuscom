@@ -54,7 +54,8 @@ one title per line as `Title | rating | notes` (rating out of 10 in halves,
 notes optional) under `# anime`, `# show` or `# movie` lines that set the
 type. Edit, commit, push. Nobody else can change it because only commits can.
 The Watch List Editor project on the site builds that file: paste titles one per
-line, set types and ratings in a table, export (also JSON and CSV).
+line, set types and ratings in a table, export (also JSON and CSV). Scene It
+exports the same format from the titles you mark as seen.
 
 **Back-to-menu bar.** Add one line anywhere in the project's HTML:
 

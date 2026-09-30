@@ -44,6 +44,7 @@ import {
 const EXCLUDED_FROM_COPY = new Set([
     ".git",
     ".github",
+    ".claude",
     ".gitignore",
     ".gitattributes",
     ".gitmodules",
