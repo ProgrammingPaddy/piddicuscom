@@ -74,15 +74,15 @@
       "href": "projects/list-editor/"
     },
     {
-      "slug": "movie-list-creator",
-      "title": "Seen It",
-      "description": "Flick through thousands of popular movies, mark the ones you have seen, rate them, export the list anywhere.",
+      "slug": "scene-it",
+      "title": "Scene It",
+      "description": "Flick through popular movies and TV shows, mark the ones you have seen, rate them, export the list.",
       "icon": null,
-      "preview": "previews/movie-list-creator.svg",
+      "preview": "previews/scene-it.svg",
       "tags": [
         "tools"
       ],
-      "href": "projects/movie-list-creator/"
+      "href": "projects/scene-it/"
     }
   ]
 }
