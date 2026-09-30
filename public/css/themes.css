@@ -254,12 +254,17 @@
 
     /* A breaker in the lower half of the view. */
     --backdrop-scene: wave;
-    --backdrop-opacity: 0.62;
+    --backdrop-opacity: 0.9;
     --backdrop-vignette: none;
-    --wave-deep: #0a3a6a;
-    --wave-mid: #1f8ae0;
-    --wave-light: #8ae9ff;
-    --wave-foam: #f2fcff;
+    --wave-deep: #0b4a86;
+    --wave-mid: #14a6e6;
+    --wave-light: #6fe6f2;
+    --wave-foam: #f4fdff;
+    --wave-sun: #fff7dc;
+    --wave-sky: #3d9ff0;
+    --wave-horizon: #cfefff;
+    --wave-surfer: #ff7a3d;
+    --wave-board: #ffd43b;
 
     /* Rounded and light, like the lettering. */
     --font-display: "Quicksand", "Nunito", system-ui, sans-serif;
@@ -289,6 +294,18 @@
 
 [data-theme="water"] .hero__tagline {
     font-weight: 600;
+    text-shadow: 0 1px 12px rgba(6, 26, 46, 0.6);
+}
+
+/* Chips and the count keep a little water behind them for legibility. */
+[data-theme="water"] .chip,
+[data-theme="water"] .menu__count {
+    background: rgba(6, 26, 46, 0.45);
+}
+
+[data-theme="water"] .menu__count {
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-pill);
 }
 
 /* The header is a solid band rather than frosted glass: blurring what

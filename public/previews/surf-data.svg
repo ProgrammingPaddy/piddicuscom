@@ -29,9 +29,9 @@
     <rect x="252" y="82" width="32" height="66" rx="7" fill="var(--preview-accent, #fec6d9)"/>
   </g>
   <!-- Trend across the bar tops -->
-  <path d="M68 52 C 85 52, 100 86, 118 86 S 150 90, 168 90 S 200 76, 218 76 S 250 82, 268 82" fill="none" stroke="var(--preview-tertiary, #cdb4ff)" stroke-width="2" stroke-linecap="round" opacity="0.9"/>
+  <path d="M68 44 C 85 44, 100 86, 118 86 S 150 90, 168 90 S 200 76, 218 76 S 250 82, 268 82" fill="none" stroke="var(--preview-tertiary, #cdb4ff)" stroke-width="2" stroke-linecap="round" opacity="0.9"/>
   <g fill="var(--preview-tertiary, #cdb4ff)">
-    <circle cx="68" cy="52" r="3.5"/>
+    <circle cx="68" cy="44" r="3.5"/>
     <circle cx="118" cy="86" r="3.5"/>
     <circle cx="168" cy="90" r="3.5"/>
     <circle cx="218" cy="76" r="3.5"/>

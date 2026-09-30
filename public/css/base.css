@@ -62,6 +62,11 @@
     --wave-mid: #a16564;
     --wave-light: #fec6d9;
     --wave-foam: #fff0f6;
+    --wave-sun: #fff6f9;
+    --wave-sky: #4a2a4a;
+    --wave-horizon: #a16564;
+    --wave-surfer: #a16564;
+    --wave-board: #fec6d9;
 
     /* Cards: the outline (drawn by js/cards.js) and the material. */
     --card-fill-start: var(--color-accent);

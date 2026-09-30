@@ -16,10 +16,12 @@
  *           smaller one, both scaled up (which turns stepped strokes into
  *           smooth gradients); only the fine detail is drawn at full
  *           size. Colours are the --forge-* tokens.
- *   wave    Inside the barrel of a wave that never stops breaking: the tube
- *           wall in perspective, lit from a bright eye, with water running
- *           along it, the lip pouring down into whitewater and spray, and a
- *           small surfer riding the floor. Colours are the --wave-* tokens.
+ *   wave    Inside the barrel of a wave, looking out along it to the point
+ *           where the wave's bottom and top meet by the horizon; through
+ *           the open side lie sky, sun, a distant island and calm sea.
+ *           Water climbs the face and goes over, foam clings to the lip,
+ *           and a surfer rides the face who can be picked up and thrown.
+ *           Colours are the --wave-* tokens.
  *
  * Both paint a canvas that CSS stretches over the viewport (the lava lamp
  * at half resolution, being per-pixel work), redraw at a capped frame rate
@@ -68,13 +70,17 @@ const FORGE = {
 
 const WAVE = {
     scale: 0.5,               // canvas pixels per CSS pixel
-    rings: 30,                // rings of the tube wall between mouth and eye
-    squash: 0.92,             // rings are a little wider than tall
-    streaks: 30,              // streaks of water running along the wall
-    curtain: 44,              // falling strands in the lip's curtain
-    foamClumps: 36,           // foam clumps in the whitewater
-    spray: 80,                // most spray drops alive at once
-    surfer: 0.085,            // the surfer's height, as a fraction of the view
+    rings: 44,                // cross-sections painted between the far point and the viewer
+    reach: 1.8,               // how far past the bottom of the view the nearest section lies
+    squash: 0.9,              // sections are a little wider than tall
+    streaks: 64,              // striations climbing the wall
+    flare: 0.5,               // how far a striation moves out to hug the curl at the crest
+    crash: 48,                // blobs in the mask that shapes the crashing whitewater
+    ripples: 9,               // ripples on the calm water
+    glitter: 60,              // flecks of sun on the calm water
+    spray: 220,               // most spray drops alive at once
+    surfer: 0.1,              // the surfer's height, as a fraction of the unit
+    foamSize: 256,            // px, the foam tile (seamless)
     gravity: 520,             // CSS px per second squared
 };
 
@@ -778,28 +784,53 @@ function createForgeScene(canvas, context, animate) {
 /* Wave -------------------------------------------------------------------- */
 
 /**
- * Inside the barrel of a wave that never stops breaking. The tube runs
- * away from the viewer to a bright eye left of centre: its wall is a stack
- * of rings drawn in perspective, each a little smaller and further off
- * than the last, lit from the eye and darkening towards the mouth. Water
- * streaks run along the wall and over, the lip pours down on the left in
- * a curtain that lands in whitewater and spray, the flat water inside the
- * tube ripples, and a small surfer rides it towards the mouth, trailing a
- * wake. Everything moves all the time; nothing needs to reset.
+ * Inside the barrel of a wave, looking out along it. The geometry:
  *
- * A few dozen fills and strokes per frame, painted at half resolution.
+ *   - The far end of the tube is a single point near the horizon, where
+ *     the bottom of the wave and the top of the wave meet.
+ *   - Every cross-section of the wave is an arc: it starts on the wave's
+ *     bottom line (which runs from that far point down to the bottom left
+ *     of the view), sweeps up the face on the right, over the ceiling, and
+ *     ends on the lip line (which runs from the far point up over the top
+ *     of the view and down the far left as the lip curls in the
+ *     foreground). Nearer cross-sections are bigger.
+ *   - The arcs never close: below and left of them is the open side of the
+ *     wave, and through it lie sky above the horizon and calm water below,
+ *     water the wave has not yet drawn up.
+ *
+ * The wall is painted as the union of those arcs (full ellipses, near to
+ * far, darkest nearest and brightest by the far point where the water is
+ * thinnest), then the open region is drawn over it: sky, sun, a cloud, a
+ * distant island, calm sea with the sky's light on it. Water climbs the
+ * face and goes over as moving striations; foam clings along the lip and
+ * drips; a surfer rides the face towards the far point, and can be picked
+ * up, dragged and thrown.
  */
 function createWaveScene(canvas, context, animate) {
     const { scale } = WAVE;
     let width = 0;
     let height = 0;
+    let unit = 0;
     let colors = readColors();
+    let foamTile = null;
+    let foamPattern = null;
     let lastNow = null;
+    let lastT = 0;
     const spray = [];
     const random = createRandom(SEED);
     const streaks = Array.from({ length: WAVE.streaks }, () => [random(), random(), random()]);
-    const curtain = Array.from({ length: WAVE.curtain }, () => [random(), random(), random()]);
-    const foamSeeds = Array.from({ length: WAVE.foamClumps }, () => [random(), random(), random()]);
+    const ripples = Array.from({ length: WAVE.ripples }, () => [random(), random(), random()]);
+    const hills = Array.from({ length: 5 }, () => [random(), random(), random()]);
+    const cloudPuffs = Array.from({ length: 7 }, () => [random(), random(), random()]);
+    const glitter = Array.from({ length: WAVE.glitter }, () => [random(), random(), random()]);
+    const crashBlobs = Array.from({ length: WAVE.crash }, () => [random(), random(), random(), random()]);
+    const foamLayer = document.createElement("canvas");
+    const foamContext = foamLayer.getContext("2d", { alpha: true });
+    let foamLayerPattern = null;
+
+    /* The surfer is riding the face, held by the pointer, flying after a
+       throw, or paddling back to the face; `state` says which. */
+    const surfer = { x: 0, y: 0, vx: 0, vy: 0, grabX: 0, grabY: 0, placed: false, state: "riding" };
 
     function readColors() {
         return {
@@ -807,63 +838,204 @@ function createWaveScene(canvas, context, animate) {
             mid: readColor(canvas, "--wave-mid"),
             light: readColor(canvas, "--wave-light"),
             foam: readColor(canvas, "--wave-foam"),
+            sun: readColor(canvas, "--wave-sun"),
+            sky: readColor(canvas, "--wave-sky"),
+            horizon: readColor(canvas, "--wave-horizon"),
+            surfer: readColor(canvas, "--wave-surfer"),
+            board: readColor(canvas, "--wave-board"),
         };
     }
 
-    /* The tube ------------------------------------------------------------- */
+    /* Textures ------------------------------------------------------------- */
+
+    /** Seamless value noise on a wrapping lattice, in [0, 1]. */
+    function noiseTile(size, octaves, seed) {
+        const rand = createRandom(seed);
+        const smooth = (f) => f * f * (3 - 2 * f);
+        const layers = octaves.map(([cells, weight]) => {
+            const lattice = Array.from({ length: cells * cells }, () => rand());
+            const at = (i, j) => lattice[((j + cells) % cells) * cells + ((i + cells) % cells)];
+            return { cells, weight, at };
+        });
+        const values = new Float32Array(size * size);
+
+        for (let y = 0; y < size; y += 1) {
+            for (let x = 0; x < size; x += 1) {
+                let value = 0;
+
+                for (const { cells, weight, at } of layers) {
+                    const gx = (x / size) * cells;
+                    const gy = (y / size) * cells;
+                    const i = Math.floor(gx);
+                    const j = Math.floor(gy);
+                    const fx = smooth(gx - i);
+                    const fy = smooth(gy - j);
+                    const top = at(i, j) * (1 - fx) + at(i + 1, j) * fx;
+                    const bottom = at(i, j + 1) * (1 - fx) + at(i + 1, j + 1) * fx;
+                    value += weight * (top * (1 - fy) + bottom * fy);
+                }
+
+                values[y * size + x] = value;
+            }
+        }
+
+        return values;
+    }
 
     /**
-     * The ring `k` of the way from the eye (0) to the mouth (1): its centre
-     * slides from the eye towards the lower right and its radius grows
-     * quickly, as a tunnel does in perspective. The eye breathes a little.
+     * A seamless tile of foam: layered noise cut to ragged white patches,
+     * with smaller, darker noise punching bubble holes in them.
+     */
+    function makeFoam() {
+        const size = WAVE.foamSize;
+        const body = noiseTile(size, [[4, 0.5], [9, 0.3], [20, 0.2]], 19);
+        const holes = noiseTile(size, [[24, 0.6], [48, 0.4]], 23);
+        const tile = document.createElement("canvas");
+        tile.width = size;
+        tile.height = size;
+
+        const tileContext = tile.getContext("2d");
+        const image = tileContext.createImageData(size, size);
+
+        for (let i = 0; i < size * size; i += 1) {
+            const patch = clamp01((body[i] - 0.3) / 0.26);
+            const hole = clamp01((holes[i] - 0.7) / 0.1);
+            const alpha = patch * (1 - hole * 0.7);
+            image.data[i * 4] = 255;
+            image.data[i * 4 + 1] = 255;
+            image.data[i * 4 + 2] = 255;
+            image.data[i * 4 + 3] = Math.round(alpha * 255);
+        }
+
+        tileContext.putImageData(image, 0, 0);
+        return tile;
+    }
+
+    /* Geometry ------------------------------------------------------------- */
+
+    /** The far point of the tube, where the wave's bottom and top meet. */
+    function farPoint() {
+        return { x: width * 0.5 + unit * 0.3, y: height * 0.52 };
+    }
+
+    /**
+     * Cross-section `k` of the wave: 0 is the far point, 1 the section
+     * whose bottom reaches the bottom of the view, larger is nearer still.
+     * Each is an ellipse; only the part of it from its bottom angle round to
+     * its end angle is wave.
      */
     function ring(k, t) {
-        const eye = { x: width * 0.36, y: height * 0.5 };
-        const mouth = { x: width * 0.86, y: height * 0.64 };
-        const inner = height * (0.055 + 0.006 * Math.sin(t * 1.3));
-        const outer = height * 0.9;
-        const p = k ** 1.6;
+        const far = farPoint();
+        const breathe = 1 + 0.012 * Math.sin(t * 1.1);
 
         return {
-            x: eye.x + (mouth.x - eye.x) * p,
-            y: eye.y + (mouth.y - eye.y) * p,
-            r: inner + (outer - inner) * p,
+            x: far.x - unit * 0.45 * k,
+            y: far.y - unit * 0.2 * k,
+            r: unit * 0.9 * k * breathe,
+            bottom: Math.PI * 0.45,
+            end: -Math.PI * Math.min(1.3, 0.55 + 0.8 * k),
         };
     }
 
-    /** A point on ring `k` at angle `a` (screen angle, clockwise from +x). */
+    /** A point on ring `k` at angle `a` (clockwise from +x). */
     function onRing(k, a, t) {
         const c = ring(k, t);
         return [c.x + Math.cos(a) * c.r, c.y + Math.sin(a) * c.r * WAVE.squash];
     }
 
-    function ellipse(c, alpha, style) {
-        context.globalAlpha = alpha;
-        context.fillStyle = style;
+    /**
+     * The open side of the wave: the lip line (arc ends, near to far),
+     * the far point, then the bottom line (arc bottoms, far to near).
+     */
+    function openingPath(t) {
+        const far = farPoint();
+        const steps = 36;
+
         context.beginPath();
-        context.ellipse(c.x, c.y, c.r, c.r * WAVE.squash, 0, 0, TAU);
-        context.fill();
-        context.globalAlpha = 1;
-    }
 
-    /** Where the floor meets the wall: the bottom of each ring, and flat to the left. */
-    function floorEdge(t) {
-        const points = [];
-        const far = ring(0, t);
-        points.push([-20, far.y + far.r * WAVE.squash]);
+        for (let i = steps; i >= 1; i -= 1) {
+            const k = (i / steps) * WAVE.reach;
+            const c = ring(k, t);
+            const [x, y] = onRing(k, c.end, t);
 
-        for (let i = 0; i <= 24; i += 1) {
-            const c = ring(i / 24, t);
-            points.push([c.x, c.y + c.r * WAVE.squash]);
+            if (i === steps) {
+                context.moveTo(x, y);
+            } else {
+                context.lineTo(x, y);
+            }
         }
 
-        points.push([width + 20, points[points.length - 1][1]]);
+        context.lineTo(far.x, far.y);
+
+        for (let i = 1; i <= steps; i += 1) {
+            const k = (i / steps) * WAVE.reach;
+            const c = ring(k, t);
+            const [x, y] = onRing(k, c.bottom, t);
+            context.lineTo(x, y);
+        }
+
+        context.closePath();
+    }
+
+    /** Points along the lip line, near to far, for stroking. */
+    function lipPoints(t, from, to, steps) {
+        const points = [];
+
+        for (let i = 0; i <= steps; i += 1) {
+            const k = from + (to - from) * (i / steps);
+            const c = ring(k, t);
+            points.push(onRing(k, c.end, t));
+        }
+
         return points;
     }
 
-    /* Foam, spray, surfer -------------------------------------------------- */
+    /** Points along the bottom line, far to near. */
+    function bottomPoints(t, steps) {
+        const points = [];
 
-    function spawnSpray(x, y, count, vx, vy) {
+        for (let i = 0; i <= steps; i += 1) {
+            const k = (i / steps) * WAVE.reach;
+            const c = ring(k, t);
+            points.push(onRing(k, c.bottom, t));
+        }
+
+        return points;
+    }
+
+    /** Height of the water where a falling surfer lands, at x. */
+    function waterAt(x, t) {
+        const far = farPoint();
+        const bottoms = bottomPoints(t, 24);
+
+        for (let i = 1; i < bottoms.length; i += 1) {
+            const [x0, y0] = bottoms[i - 1];
+            const [x1, y1] = bottoms[i];
+
+            if (x <= x0 && x >= x1) {
+                const f = clamp01((x - x0) / ((x1 - x0) || 1));
+                return y0 + (y1 - y0) * f;
+            }
+        }
+
+        return x > far.x ? far.y + unit * 0.02 : far.y + unit * 0.14;
+    }
+
+    function polyline(points) {
+        context.beginPath();
+
+        for (let i = 0; i < points.length; i += 1) {
+            if (i === 0) {
+                context.moveTo(points[i][0], points[i][1]);
+            } else {
+                context.lineTo(points[i][0], points[i][1]);
+            }
+        }
+    }
+
+    /* Spray ---------------------------------------------------------------- */
+
+    function spawnSpray(x, y, count, vx, vy, size = 1) {
         for (let i = 0; i < count && spray.length < WAVE.spray; i += 1) {
             const life = 0.5 + Math.random() * 0.9;
             spray.push({
@@ -871,7 +1043,7 @@ function createWaveScene(canvas, context, animate) {
                 y: y + (Math.random() - 0.5) * 16,
                 vx: vx + (Math.random() - 0.5) * 120,
                 vy: vy + (Math.random() - 0.5) * 120,
-                r: 1.2 + Math.random() * 2.6,
+                r: (1.2 + Math.random() * 2.4) * size,
                 life,
                 max: life,
             });
@@ -880,6 +1052,8 @@ function createWaveScene(canvas, context, animate) {
 
     function drawSpray(dt) {
         const { foam } = colors;
+
+        context.lineCap = "round";
 
         for (let i = spray.length - 1; i >= 0; i -= 1) {
             const drop = spray[i];
@@ -895,293 +1069,669 @@ function createWaveScene(canvas, context, animate) {
             drop.x += drop.vx * dt;
             drop.y += drop.vy * dt;
 
-            context.fillStyle = rgba(foam, 0.85 * (drop.life / drop.max));
+            context.strokeStyle = rgba(foam, 0.85 * (drop.life / drop.max));
+            context.lineWidth = drop.r * 2;
             context.beginPath();
-            context.arc(drop.x, drop.y, drop.r, 0, TAU);
-            context.fill();
+            context.moveTo(drop.x, drop.y);
+            context.lineTo(drop.x - drop.vx * 0.03, drop.y - drop.vy * 0.03);
+            context.stroke();
         }
     }
 
+    /* The surfer ----------------------------------------------------------- */
+
+    /** Where the surfer rides when left alone: on the face, just above the bottom line. */
+    function surferHome(t) {
+        const [x, y] = onRing(0.5, Math.PI * 0.3 + Math.sin(t * 0.4) * 0.02, t);
+        return { x, y };
+    }
+
+    function updateSurfer(t, dt) {
+        const h = unit * WAVE.surfer;
+        const home = surferHome(t);
+
+        if (!surfer.placed) {
+            surfer.x = home.x;
+            surfer.y = home.y;
+            surfer.placed = true;
+            surfer.state = "riding";
+        }
+
+        if (surfer.state === "held") {
+            return;
+        }
+
+        if (surfer.state === "riding") {
+            surfer.x = home.x;
+            surfer.y = home.y + Math.sin(t * 2.3) * h * 0.04;
+            return;
+        }
+
+        if (surfer.state === "flying") {
+            surfer.vy += WAVE.gravity * 1.4 * dt;
+            surfer.x += surfer.vx * dt;
+            surfer.y += surfer.vy * dt;
+
+            const landing = waterAt(surfer.x, t) - h * 0.5;
+
+            if (surfer.vy > 0 && surfer.y >= landing) {
+                spawnSpray(surfer.x, landing + h * 0.4, Math.min(30, 6 + surfer.vy / 40), 0, -220, 1.4);
+                surfer.y = landing;
+                surfer.vx = 0;
+                surfer.vy = 0;
+                surfer.state = "paddling";
+            }
+        } else {
+            const ease = Math.min(1, 1.6 * dt);
+            surfer.x += (home.x - surfer.x) * ease;
+            surfer.y += (home.y - surfer.y) * ease;
+
+            if (Math.hypot(home.x - surfer.x, home.y - surfer.y) < h * 0.12) {
+                surfer.state = "riding";
+            }
+        }
+
+        surfer.x = Math.max(h, Math.min(width - h, surfer.x));
+        surfer.y = Math.max(-h, Math.min(height + h, surfer.y));
+    }
+
     /**
-     * A surfer crouched on a board, seen from the side, riding towards the
-     * mouth: a dark silhouette against the bright water, bobbing with the
-     * ride, and a fan of wake off the tail.
+     * The surfer, lounging along the board in the famous pose: on his side,
+     * propped on one elbow with his head in his hand, the other hand on his
+     * hip, one knee up, looking at the viewer through round glasses. A few
+     * simple shapes. Drawn along -x, with the board's tail at +x.
      */
     function drawSurfer(t) {
-        const { foam } = colors;
-        const h = height * WAVE.surfer;
-        const floor = floorEdge(t);
-        const x = width * 0.45 + Math.sin(t * 0.7) * width * 0.02;
-        const at = floor.find((point) => point[0] >= x) || floor[floor.length - 1];
-        const y = at[1] - h * 0.5 + Math.sin(t * 2.3) * h * 0.06;
-        const tilt = -0.14 + Math.sin(t * 1.7) * 0.06;
+        const { foam, surfer: suit, board, deep, sun } = colors;
+        const h = unit * WAVE.surfer;
+        const lean = { riding: 0.3, held: -0.25, flying: 0.2, paddling: 0.1 }[surfer.state];
+        const tilt = lean + Math.sin(t * 1.7) * 0.04;
+        const bob = Math.sin(t * 5) * h * 0.012;
 
         context.save();
-        context.translate(x, y);
+        context.translate(surfer.x, surfer.y);
         context.rotate(tilt);
+        context.scale(-1, 1);
 
-        /* Wake: a fan of white off the tail, and drops. */
-        context.fillStyle = rgba(foam, 0.5);
+        if (surfer.state === "riding" || surfer.state === "paddling") {
+            context.fillStyle = rgba(foam, 0.7);
+            context.beginPath();
+            context.moveTo(-h * 0.7, h * 0.5);
+            context.quadraticCurveTo(-h * 1.5, h * 0.2 + Math.sin(t * 9) * h * 0.05, -h * 2.1, h * 0.5);
+            context.quadraticCurveTo(-h * 1.4, h * 0.66, -h * 0.7, h * 0.58);
+            context.closePath();
+            context.fill();
+        }
+
+        /* Board: rounded nose, a stripe. */
+        context.save();
+        context.translate(0, h * 0.5);
+        context.rotate(-0.08);
+        context.fillStyle = rgba(board);
         context.beginPath();
-        context.moveTo(-h * 0.7, h * 0.5);
-        context.quadraticCurveTo(-h * 1.4, h * 0.25 + Math.sin(t * 9) * h * 0.05, -h * 1.9, h * 0.55);
-        context.quadraticCurveTo(-h * 1.3, h * 0.65, -h * 0.7, h * 0.58);
+        context.moveTo(-h * 0.7, 0);
+        context.quadraticCurveTo(-h * 0.7, -h * 0.11, -h * 0.4, -h * 0.11);
+        context.lineTo(h * 0.4, -h * 0.11);
+        context.quadraticCurveTo(h * 0.8, -h * 0.11, h * 0.8, 0);
+        context.quadraticCurveTo(h * 0.8, h * 0.11, h * 0.4, h * 0.11);
+        context.lineTo(-h * 0.4, h * 0.11);
+        context.quadraticCurveTo(-h * 0.7, h * 0.11, -h * 0.7, 0);
         context.closePath();
         context.fill();
+        context.strokeStyle = rgba(suit, 0.9);
+        context.lineWidth = h * 0.035;
+        context.beginPath();
+        context.moveTo(-h * 0.58, 0);
+        context.lineTo(h * 0.65, 0);
+        context.stroke();
+        context.restore();
 
-        const ink = rgba([6, 18, 36, 1], 0.92);
-        context.strokeStyle = ink;
-        context.fillStyle = ink;
+        context.translate(0, bob);
         context.lineCap = "round";
         context.lineJoin = "round";
 
-        /* Board. */
+        /* Legs along the board: the far one straight, the near one with its
+           knee up. */
+        context.strokeStyle = rgba(suit);
+        context.lineWidth = h * 0.11;
         context.beginPath();
-        context.ellipse(0, h * 0.5, h * 0.8, h * 0.09, -0.08, 0, TAU);
-        context.fill();
-
-        /* Legs, torso, arms. */
-        context.lineWidth = h * 0.075;
-        context.beginPath();
-        context.moveTo(-h * 0.36, h * 0.44);
-        context.lineTo(-h * 0.2, h * 0.24);
-        context.lineTo(h * 0.02, h * 0.1);
-        context.moveTo(-h * 0.06, h * 0.44);
-        context.lineTo(h * 0.12, h * 0.28);
-        context.lineTo(h * 0.02, h * 0.1);
-        context.lineTo(h * 0.26, -h * 0.24);
-        context.moveTo(h * 0.26, -h * 0.24);
-        context.lineTo(h * 0.62, -h * 0.08);
-        context.moveTo(h * 0.26, -h * 0.24);
-        context.lineTo(-h * 0.08, -h * 0.02);
+        context.moveTo(h * 0.02, h * 0.3);
+        context.lineTo(-h * 0.55, h * 0.36);
+        context.moveTo(h * 0.0, h * 0.28);
+        context.lineTo(-h * 0.26, h * 0.1);
+        context.lineTo(-h * 0.5, h * 0.34);
         context.stroke();
 
-        /* Head. */
+        /* Feet. */
+        context.fillStyle = rgba(deep);
         context.beginPath();
-        context.arc(h * 0.37, -h * 0.4, h * 0.11, 0, TAU);
+        context.ellipse(-h * 0.6, h * 0.37, h * 0.07, h * 0.045, 0.3, 0, TAU);
+        context.ellipse(-h * 0.55, h * 0.35, h * 0.07, h * 0.045, 0.3, 0, TAU);
         context.fill();
+
+        /* Torso, lying along the board and rising to the shoulders. */
+        context.fillStyle = rgba(suit);
+        context.beginPath();
+        context.ellipse(h * 0.2, h * 0.2, h * 0.26, h * 0.13, -0.32, 0, TAU);
+        context.fill();
+
+        /* The arm propping him up: elbow on the board, hand under the cheek. */
+        context.strokeStyle = rgba(suit);
+        context.lineWidth = h * 0.09;
+        context.beginPath();
+        context.moveTo(h * 0.36, h * 0.1);
+        context.lineTo(h * 0.5, h * 0.36);
+        context.lineTo(h * 0.62, h * 0.02);
+        context.stroke();
+
+        /* The other arm, hand on the hip. */
+        context.beginPath();
+        context.moveTo(h * 0.32, h * 0.08);
+        context.lineTo(h * 0.16, h * 0.18);
+        context.lineTo(h * 0.02, h * 0.18);
+        context.stroke();
+        context.fillStyle = rgba(sun);
+        context.beginPath();
+        context.arc(h * 0.0, h * 0.18, h * 0.055, 0, TAU);
+        context.arc(h * 0.63, h * 0.0, h * 0.055, 0, TAU);
+        context.fill();
+
+        /* Head, resting on the hand, turned to the viewer. */
+        const headX = h * 0.5;
+        const headY = -h * 0.1;
+        const headR = h * 0.17;
+        context.fillStyle = rgba(sun);
+        context.beginPath();
+        context.arc(headX, headY, headR, 0, TAU);
+        context.fill();
+
+        /* Hair at the sides only. */
+        context.fillStyle = rgba(deep);
+        context.beginPath();
+        context.ellipse(headX - headR * 0.95, headY + headR * 0.05, h * 0.05, h * 0.07, 0, 0, TAU);
+        context.ellipse(headX + headR * 0.95, headY + headR * 0.05, h * 0.05, h * 0.07, 0, 0, TAU);
+        context.fill();
+
+        /* Round glasses, a brow, and a smug little smile. */
+        context.strokeStyle = rgba(deep);
+        context.lineWidth = h * 0.02;
+        context.beginPath();
+        context.arc(headX - headR * 0.36, headY + headR * 0.05, headR * 0.28, 0, TAU);
+        context.moveTo(headX + headR * 0.64, headY + headR * 0.05);
+        context.arc(headX + headR * 0.36, headY + headR * 0.05, headR * 0.28, 0, TAU);
+        context.moveTo(headX - headR * 0.08, headY + headR * 0.05);
+        context.lineTo(headX + headR * 0.08, headY + headR * 0.05);
+        context.stroke();
+        context.fillStyle = rgba(deep);
+        context.beginPath();
+        context.arc(headX - headR * 0.36, headY + headR * 0.08, h * 0.018, 0, TAU);
+        context.arc(headX + headR * 0.36, headY + headR * 0.08, h * 0.018, 0, TAU);
+        context.fill();
+        context.beginPath();
+        context.arc(headX + headR * 0.1, headY + headR * 0.45, headR * 0.3, Math.PI * 0.1, Math.PI * 0.7);
+        context.stroke();
 
         context.restore();
 
-        if (animate && Math.random() < 0.6) {
-            spawnSpray(x - h * 1.2, y + h * 0.4, 1, -60, -90);
+        /* Spray off the tail: the tail's spot in the world, then a drop
+           thrown back along the board and up. */
+        if (animate && surfer.state === "riding" && Math.random() < 0.7) {
+            const tailX = h * 0.7;
+            const tailY = h * 0.5;
+            const x = surfer.x + tailX * Math.cos(tilt) - tailY * Math.sin(tilt);
+            const y = surfer.y + tailX * Math.sin(tilt) + tailY * Math.cos(tilt);
+            spawnSpray(x, y, 1, Math.cos(tilt) * 90, Math.sin(tilt) * 90 - 80, 0.8);
+        }
+    }
+
+    /* The open side --------------------------------------------------------- */
+
+    /** Sky, sun, cloud, island and calm sea, clipped to the open side. */
+    function drawOpenSide(t) {
+        const { sky, horizon, mid, deep, foam, sun } = colors;
+        const far = farPoint();
+        const horizonY = far.y + unit * 0.005;
+
+        context.save();
+        openingPath(t);
+        context.clip();
+
+        /* Sky, warm towards the horizon. */
+        const skyFill = context.createLinearGradient(0, 0, 0, horizonY);
+        skyFill.addColorStop(0, rgba(sky));
+        skyFill.addColorStop(0.7, rgba(mix(sky, horizon, 0.6)));
+        skyFill.addColorStop(1, rgba(horizon));
+        context.fillStyle = skyFill;
+        context.fillRect(0, 0, width, horizonY + 1);
+
+        /* The sun, low, a little left of the far point. */
+        const sunX = far.x - unit * 0.16;
+        const sunY = horizonY - unit * 0.12;
+        const sunGlow = context.createRadialGradient(sunX, sunY, 0, sunX, sunY, unit * 0.5);
+        sunGlow.addColorStop(0, rgba(sun, 1));
+        sunGlow.addColorStop(0.08, rgba(sun, 0.9));
+        sunGlow.addColorStop(0.3, rgba(sun, 0.35));
+        sunGlow.addColorStop(1, rgba(sun, 0));
+        context.fillStyle = sunGlow;
+        context.fillRect(0, 0, width, horizonY + 2);
+
+        /* A cloud drifting through. */
+        const cloudX = width * 0.15 + ((t * 8 + width * 0.1) % (width * 0.5));
+        const cloudY = horizonY - unit * 0.24;
+
+        for (const [a, b, d] of cloudPuffs) {
+            const px = cloudX + (a - 0.5) * unit * 0.24;
+            const py = cloudY - b * unit * 0.04 + Math.abs(a - 0.5) * unit * 0.04;
+            const r = unit * (0.025 + d * 0.03);
+            const puff = context.createRadialGradient(px, py - r * 0.3, r * 0.1, px, py, r);
+            puff.addColorStop(0, rgba(foam, 0.95));
+            puff.addColorStop(0.7, rgba(foam, 0.8));
+            puff.addColorStop(1, rgba(foam, 0));
+            context.fillStyle = puff;
+            context.fillRect(px - r, py - r, r * 2, r * 2);
+        }
+
+        /* Calm sea, from the horizon down to the viewer. */
+        const seaFill = context.createLinearGradient(0, horizonY, 0, height);
+        seaFill.addColorStop(0, rgba(mix(horizon, mid, 0.5)));
+        seaFill.addColorStop(0.35, rgba(mid));
+        seaFill.addColorStop(1, rgba(deep));
+        context.fillStyle = seaFill;
+        context.fillRect(0, horizonY, width, height - horizonY);
+
+        /* Islands on the horizon: a faint one far off, a nearer one in
+           front, both left of the far point. */
+        const island = (left, span, scaleY, tone, alpha) => {
+            context.fillStyle = rgba(tone, alpha);
+            context.beginPath();
+            context.moveTo(left, horizonY + 1);
+
+            for (let i = 0; i <= 30; i += 1) {
+                const f = i / 30;
+                let rise = 0;
+
+                for (const [a, b, d] of hills) {
+                    rise += Math.max(0, 1 - Math.abs(f - (0.15 + a * 0.7)) / (0.1 + b * 0.2)) * (0.03 + d * 0.06);
+                }
+
+                context.lineTo(left + f * span, horizonY - rise * unit * scaleY * Math.sin(f * Math.PI));
+            }
+
+            context.lineTo(left + span, horizonY + 1);
+            context.closePath();
+            context.fill();
+        };
+
+        island(far.x - unit * 1.25, unit * 0.7, 0.28, mix(horizon, sky, 0.5), 0.8);
+        island(far.x - unit * 0.7, unit * 0.5, 0.5, mix(deep, sky, 0.35), 0.9);
+
+        /* Haze where the sea meets the sky. */
+        const haze = context.createLinearGradient(0, horizonY - unit * 0.08, 0, horizonY + unit * 0.06);
+        haze.addColorStop(0, rgba(foam, 0));
+        haze.addColorStop(0.55, rgba(foam, 0.32));
+        haze.addColorStop(1, rgba(foam, 0));
+        context.fillStyle = haze;
+        context.fillRect(0, horizonY - unit * 0.08, width, unit * 0.14);
+
+        /* The sun's light lying on the water, and the sky's. */
+        context.save();
+        context.translate(sunX, horizonY + unit * 0.02);
+        context.scale(0.35, 1);
+        const path = context.createRadialGradient(0, 0, 0, 0, 0, unit * 0.45);
+        path.addColorStop(0, rgba(sun, 0.6));
+        path.addColorStop(0.4, rgba(sun, 0.22));
+        path.addColorStop(1, rgba(sun, 0));
+        context.fillStyle = path;
+        context.fillRect(-unit, -unit * 0.05, unit * 2, unit * 0.6);
+        context.restore();
+
+        /* Glitter: the sun on the water, flickering. */
+        context.lineCap = "round";
+        context.lineWidth = 2;
+
+        for (const [a, b, d] of glitter) {
+            const spread = 0.05 + b * 0.35;
+            const x = sunX + (a - 0.5) * unit * spread;
+            const y = horizonY + unit * 0.012 + b * b * unit * 0.3;
+            const flicker = 0.5 + 0.5 * Math.sin(t * (4 + d * 5) + d * 40);
+            context.strokeStyle = rgba(sun, 0.7 * flicker * (1 - b * 0.6));
+            context.beginPath();
+            context.moveTo(x - unit * 0.004 * (1 + b * 3), y);
+            context.lineTo(x + unit * 0.004 * (1 + b * 3), y);
+            context.stroke();
+        }
+
+        /* Ripples on the calm water, sliding away towards the horizon. */
+        context.lineWidth = 1.5;
+
+        for (const [a, b, d] of ripples) {
+            const f = ((a - t * 0.04 * (0.6 + d)) % 1 + 1) % 1;
+            const y = horizonY + unit * 0.02 + (height - horizonY) * f * f;
+            context.strokeStyle = rgba(foam, 0.2 * (1 - f) * (0.4 + d * 0.6));
+            context.beginPath();
+
+            for (let x = -20; x <= width + 20; x += 14) {
+                const yy = y + Math.sin(x * (0.012 + b * 0.01) + t * 1.4 + b * 20) * (1.5 + f * 8);
+
+                if (x === -20) {
+                    context.moveTo(x, yy);
+                } else {
+                    context.lineTo(x, yy);
+                }
+            }
+
+            context.stroke();
+        }
+
+        context.restore();
+    }
+
+    /* The crash ------------------------------------------------------------ */
+
+    /**
+     * Where the lip comes down on the left: a mass of whitewater along the
+     * curl and piled up where it lands. On its own layer, a mask of blobs
+     * that heave and roll is drawn first, then the foam texture is kept
+     * only where the mask is, over a solid white body, so the mass churns
+     * inside and boils at its edges. Spray flies off it and mist hangs
+     * over it.
+     */
+    function drawCrash(t) {
+        const { foam } = colors;
+        const boxX = -20;
+        const boxY = height * 0.15;
+        const boxW = width * 0.75;
+        const boxH = height * 0.85 + 40;
+
+        if (foamLayer.width !== Math.round(boxW * scale) || foamLayer.height !== Math.round(boxH * scale)) {
+            foamLayer.width = Math.max(4, Math.round(boxW * scale));
+            foamLayer.height = Math.max(4, Math.round(boxH * scale));
+            foamLayerPattern = foamTile ? foamContext.createPattern(foamTile, "repeat") : null;
+        }
+
+        /* Anchors along the curl, from a little way up it down to where it
+           lands, and the pile at the bottom. */
+        const curl = lipPoints(t, 0.5, 1.02, 14);
+        const base = curl[curl.length - 1];
+
+        foamContext.setTransform(scale, 0, 0, scale, -boxX * scale, -boxY * scale);
+        foamContext.clearRect(boxX, boxY, boxW, boxH);
+
+        for (const [a, b, d, e] of crashBlobs) {
+            const along = curl[Math.min(curl.length - 1, Math.floor(a * curl.length))];
+            const pile = b < 0.45;
+            const roll = t * (0.7 + d * 0.9) + e * TAU;
+            const px = pile
+                ? base[0] + (b / 0.45) * unit * 0.42 + Math.cos(roll) * unit * 0.03
+                : along[0] + (d - 0.35) * unit * 0.12 + Math.cos(roll) * unit * 0.02;
+            const py = pile
+                ? base[1] - d * unit * 0.22 + Math.sin(roll * 1.3) * unit * 0.025
+                : along[1] + (e - 0.5) * unit * 0.08 + Math.sin(roll) * unit * 0.02;
+            const r = unit * (pile ? 0.07 + d * 0.09 : 0.04 + d * 0.05) * (0.88 + 0.12 * Math.sin(t * 2.4 + e * TAU));
+            const blob = foamContext.createRadialGradient(px, py, 0, px, py, r);
+            blob.addColorStop(0, "rgba(255, 255, 255, 1)");
+            blob.addColorStop(0.55, "rgba(255, 255, 255, 0.85)");
+            blob.addColorStop(1, "rgba(255, 255, 255, 0)");
+            foamContext.fillStyle = blob;
+            foamContext.fillRect(px - r, py - r, r * 2, r * 2);
+        }
+
+        if (foamLayerPattern && typeof foamLayerPattern.setTransform === "function") {
+            foamContext.globalCompositeOperation = "source-in";
+            foamLayerPattern.setTransform(new DOMMatrix().translate(t * unit * 0.08, -t * unit * 0.14).scale(unit * 0.0017));
+            foamContext.fillStyle = foamLayerPattern;
+            foamContext.fillRect(boxX, boxY, boxW, boxH);
+            foamContext.globalCompositeOperation = "source-atop";
+            foamLayerPattern.setTransform(new DOMMatrix().translate(-t * unit * 0.1, -t * unit * 0.1).scale(unit * 0.0008));
+            foamContext.globalAlpha = 0.6;
+            foamContext.fillRect(boxX, boxY, boxW, boxH);
+            const body = foamContext.createRadialGradient(base[0] + unit * 0.18, base[1] - unit * 0.06, unit * 0.02, base[0] + unit * 0.18, base[1] - unit * 0.06, unit * 0.45);
+            body.addColorStop(0, "rgba(255, 255, 255, 0.95)");
+            body.addColorStop(0.5, "rgba(255, 255, 255, 0.7)");
+            body.addColorStop(1, "rgba(255, 255, 255, 0.35)");
+            foamContext.fillStyle = body;
+            foamContext.globalAlpha = 1;
+            foamContext.fillRect(boxX, boxY, boxW, boxH);
+            foamContext.globalCompositeOperation = "source-over";
+        }
+
+        /* Mist over the landing, then the whitewater, twice for weight. */
+        const mist = context.createRadialGradient(base[0] + unit * 0.18, base[1] - unit * 0.15, unit * 0.02, base[0] + unit * 0.18, base[1] - unit * 0.15, unit * 0.45);
+        mist.addColorStop(0, rgba(foam, 0.6));
+        mist.addColorStop(1, rgba(foam, 0));
+        context.fillStyle = mist;
+        context.fillRect(base[0] - unit * 0.3, base[1] - unit * 0.65, unit, unit);
+
+        context.drawImage(foamLayer, boxX, boxY, boxW, boxH);
+        context.globalAlpha = 0.75;
+        context.drawImage(foamLayer, boxX, boxY, boxW, boxH);
+        context.globalAlpha = 1;
+
+        if (animate) {
+            spawnSpray(base[0] + unit * (0.02 + Math.random() * 0.4), base[1] - unit * 0.2, 6, (Math.random() - 0.3) * 200, -380, 1.3);
+            const along = curl[Math.floor(Math.random() * curl.length)];
+            spawnSpray(along[0], along[1], 2, -40, 60, 1);
         }
     }
 
     /* A frame --------------------------------------------------------------- */
 
     function draw(t, dt) {
-        const { deep, mid, light, foam } = colors;
-        const eye = ring(0, t);
+        const { deep, mid, light, foam, sun } = colors;
+        const far = farPoint();
 
-        /* Spray haze beyond the lip, top left. */
-        const haze = context.createRadialGradient(width * 0.12, height * 0.18, 10, width * 0.12, height * 0.18, height * 0.7);
-        haze.addColorStop(0, rgba(foam, 0.35));
-        haze.addColorStop(1, rgba(foam, 0));
-        context.fillStyle = haze;
+        /* The wall: every cross-section from nearest to farthest, darkest
+           nearest, brightest by the far point where the water is thinnest
+           and the sun comes through it. */
+        context.fillStyle = rgba(deep);
         context.fillRect(0, 0, width, height);
 
-        /* The wall: rings from the mouth in to the eye, darkest nearest. The
-           bands creep outward, so the water seems to pour over towards us. */
-        const drift = (t * 0.06) % (1 / WAVE.rings);
-        ellipse(ring(1, t), 1, rgba(deep));
-
-        for (let i = WAVE.rings; i >= 0; i -= 1) {
-            const k = Math.min(1, i / WAVE.rings + drift);
+        /* Painted as annuli, outermost first, so each pixel is filled once
+           rather than under every larger section. */
+        for (let i = WAVE.rings; i >= 1; i -= 1) {
+            const k = (i / WAVE.rings) * WAVE.reach;
+            const f = k / WAVE.reach;
             const c = ring(k, t);
-            const shade = mix(light, deep, Math.sqrt(k));
-            ellipse(c, 0.45, rgba(shade));
+            const inner = ring(((i - 1) / WAVE.rings) * WAVE.reach, t);
+
+            /* Each section is lit across itself: its lower right, the face,
+               is thin backlit water, bright and green; its upper left, the
+               ceiling, is thick and dark. Nearer sections are darker overall. */
+            const face = f < 0.5 ? mix(light, mid, f / 0.5) : mix(mid, deep, (f - 0.5) * 0.8);
+            const ceiling = mix(mid, deep, 0.5 + f * 0.5);
+            const shade = context.createLinearGradient(c.x + c.r * 0.7, c.y + c.r * 0.6, c.x - c.r * 0.5, c.y - c.r * 0.9);
+            shade.addColorStop(0, rgba(face));
+            shade.addColorStop(0.45, rgba(mix(face, ceiling, 0.5)));
+            shade.addColorStop(1, rgba(ceiling));
+            context.fillStyle = shade;
+            context.beginPath();
+            context.ellipse(c.x, c.y, c.r, c.r * WAVE.squash, 0, 0, TAU);
+
+            if (i > 1) {
+                context.ellipse(inner.x, inner.y, inner.r * 0.985, inner.r * 0.985 * WAVE.squash, 0, 0, TAU);
+            }
+
+            context.fill("evenodd");
         }
 
-        /* Light from the eye across the wall. */
-        const glow = context.createRadialGradient(eye.x, eye.y, eye.r, eye.x, eye.y, height * 0.85);
-        glow.addColorStop(0, rgba(foam, 0.35));
-        glow.addColorStop(0.35, rgba(light, 0.12));
-        glow.addColorStop(1, rgba(deep, 0));
-        context.fillStyle = glow;
+        /* Thick water overhead: the ceiling darkens towards the top. */
+        const overhead = context.createLinearGradient(0, 0, 0, height * 0.5);
+        overhead.addColorStop(0, rgba(deep, 0.75));
+        overhead.addColorStop(1, rgba(deep, 0));
+        context.fillStyle = overhead;
+        context.fillRect(0, 0, width, height * 0.5);
+
+        /* Sun through the lip: the wall glows where it is thin, along the
+           lip line by the top of the wave. */
+        const lipGlow = context.createRadialGradient(far.x + unit * 0.05, far.y - unit * 0.18, 0, far.x + unit * 0.05, far.y - unit * 0.18, unit * 0.75);
+        lipGlow.addColorStop(0, rgba(sun, 0.6));
+        lipGlow.addColorStop(0.35, rgba(light, 0.3));
+        lipGlow.addColorStop(1, rgba(light, 0));
+        context.fillStyle = lipGlow;
         context.fillRect(0, 0, width, height);
 
-        /* Streaks of water on the wall: short spirals that wind around the
-           tube as they slide in towards the eye, then start again. */
+        /* Striations: water climbing the face and going over. Each is a
+           long arc lying on one cross-section, so it bends exactly as the
+           wall does there, fading in and out along its length, and slides
+           up from the bottom line, over the ceiling, to the lip, then
+           starts again. */
         context.lineCap = "round";
 
         for (const [a, b, d] of streaks) {
-            const from = 1 - ((t * (0.08 + d * 0.05) + b) % 1) * 0.85;
-            const to = from - 0.18;
-            const angle = Math.PI * 1.05 + a * Math.PI * 1.15;
-            const fade = Math.min(1, (1 - from) * 6, (from - 0.05) * 6);
-            context.strokeStyle = rgba(foam, (0.08 + d * 0.16) * fade);
-            context.lineWidth = 1 + d * 2.5;
-            context.beginPath();
+            const k = (0.1 + a * 0.9) * WAVE.reach;
+            const c = ring(k, t);
+            const span = 0.45 + d * 0.5;
+            const lap = (t * (0.07 + d * 0.05) + b) % 1;
+            const top = c.bottom - (c.bottom - c.end + span) * lap;
+            const segments = 10;
+            let last = null;
 
-            for (let i = 0; i <= 8; i += 1) {
-                const f = i / 8;
-                const k = Math.max(0.05, from + (to - from) * f);
-                const [x, y] = onRing(k, angle + f * 0.35, t);
+            for (let i = 0; i < segments; i += 1) {
+                const f0 = i / segments;
+                const f1 = (i + 1) / segments;
+                const a0 = Math.max(c.end, Math.min(c.bottom, top + span * f0));
+                const a1 = Math.max(c.end, Math.min(c.bottom, top + span * f1));
 
-                if (i === 0) {
-                    context.moveTo(x, y);
-                } else {
-                    context.lineTo(x, y);
+                if (a1 - a0 < 0.001) {
+                    continue;
                 }
-            }
 
+                const s0 = (c.bottom - a0) / (c.bottom - c.end);
+                const s1 = (c.bottom - a1) / (c.bottom - c.end);
+                const [x0, y0] = last || onRing(k * (1 + WAVE.flare * s0 * s0), a0, t);
+                const [x1, y1] = onRing(k * (1 + WAVE.flare * s1 * s1), a1, t);
+                last = [x1, y1];
+                const along = Math.sin(Math.PI * (f0 + f1) / 2);
+                context.strokeStyle = rgba(foam, (0.1 + d * 0.22) * along * (1 - (k / WAVE.reach) * 0.4));
+                context.lineWidth = 1 + d * 2;
+                context.beginPath();
+                context.moveTo(x0, y0);
+                context.lineTo(x1, y1);
+                context.stroke();
+            }
+        }
+
+        for (const [lineWidth, alpha] of [[unit * 0.08, 0.16], [unit * 0.035, 0.3]]) {
+            polyline(lipPoints(t, WAVE.reach, 0.05, 40));
+            context.strokeStyle = rgba(light, alpha);
+            context.lineWidth = lineWidth;
+            context.lineJoin = "round";
             context.stroke();
         }
 
-        /* The eye: light through the far end of the tube. */
-        const eyeGlow = context.createRadialGradient(eye.x, eye.y, 0, eye.x, eye.y, eye.r * 2.4);
-        eyeGlow.addColorStop(0, rgba(foam, 0.8));
-        eyeGlow.addColorStop(0.35, rgba(foam, 0.4));
-        eyeGlow.addColorStop(1, rgba(foam, 0));
-        context.fillStyle = eyeGlow;
-        context.fillRect(eye.x - eye.r * 2.4, eye.y - eye.r * 2.4, eye.r * 4.8, eye.r * 4.8);
-        ellipse(eye, 1, rgba(foam));
+        drawOpenSide(t);
 
-        /* The floor: flat water inside the tube, foam-lit near the eye and
-           the lip, deep towards the mouth. */
-        const floor = floorEdge(t);
-        const floorFill = context.createLinearGradient(0, eye.y, 0, height);
-        floorFill.addColorStop(0, rgba(light, 0.7));
-        floorFill.addColorStop(0.4, rgba(mid, 0.95));
-        floorFill.addColorStop(1, rgba(deep, 1));
-        context.fillStyle = floorFill;
-        context.beginPath();
-        context.moveTo(-20, height + 20);
-
-        for (const [x, y] of floor) {
-            context.lineTo(x, y);
-        }
-
-        context.lineTo(width + 20, height + 20);
-        context.closePath();
-        context.fill();
-
-        /* The wall curves into the floor: wide soft strokes of the water's
-           own colours blur the join, then a thin line of foam sits in it. */
+        /* The bottom of the wave: the face lifts out of the flat water with
+           no edge, so the join is feathered with wide, faint strokes of the
+           water's own colours, fading away towards the far point. */
+        const bottom = bottomPoints(t, 30);
         context.lineCap = "round";
         context.lineJoin = "round";
 
-        for (const [lineWidth, alpha, tone] of [[height * 0.16, 0.22, mid], [height * 0.09, 0.28, mid], [height * 0.04, 0.3, light], [18, 0.07, foam], [9, 0.14, foam], [3, 0.35, foam]]) {
-            context.strokeStyle = rgba(tone, alpha);
-            context.lineWidth = lineWidth;
-            context.beginPath();
+        const layers = 12;
 
-            for (let i = 0; i < floor.length; i += 1) {
-                const [x, y] = floor[i];
-                const wobble = Math.sin(x * 0.03 + t * 2.2) * 3;
+        for (let j = 0; j < layers; j += 1) {
+            const f = j / (layers - 1);
+            const tone = mix(mid, light, f * f);
+            const alpha = 0.05 + f * 0.04;
+            context.lineWidth = unit * (0.02 + 0.22 * (1 - f) * (1 - f));
 
-                if (i === 0) {
-                    context.moveTo(x, y + wobble);
-                } else {
-                    context.lineTo(x, y + wobble);
-                }
+            for (let i = 1; i < bottom.length; i += 1) {
+                const near = i / bottom.length;
+                context.strokeStyle = rgba(tone, alpha * Math.min(1, near * 3));
+                context.beginPath();
+                context.moveTo(bottom[i - 1][0], bottom[i - 1][1]);
+                context.lineTo(bottom[i][0], bottom[i][1]);
+                context.stroke();
             }
-
-            context.stroke();
         }
 
-        /* Ripples on the floor, sliding towards the eye. */
-        context.lineWidth = 1.5;
+        drawCrash(t);
 
-        for (let i = 0; i < 7; i += 1) {
-            const f = (i + 0.5) / 7;
-            const yBase = floor[1][1] + (height - floor[1][1]) * f * f;
-            context.strokeStyle = rgba(foam, 0.18 * (1 - f * 0.6));
-            context.beginPath();
-
-            for (let x = -20; x <= width + 20; x += 14) {
-                const y = yBase + Math.sin(x * (0.02 - f * 0.01) - t * (1.6 + f) + i) * (3 + f * 8);
-
-                if (x === -20) {
-                    context.moveTo(x, y);
-                } else {
-                    context.lineTo(x, y);
-                }
-            }
-
-            context.stroke();
-        }
-
-        /* The lip pouring down on the left: a curtain of falling white. */
-        const curtainRight = eye.x - eye.r * 1.4;
-        const curtainTop = height * 0.02;
-        const curtainBottom = floor[1][1];
-        const sheet = context.createLinearGradient(0, curtainTop, 0, curtainBottom);
-        sheet.addColorStop(0, rgba(foam, 0.7));
-        sheet.addColorStop(0.5, rgba(foam, 0.4));
-        sheet.addColorStop(1, rgba(foam, 0.2));
-        context.fillStyle = sheet;
-        context.fillRect(0, curtainTop, curtainRight, curtainBottom - curtainTop);
-
-        const fadeIn = context.createLinearGradient(curtainRight * 0.55, 0, curtainRight, 0);
-        fadeIn.addColorStop(0, rgba(deep, 0));
-        fadeIn.addColorStop(1, rgba(deep, 0.35));
-        context.fillStyle = fadeIn;
-        context.fillRect(curtainRight * 0.55, curtainTop, curtainRight * 0.45, curtainBottom - curtainTop);
-
-        /* The lip itself: a thick white edge along the top-left of the tube,
-           where the water comes over. */
-        for (const [lineWidth, alpha] of [[height * 0.09, 0.18], [height * 0.045, 0.35], [height * 0.018, 0.6]]) {
-            context.strokeStyle = rgba(foam, alpha);
-            context.lineWidth = lineWidth;
-            context.beginPath();
-
-            for (let i = 0; i <= 16; i += 1) {
-                const angle = Math.PI * 1.02 + (Math.PI * 0.5) * (i / 16);
-                const [x, y] = onRing(0.97, angle, t);
-
-                if (i === 0) {
-                    context.moveTo(x, y);
-                } else {
-                    context.lineTo(x, y);
-                }
-            }
-
-            context.stroke();
-        }
-
-        context.lineWidth = 3;
-
-        for (const [a, b, d] of curtain) {
-            const x = a * curtainRight + Math.sin(t * 1.5 + b * 10) * 8;
-            const span = curtainBottom - curtainTop;
-            const length = span * (0.14 + d * 0.32);
-            const y = curtainTop + ((b * span + t * (160 + d * 160)) % span);
-            context.strokeStyle = rgba(foam, 0.25 + d * 0.4);
-            context.beginPath();
-            context.moveTo(x, y);
-            context.quadraticCurveTo(x + 4, y + length * 0.5, x + 8, Math.min(curtainBottom, y + length));
-            context.stroke();
-        }
-
-        /* Whitewater where the lip lands. */
-        for (const [a, b, d] of foamSeeds) {
-            const x = a * curtainRight * 1.25;
-            const y = curtainBottom - b * height * 0.09 + Math.sin(t * 4 + a * 30) * 4;
-            const r = 5 + d * 22 + Math.sin(t * 5 + b * 20) * 2;
-            context.fillStyle = rgba(foam, 0.2 + d * 0.5);
-            context.beginPath();
-            context.arc(x, y, r, 0, TAU);
-            context.fill();
-        }
-
-        if (animate) {
-            spawnSpray(curtainRight * (0.2 + Math.random() * 0.8), curtainTop + 20, 2, -40, 120);
-            spawnSpray(curtainRight * Math.random(), curtainBottom - 10, 2, 60, -200);
-        }
+        /* Depth: the nearest water, at the edges of the view, in shadow. */
+        const depth = context.createRadialGradient(far.x, far.y, unit * 0.5, far.x, far.y, unit * 1.5);
+        depth.addColorStop(0, rgba(deep, 0));
+        depth.addColorStop(1, rgba(deep, 0.55));
+        context.fillStyle = depth;
+        context.fillRect(0, 0, width, height);
 
         drawSpray(dt);
+        updateSurfer(t, dt);
         drawSurfer(t);
     }
+
+    /* Pointer: grab and throw the surfer ---------------------------------- */
+
+    function toScene(clientX, clientY) {
+        const rect = canvas.getBoundingClientRect();
+        return {
+            x: ((clientX - rect.left) / rect.width) * width,
+            y: ((clientY - rect.top) / rect.height) * height,
+        };
+    }
+
+    function overSurfer(point) {
+        const h = unit * WAVE.surfer;
+        return Math.abs(point.x - surfer.x) < h * 0.9 && Math.abs(point.y - surfer.y) < h * 0.7;
+    }
+
+    const pointer = {
+        hit(clientX, clientY) {
+            return surfer.placed && overSurfer(toScene(clientX, clientY));
+        },
+
+        down(clientX, clientY) {
+            const point = toScene(clientX, clientY);
+            surfer.state = "held";
+            surfer.grabX = surfer.x - point.x;
+            surfer.grabY = surfer.y - point.y;
+            surfer.vx = 0;
+            surfer.vy = 0;
+        },
+
+        move(clientX, clientY, dtMs) {
+            const point = toScene(clientX, clientY);
+            const nx = point.x + surfer.grabX;
+            const ny = point.y + surfer.grabY;
+            const dt = Math.max(dtMs, 8) / 1000;
+            surfer.vx = (nx - surfer.x) / dt;
+            surfer.vy = (ny - surfer.y) / dt;
+            surfer.x = nx;
+            surfer.y = ny;
+        },
+
+        up() {
+            const h = unit * WAVE.surfer;
+
+            if (surfer.y >= waterAt(surfer.x, lastT) - h * 0.5) {
+                /* Let go in the water: no snap, just paddle from here. */
+                surfer.state = "paddling";
+                surfer.vx = 0;
+                surfer.vy = 0;
+                return;
+            }
+
+            surfer.state = "flying";
+            surfer.vx = Math.max(-1200, Math.min(1200, surfer.vx * 0.6));
+            surfer.vy = Math.max(-1400, Math.min(600, surfer.vy * 0.6));
+        },
+    };
 
     return {
         scale,
         interval: 1000 / 30,
+        pointer,
 
         resize(w, h) {
             width = w / scale;
             height = h / scale;
+            unit = Math.min(height, width * 0.7);
+            surfer.placed = false;
+
+            if (!foamTile) {
+                foamTile = makeFoam();
+                foamPattern = context.createPattern(foamTile, "repeat");
+            }
         },
 
         recolour() {
@@ -1193,6 +1743,7 @@ function createWaveScene(canvas, context, animate) {
             lastNow = now;
 
             const t = animate ? now / 1000 : 12;
+            lastT = t;
 
             context.setTransform(scale, 0, 0, scale, 0, 0);
             context.clearRect(0, 0, width, height);
@@ -1257,6 +1808,69 @@ function play(canvas, createScene, animate) {
         request = requestAnimationFrame(frame);
     }
 
+    /* A scene with a `pointer` can be touched through the page: whatever
+       lies over it still works, only clicks that land on plain background
+       (not a link or control) and hit the scene's target are taken. */
+    const listeners = [];
+
+    if (scene.pointer && animate) {
+        const { pointer } = scene;
+        const isControl = (node) => node instanceof Element && Boolean(node.closest("a, button, input, textarea, select, summary, label"));
+        let holding = null;
+        let cursorSet = false;
+        let lastMove = 0;
+
+        const on = (name, handler, options) => {
+            document.addEventListener(name, handler, options);
+            listeners.push([name, handler, options]);
+        };
+
+        on("pointerdown", (event) => {
+            if (event.button !== 0 || isControl(event.target) || !pointer.hit(event.clientX, event.clientY)) {
+                return;
+            }
+
+            event.preventDefault();
+            holding = event.pointerId;
+            lastMove = event.timeStamp;
+            pointer.down(event.clientX, event.clientY);
+            document.documentElement.style.cursor = "grabbing";
+            cursorSet = true;
+        });
+
+        on("pointermove", (event) => {
+            if (holding === event.pointerId) {
+                pointer.move(event.clientX, event.clientY, event.timeStamp - lastMove);
+                lastMove = event.timeStamp;
+                return;
+            }
+
+            if (holding === null) {
+                const over = !isControl(event.target) && pointer.hit(event.clientX, event.clientY);
+
+                if (over && !cursorSet) {
+                    document.documentElement.style.cursor = "grab";
+                    cursorSet = true;
+                } else if (!over && cursorSet) {
+                    document.documentElement.style.cursor = "";
+                    cursorSet = false;
+                }
+            }
+        }, { passive: true });
+
+        const release = (event) => {
+            if (holding === event.pointerId) {
+                holding = null;
+                pointer.up();
+                document.documentElement.style.cursor = "";
+                cursorSet = false;
+            }
+        };
+
+        on("pointerup", release);
+        on("pointercancel", release);
+    }
+
     return {
         recolour() {
             scene.recolour();
@@ -1267,6 +1881,12 @@ function play(canvas, createScene, animate) {
             stopped = true;
             cancelAnimationFrame(request);
             window.removeEventListener("resize", onResize);
+
+            for (const [name, handler, options] of listeners) {
+                document.removeEventListener(name, handler, options);
+            }
+
+            document.documentElement.style.cursor = "";
         },
     };
 }

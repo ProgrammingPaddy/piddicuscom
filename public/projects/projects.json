@@ -72,6 +72,17 @@
         "tools"
       ],
       "href": "projects/list-editor/"
+    },
+    {
+      "slug": "movie-list-creator",
+      "title": "Seen It",
+      "description": "Flick through thousands of popular movies, mark the ones you have seen, rate them, export the list anywhere.",
+      "icon": null,
+      "preview": "previews/movie-list-creator.svg",
+      "tags": [
+        "tools"
+      ],
+      "href": "projects/movie-list-creator/"
     }
   ]
 }

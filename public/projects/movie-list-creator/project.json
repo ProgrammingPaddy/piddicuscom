@@ -1,0 +1,10 @@
+{
+  "title": "Seen It",
+  "description": "Flick through thousands of popular movies, mark the ones you have seen, rate them, export the list anywhere.",
+  "icon": null,
+  "tags": ["tools"],
+  "entry": "index.html",
+  "order": 6,
+  "hidden": false,
+  "repo": null
+}

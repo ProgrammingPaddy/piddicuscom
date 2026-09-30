@@ -38,9 +38,9 @@
     <rect x="252" y="82" width="32" height="66" fill="var(--preview-accent, #d6a65a)"/>
   </g>
   <!-- Trend in red, with diamond marks -->
-  <path d="M68 52 C 85 52, 100 86, 118 86 S 150 90, 168 90 S 200 76, 218 76 S 250 82, 268 82" fill="none" stroke="var(--preview-tertiary, #a4402e)" stroke-width="1.8" stroke-linecap="round"/>
+  <path d="M68 44 C 85 44, 100 86, 118 86 S 150 90, 168 90 S 200 76, 218 76 S 250 82, 268 82" fill="none" stroke="var(--preview-tertiary, #a4402e)" stroke-width="1.8" stroke-linecap="round"/>
   <g fill="var(--preview-tertiary, #a4402e)" stroke="var(--preview-accent-strong, #ecc274)" stroke-width="0.8">
-    <rect x="64.5" y="48.5" width="7" height="7" transform="rotate(45 68 52)"/>
+    <rect x="64.5" y="40.5" width="7" height="7" transform="rotate(45 68 44)"/>
     <rect x="114.5" y="82.5" width="7" height="7" transform="rotate(45 118 86)"/>
     <rect x="164.5" y="86.5" width="7" height="7" transform="rotate(45 168 90)"/>
     <rect x="214.5" y="72.5" width="7" height="7" transform="rotate(45 218 76)"/>
