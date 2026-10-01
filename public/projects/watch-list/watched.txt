@@ -187,6 +187,8 @@ Chivalry of a Failed Knight | 5
 HELL MODE | 8.5
 Ragna Crimson | 7.5
 Undead Unluck | 8.5
+Death Note | 8
+Cowboy Bebop | 6.5
 
 # show
 Person of Interest | 10
@@ -292,7 +294,6 @@ Murder Mindfully | 8.5
 How I Met Your Mother | 8
 Smallville | 8
 Modern Family | 9.5
-Sakamoto Days | 10
 Buffy the Vampire Slayer | 9.5
 Angel | 8.5
 The Recruit | 7.5
@@ -311,6 +312,98 @@ Slow Horses | 7
 The Glades | 7.5
 Mad Men | 8
 Cupid | 9
+The Office | 8.5
+Dexter | 8
+Planet Earth | 8
+Vikings | 7.5
+House | 7.5
+Westworld | 7.5
+Avatar: The Last Airbender | 7.5
+The Penguin | 7.5
+Star Wars: The Clone Wars | 7.5
+Paradise | 7.5
+Terra Nova | 7.5
+Supernatural | 7
+The Simpsons | 7
+Justified | 7
+Legends of Tomorrow | 7
+Last Week Tonight with John Oliver | 7
+Upload | 7
+Your Honor | 7
+Squid Game | 6.5
+Daredevil | 6.5
+The Flash | 6.5
+Grey's Anatomy | 6.5
+Sons of Anarchy | 6.5
+The Bear | 6.5
+The Punisher | 6.5
+The Falcon and the Winter Soldier | 6.5
+Only Murders in the Building | 6.5
+Outlander | 6.5
+Top Gear | 6.5
+The Newsroom | 6.5
+Unbreakable Kimmy Schmidt | 6.5
+House of the Dragon | 6
+You | 6
+The 100 | 6
+Jessica Jones | 6
+Agents of S.H.I.E.L.D. | 6
+Boardwalk Empire | 6
+The Sandman | 6
+Bones | 6
+Bodyguard | 6
+After Life | 6
+The Sinner | 6
+Lie to Me | 6
+American Gods | 6
+Louie | 6
+Veep | 6
+Mr. Robot | 5.5
+Obi-Wan Kenobi | 5.5
+Californication | 5.5
+Archer | 5.5
+The Originals | 5.5
+Iron Fist | 5.5
+Ahsoka | 5.5
+30 Rock | 5.5
+Bosch | 5.5
+Mayor of Kingstown | 5.5
+Stranger Things | 5
+Mindhunter | 5
+Ozark | 5
+Andor | 5
+Gotham | 5
+Jack Ryan | 5
+Luke Cage | 5
+The Defenders | 5
+Designated Survivor | 5
+Monk | 5
+The Diplomat | 5
+A Knight of the Seven Kingdoms | 4.5
+NCIS | 4.5
+The Pitt | 4.5
+The Rookie | 4.5
+The Fall | 4.5
+The Good Doctor | 4.5
+Russian Doll | 4.5
+The Lincoln Lawyer | 4.5
+Ray Donovan | 4.5
+The Night Agent | 4
+Barry | 4
+Good Omens | 4
+Santa Clarita Diet | 4
+Dark Matter | 4
+WandaVision | 3.5
+SpongeBob SquarePants | 3.5
+Lost in Space | 3.5
+Sense8 | 3
+Watchmen | 3
+What We Do in the Shadows | 3
+Spider-Noir | 3
+BoJack Horseman | 2.5
+Manifest | 2.5
+Legion | 2
+Inventing Anna | 2
 
 # movie
 Wanted | 8
@@ -348,3 +441,564 @@ Kick-Ass | 9
 This Is Spinal Tap | 10
 Hit Man | 7.5
 Falling Down | 9.5
+Back to the Future | 10
+WALL·E | 10
+Iron Man | 10
+Good Will Hunting | 10
+The Martian | 10
+Edge of Tomorrow | 10
+La La Land | 10
+Groundhog Day | 10
+Ex Machina | 10
+The Bourne Identity | 10
+Project Hail Mary | 10
+Ferris Bueller's Day Off | 10
+Star Wars: Episode IV - A New Hope | 9.5
+The Truman Show | 9.5
+Catch Me If You Can | 9.5
+Die Hard | 9.5
+Harry Potter and the Sorcerer's Stone | 9.5
+The Incredibles | 9.5
+Knives Out | 9.5
+Home Alone | 9.5
+Casino Royale | 9.5
+Lucy | 9.5
+The Wizard of Oz | 9.5
+Inside Man | 9.5
+Chef | 9.5
+Red Eye | 9.5
+The Wolf of Wall Street | 9
+Star Wars: Episode V - The Empire Strikes Back | 9
+Guardians of the Galaxy | 9
+Terminator 2: Judgment Day | 9
+Up | 9
+Monsters, Inc. | 9
+The Terminator | 9
+Star Wars: Episode III - Revenge of the Sith | 9
+Slumdog Millionaire | 9
+How to Train Your Dragon | 9
+John Wick | 9
+District 9 | 9
+Despicable Me | 9
+Tropic Thunder | 9
+Ghostbusters | 9
+The Gentlemen | 9
+Mission: Impossible - Fallout | 9
+The Italian Job | 9
+Uncut Gems | 9
+The Bourne Legacy | 9
+Paul | 9
+The Shawshank Redemption | 8.5
+The Silence of the Lambs | 8.5
+Deadpool | 8.5
+V for Vendetta | 8.5
+Finding Nemo | 8.5
+Toy Story | 8.5
+Dune | 8.5
+Star Wars: Episode I - The Phantom Menace | 8.5
+Doctor Strange | 8.5
+Fargo | 8.5
+Harry Potter and the Prisoner of Azkaban | 8.5
+Ted | 8.5
+Ocean's Eleven | 8.5
+Shaun of the Dead | 8.5
+Watchmen | 8.5
+Ford v Ferrari | 8.5
+Mission: Impossible - Ghost Protocol | 8.5
+The Big Short | 8.5
+Mission: Impossible | 8.5
+The Bourne Supremacy | 8.5
+E.T. the Extra-Terrestrial | 8.5
+The Equalizer | 8.5
+Mission: Impossible - Rogue Nation | 8.5
+Mission: Impossible III | 8.5
+Nobody | 8.5
+Moon | 8.5
+Jack Reacher | 8.5
+Airplane! | 8.5
+The Lincoln Lawyer | 8.5
+Knight and Day | 8.5
+Crazy Rich Asians | 8.5
+K-PAX | 8.5
+Caddyshack | 8.5
+Crocodile Dundee | 8.5
+The Color of Money | 8.5
+Back to School | 8.5
+The Dark Knight | 8
+The Dark Knight Rises | 8
+Batman Begins | 8
+The Departed | 8
+Avengers: Infinity War | 8
+The Usual Suspects | 8
+Star Wars: Episode VI - Return of the Jedi | 8
+No Country for Old Men | 8
+Whiplash | 8
+Oppenheimer | 8
+The Intouchables | 8
+Thor | 8
+American Psycho | 8
+Ant-Man | 8
+Skyfall | 8
+Now You See Me | 8
+Harry Potter and the Chamber of Secrets | 8
+Rogue One: A Star Wars Story | 8
+Harry Potter and the Order of the Phoenix | 8
+Cast Away | 8
+The Bourne Ultimatum | 8
+Toy Story 2 | 8
+Taken | 8
+Harry Potter and the Deathly Hallows: Part 1 | 8
+Harry Potter and the Half-Blood Prince | 8
+Back to the Future Part II | 8
+Mr. & Mrs. Smith | 8
+Rain Man | 8
+John Wick: Chapter 2 | 8
+Big Hero 6 | 8
+Dallas Buyers Club | 8
+The Girl with the Dragon Tattoo | 8
+Moneyball | 8
+Predator | 8
+Shang-Chi and the Legend of the Ten Rings | 8
+Despicable Me 2 | 8
+Ocean's Twelve | 8
+Man on Fire | 8
+Beetlejuice | 8
+The Lego Movie | 8
+Die Hard 2 | 8
+The Accountant | 8
+F1: The Movie | 8
+Ocean's Thirteen | 8
+Lord of War | 8
+Megamind | 8
+Grown Ups | 8
+First Blood | 8
+Lethal Weapon | 8
+Cloudy with a Chance of Meatballs | 8
+Spy | 8
+Fast & Furious Presents: Hobbs & Shaw | 8
+American Made | 8
+You Don't Mess with the Zohan | 8
+The Santa Clause | 8
+Ransom | 8
+Jack Ryan: Shadow Recruit | 8
+Patriot Games | 8
+Diamonds Are Forever | 8
+Uncle Buck | 8
+Witness | 8
+The Thomas Crown Affair | 8
+Dirty Rotten Scoundrels | 8
+Cold Pursuit | 8
+True Memoirs of an International Assassin | 8
+Quick Change | 8
+Inception | 7.5
+Interstellar | 7.5
+Pulp Fiction | 7.5
+Django Unchained | 7.5
+Avatar | 7.5
+Avengers: Endgame | 7.5
+Léon: The Professional | 7.5
+Reservoir Dogs | 7.5
+Raiders of the Lost Ark | 7.5
+Harry Potter and the Deathly Hallows: Part 2 | 7.5
+Taxi Driver | 7.5
+Star Wars: Episode VII - The Force Awakens | 7.5
+Captain America: The Winter Soldier | 7.5
+Captain America: The First Avenger | 7.5
+Logan | 7.5
+Gravity | 7.5
+Guardians of the Galaxy: Vol. 2 | 7.5
+Shrek | 7.5
+The Amazing Spider-Man | 7.5
+Blade Runner 2049 | 7.5
+Harry Potter and the Goblet of Fire | 7.5
+Wonder Woman | 7.5
+Transformers | 7.5
+Sherlock Holmes | 7.5
+Superbad | 7.5
+Men in Black | 7.5
+Minority Report | 7.5
+Venom | 7.5
+Oblivion | 7.5
+Rear Window | 7.5
+Ice Age | 7.5
+Edward Scissorhands | 7.5
+It's a Wonderful Life | 7.5
+Cars | 7.5
+Hancock | 7.5
+Training Day | 7.5
+War of the Worlds | 7.5
+Jumanji: Welcome to the Jungle | 7.5
+Wreck-It Ralph | 7.5
+Quantum of Solace | 7.5
+Mean Girls | 7.5
+John Wick: Chapter 3 - Parabellum | 7.5
+Madagascar | 7.5
+Home Alone 2: Lost in New York | 7.5
+Die Hard with a Vengeance | 7.5
+Face/Off | 7.5
+John Wick: Chapter 4 | 7.5
+Shazam! | 7.5
+Night at the Museum | 7.5
+Total Recall | 7.5
+Kong: Skull Island | 7.5
+Incredibles 2 | 7.5
+Hellboy | 7.5
+The Book of Eli | 7.5
+El Camino | 7.5
+RED | 7.5
+Rush Hour | 7.5
+Mission: Impossible - Dead Reckoning Part One | 7.5
+The Intern | 7.5
+Anora | 7.5
+Fantastic Four: Rise of the Silver Surfer | 7.5
+GoldenEye | 7.5
+Austin Powers: International Man of Mystery | 7.5
+The Hitman's Bodyguard | 7.5
+Rush Hour 2 | 7.5
+National Lampoon's Christmas Vacation | 7.5
+Willy Wonka & the Chocolate Factory | 7.5
+Wrath of Man | 7.5
+Beverly Hills Cop | 7.5
+The World Is Not Enough | 7.5
+Tomorrow Never Dies | 7.5
+The Jungle Book | 7.5
+Rambo: First Blood Part II | 7.5
+Wayne's World | 7.5
+Wall Street | 7.5
+The Firm | 7.5
+Tag | 7.5
+Man on a Ledge | 7.5
+Den of Thieves | 7.5
+Payback | 7.5
+The French Connection | 7.5
+Shanghai Noon | 7.5
+Parker | 7.5
+The Foreigner | 7.5
+The Manchurian Candidate | 7.5
+WarGames | 7.5
+The Man with the Golden Gun | 7.5
+Premium Rush | 7.5
+Licence to Kill | 7.5
+Shanghai Knights | 7.5
+Penguins of Madagascar | 7.5
+Hitman: Agent 47 | 7.5
+American Assassin | 7.5
+The Money Pit | 7.5
+Forrest Gump | 7
+The Avengers | 7
+Kill Bill: Vol. 1 | 7
+The Lion King | 7
+Jurassic Park | 7
+Spider-Man: No Way Home | 7
+Spider-Man | 7
+Once Upon a Time in... Hollywood | 7
+Ratatouille | 7
+The Revenant | 7
+Iron Man 2 | 7
+Captain America: Civil War | 7
+The Batman | 7
+The Big Lebowski | 7
+Star Wars: Episode II - Attack of the Clones | 7
+X-Men: Days of Future Past | 7
+X-Men: First Class | 7
+Everything Everywhere All at Once | 7
+Source Code | 7
+The Maze Runner | 7
+Shrek 2 | 7
+Tangled | 7
+Ready Player One | 7
+The Breakfast Club | 7
+Bruce Almighty | 7
+Thor: Love and Thunder | 7
+The Chronicles of Narnia: The Lion, the Witch and the Wardrobe | 7
+Men in Black II | 7
+Monsters University | 7
+How to Train Your Dragon 2 | 7
+Ace Ventura: Pet Detective | 7
+Apollo 13 | 7
+Zoolander | 7
+Happy Gilmore | 7
+Olympus Has Fallen | 7
+The Sound of Music | 7
+Crank | 7
+Rio | 7
+Escape Plan | 7
+The Boondock Saints | 7
+The Adam Project | 7
+White House Down | 7
+Die Another Day | 7
+Austin Powers in Goldmember | 7
+The Killer | 7
+Air Force One | 7
+Unstoppable | 7
+6 Underground | 7
+Superman | 7
+The King's Man | 7
+The Bank Job | 7
+Monsters vs. Aliens | 7
+Cinderella | 7
+Logan Lucky | 7
+Last Action Hero | 7
+Rounders | 7
+Beverly Hills Cop II | 7
+The Lorax | 7
+Homefront | 7
+KPop Demon Hunters | 7
+Hamilton | 7
+The Commuter | 7
+National Lampoon's Vacation | 7
+You Only Live Twice | 7
+The Spy Who Loved Me | 7
+Live and Let Die | 7
+Safe | 7
+Clear and Present Danger | 7
+For Your Eyes Only | 7
+The Living Daylights | 7
+Shot Caller | 7
+Redemption | 7
+A Working Man | 7
+The Matrix | 6.5
+Titanic | 6.5
+Avengers: Age of Ultron | 6.5
+Inside Out | 6.5
+Thor: Ragnarok | 6.5
+The Good, the Bad and the Ugly | 6.5
+Indiana Jones and the Last Crusade | 6.5
+Spider-Man: Homecoming | 6.5
+The Hateful Eight | 6.5
+Frozen | 6.5
+Looper | 6.5
+Kung Fu Panda | 6.5
+Glass Onion | 6.5
+Aladdin | 6.5
+Free Guy | 6.5
+No Time to Die | 6.5
+Brave | 6.5
+The Fast and the Furious | 6.5
+The Suicide Squad | 6.5
+The Nice Guys | 6.5
+Solo: A Star Wars Story | 6.5
+Now You See Me 2 | 6.5
+Red Notice | 6.5
+Gattaca | 6.5
+Elf | 6.5
+Taken 2 | 6.5
+Ice Age: The Meltdown | 6.5
+Mrs. Doubtfire | 6.5
+RoboCop | 6.5
+Black Adam | 6.5
+The Sting | 6.5
+The Fall Guy | 6.5
+Austin Powers: The Spy Who Shagged Me | 6.5
+Cars 2 | 6.5
+The Purge | 6.5
+Bolt | 6.5
+Snow White and the Seven Dwarfs | 6.5
+Upgrade | 6.5
+Chicken Run | 6.5
+Mary Poppins | 6.5
+Air | 6.5
+The Running Man | 6.5
+Hitman | 6.5
+London Has Fallen | 6.5
+The Unbearable Weight of Massive Talent | 6.5
+Freaky Friday | 6.5
+Honey, I Shrunk the Kids | 6.5
+The Parent Trap | 6.5
+Crank: High Voltage | 6.5
+Pleasantville | 6.5
+Paul Blart: Mall Cop | 6.5
+Footloose | 6.5
+The Muppets | 6.5
+Flubber | 6.5
+Short Circuit | 6.5
+Better Off Dead | 6.5
+The Godfather | 6
+Joker | 6
+Kill Bill: Vol. 2 | 6
+Thor: The Dark World | 6
+Deadpool 2 | 6
+Don't Look Up | 6
+Spider-Man: Far from Home | 6
+Dead Poets Society | 6
+Avatar: The Way of Water | 6
+I, Robot | 6
+Indiana Jones and the Temple of Doom | 6
+Fantastic Beasts and Where to Find Them | 6
+Back to the Future Part III | 6
+Ant-Man and the Wasp | 6
+Spectre | 6
+King Kong | 6
+Batman | 6
+Snowpiercer | 6
+National Treasure | 6
+Shooter | 6
+Fantastic Four | 6
+Liar Liar | 6
+School of Rock | 6
+A Bug's Life | 6
+Finding Dory | 6
+Hotel Transylvania | 6
+Thunderbolts* | 6
+Dodgeball: A True Underdog Story | 6
+The Karate Kid | 6
+The Polar Express | 6
+Ender's Game | 6
+Big | 6
+Cowboys & Aliens | 6
+Mission: Impossible - The Final Reckoning | 6
+Butch Cassidy and the Sundance Kid | 6
+The Equalizer 2 | 6
+Atomic Blonde | 6
+Puss in Boots | 6
+Swordfish | 6
+Bee Movie | 6
+Pokémon: Detective Pikachu | 6
+A Christmas Story | 6
+Extraction II | 6
+The Disaster Artist | 6
+Killing Them Softly | 6
+I Care a Lot | 6
+Tower Heist | 6
+Superman II | 6
+Enter the Dragon | 6
+Self/less | 6
+Mechanic: Resurrection | 6
+The Pink Panther | 6
+Zookeeper | 6
+No Way Out | 6
+Gunpowder Milkshake | 6
+Toy Story 3 | 5.5
+Rise of the Planet of the Apes | 5.5
+Charlie and the Chocolate Factory | 5.5
+Top Gun | 5.5
+Aquaman | 5.5
+Divergent | 5.5
+2012 | 5.5
+Men in Black 3 | 5.5
+Kingsman: The Golden Circle | 5.5
+Click | 5.5
+Real Steel | 5.5
+Kung Fu Panda 2 | 5.5
+The Transporter | 5.5
+Fantastic Beasts: The Crimes of Grindelwald | 5.5
+The Talented Mr. Ripley | 5.5
+Romeo + Juliet | 5.5
+Jason Bourne | 5.5
+The Hunt for Red October | 5.5
+Over the Hedge | 5.5
+Army of the Dead | 5.5
+Cool Hand Luke | 5.5
+Jack Reacher: Never Go Back | 5.5
+RED 2 | 5.5
+Antz | 5.5
+Billy Madison | 5.5
+Journey to the Center of the Earth | 5.5
+Field of Dreams | 5.5
+Nosferatu | 5.5
+Chicken Little | 5.5
+Spenser Confidential | 5.5
+The American | 5.5
+Weird Science | 5.5
+Superman III | 5.5
+Honest Thief | 5.5
+Memory | 5.5
+The Lord of the Rings: The Fellowship of the Ring | 5
+The Godfather Part II | 5
+Memento | 5
+The Hunger Games | 5
+300 | 5
+Star Wars: Episode VIII - The Last Jedi | 5
+Zootopia | 5
+The Amazing Spider-Man 2 | 5
+The Incredible Hulk | 5
+Pacific Rim | 5
+Sicario | 5
+Black Widow | 5
+The Mask | 5
+Transformers: Dark of the Moon | 5
+Live Free or Die Hard | 5
+Jumanji | 5
+Pitch Perfect | 5
+Minions | 5
+Battleship | 5
+Ocean's Eight | 5
+I Am Number Four | 5
+Night at the Museum: Battle of the Smithsonian | 5
+Shark Tale | 5
+The Waterboy | 5
+The Sorcerer's Apprentice | 5
+Spy Kids | 5
+Fences | 5
+Do the Right Thing | 5
+Meet the Robinsons | 5
+The Karate Kid Part II | 5
+The Circle | 5
+The Karate Kid Part III | 5
+Pee-wee's Big Adventure | 5
+The Ice Road | 5
+Mad Max: Fury Road | 4.5
+Sin City | 4.5
+Captain Marvel | 4.5
+The Irishman | 4.5
+Remember the Titans | 4.5
+The Flash | 4.5
+The Karate Kid | 4.5
+Taken 3 | 4.5
+Stuart Little | 4.5
+Flushed Away | 4.5
+Rambo: Last Blood | 4.5
+A View to a Kill | 4.5
+Pig | 4.5
+Flash Gordon | 4.5
+Crocodile Dundee II | 4.5
+Iron Man 3 | 4
+The Imitation Game | 4
+12 Monkeys | 4
+The Perks of Being a Wallflower | 4
+Doctor Strange in the Multiverse of Madness | 4
+50 First Dates | 4
+Tron: Legacy | 4
+How the Grinch Stole Christmas | 4
+Fantastic Mr. Fox | 4
+Teenage Mutant Ninja Turtles | 4
+A Good Day to Die Hard | 4
+Happy Feet | 4
+The Last Airbender | 4
+The Green Hornet | 4
+Dumbo | 4
+Shazam! Fury of the Gods | 4
+Gemini Man | 4
+A House of Dynamite | 4
+Little Nicky | 4
+Holes | 4
+Polar | 4
+The Hobbit: An Unexpected Journey | 3.5
+Mission: Impossible II | 3.5
+The Nightmare Before Christmas | 3.5
+Apocalypto | 3.5
+Grease | 3.5
+Robots | 3.5
+Hitman's Wife's Bodyguard | 3.5
+The Outsiders | 3.5
+Black Panther | 3
+X-Men: The Last Stand | 3
+X-Men Origins: Wolverine | 3
+Eternals | 3
+End of Watch | 3
+Tinker Tailor Soldier Spy | 3
+Good Time | 3
+Babe | 3
+Charlotte's Web | 3
+Tenet | 2.5
+The Tomorrow War | 2.5
+Batman Returns | 2
+Vanilla Sky | 2
+Home Alone 3 | 2
+Madame Web | 2
+Alvin and the Chipmunks | 2
+Star Wars: Episode IX - The Rise of Skywalker | 1.5
+Coraline | 1
+A Clockwork Orange | 0.5
+Mr. Nobody | 0.5
+Frankenweenie | 0.5
